@@ -1,0 +1,590 @@
+/* --- VARIABLES DE COULEURS (Ta palette Canva) --- */
+:root {
+    --creme: #FFF8E7;
+    --vert-menthe: #85D6CD;
+    --rose-corail: #FE7B7E;
+    --gris-fonce: #2B2B2B;
+}
+
+/* --- RESET DE BASE (Pour effacer les marges par défaut) --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- LE CORPS DU SITE --- */
+body {
+    background-color: var(--creme);
+    color: var(--gris-fonce);
+    font-family: 'Montserrat', sans-serif; /* On applique Montserrat partout par défaut */
+}
+
+.page-section {
+    padding: 60px 50px 90px;
+    text-align: center;
+}
+
+.page-title {
+    font-family: 'Pacifico', cursive;
+    color: var(--rose-corail);
+    font-size: 3rem;
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+
+/* --- L'EN-TÊTE (Header) --- */
+header {
+    background-color: var(--vert-menthe);
+    display: flex; /* La magie pour aligner les éléments sur une ligne */
+    justify-content: space-between; /* Écarte les éléments au maximum */
+    align-items: center; /* Centre tout verticalement */
+    padding: 10px 50px; /* Un peu d'espace en haut/bas et sur les côtés */
+}
+
+/* --- LE LOGO --- */
+.logo img {
+    height: 90px; /* Empêche le logo d'être géant */
+}
+
+/* --- LE MENU --- */
+nav ul {
+    display: flex;
+    gap: 40px; /* L'espace entre tes liens de menu */
+    list-style: none; /* Enlève les petites puces moches */
+}
+
+/* --- LE LOOK RÉTRO DU MENU --- */
+nav a {
+    font-family: 'Pacifico', cursive; /* La police attachée */
+    font-size: 1.5rem; /* On grossit un peu */
+    color: var(--rose-corail); /* On met le texte en rose ! */
+    text-transform: capitalize; /* Enlève les majuscules */
+    text-decoration: none;
+    font-weight: normal;
+}
+
+/* --- LE BOUTON RÉSERVER --- */
+.bouton-reserver {
+    background-color: var(--rose-corail);
+    color: white;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 30px; /* Les bords ronds du bouton ! */
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif; /* Pour être sûr qu'il reste lisible */
+    font-size: 1.1rem;
+}
+
+/* --- LA SECTION HERO (Texte + Image) --- */
+.hero {
+    display: flex; /* Met le texte et l'image côte à côte */
+    align-items: center; /* Centre le tout verticalement */
+    padding: 50px;
+    gap: 50px; /* L'espace entre le texte et l'image */
+}
+
+.hero-texte {
+    flex: 1; /* Le texte prend la moitié de l'écran */
+}
+
+/* --- LE LOOK RÉTRO DU GROS TITRE --- */
+.hero-texte h1 {
+    font-family: 'Pacifico', cursive; /* La police attachée */
+    color: var(--rose-corail); /* Le fameux rose ! */
+    font-size: 3.5rem; /* Un titre bien gros */
+    font-weight: normal;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.hero-texte p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* Le bouton sous le texte */
+.bouton-principal {
+    background-color: var(--vert-menthe);
+    color: var(--gris-fonce);
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.hero-image {
+    flex: 1; /* L'image prend l'autre moitié de l'écran */
+}
+
+.hero-image img {
+    max-width: 100%; /* L'image ne peut plus déborder ! */
+    border-radius: 20px; /* Arrondit les angles de ton image */
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.1); /* Une petite ombre légère */
+}
+
+/* --- SECTION SERVICES (Les 3 petites cartes) --- */
+.services {
+    display: flex; /* Met les cartes côte à côte */
+    justify-content: center; /* Centre le groupe de cartes sur la page */
+    gap: 50px; /* L'espace entre chaque carte */
+    padding: 50px;
+}
+
+.carte {
+    background-color: var(--vert-menthe);
+    color: var(--gris-fonce);
+    padding: 50px 30px;
+    border-radius: 20px; /* Les jolis bords arrondis */
+    text-align: center; /* Centre le texte à l'intérieur */
+    width: 250px; /* Donne une largeur fixe pour qu'elles fassent toutes la même taille */
+    box-shadow: 0px 8px 15px rgba(0,0,0,0.05); /* Une toute petite ombre douce */
+}
+
+.carte h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+/* --- SECTION MOUSTACHUS (L'équipage) --- */
+.moustachus {
+    padding: 80px 50px;
+    text-align: center; /* Centre le titre */
+}
+
+.moustachus h2 {
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+}
+
+/* La boîte qui contient les 3 chats */
+.grille-chats {
+    display: flex;
+    justify-content: center;
+    gap: 60px; /* L'espace entre chaque chat */
+}
+
+/* La colonne individuelle de chaque chat (Photo + Bouton) */
+.carte-chat {
+    display: flex;
+    flex-direction: column; /* Empile la photo et le bouton de haut en bas */
+    align-items: center; /* Centre le contenu */
+    gap: 20px; /* L'espace entre la photo et le bouton */
+}
+
+/* La magie des photos rondes et cadrées proprement */
+.carte-chat img {
+    width: 220px;
+    height: 220px;
+    object-fit: cover; 
+    
+    /* LA NOUVELLE LIGNE POUR RECADRER LA TÊTE */
+    object-position: center 20%; 
+    
+    border-radius: 50%; 
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Les petits boutons roses sous les chats */
+.bouton-chat {
+    background-color: #F8BBD0; /* Un rose un peu plus doux pour les badges */
+    color: var(--gris-fonce);
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    text-align: center;
+}
+/* --- PIED DE PAGE (Footer) --- */
+footer {
+    background-color: var(--gris-fonce);
+    color: var(--creme);
+    text-align: center;
+    padding: 30px 50px;
+    margin-top: 50px; /* Espace au-dessus du footer */
+    font-size: 0.9rem;
+}
+
+.reseaux-sociaux {
+    margin-top: 15px;
+}
+
+.reseaux-sociaux a {
+    color: var(--vert-menthe);
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 10px;
+}
+/* --- SECTION CONCEPT (Comment ça marche) --- */
+.concept {
+    padding: 60px 50px;
+    text-align: center;
+    background-color: white; /* Démarque cette section du fond crème */
+}
+
+.concept h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+.grille-concept {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.concept-item {
+    flex: 1;
+    min-width: 200px;
+    background-color: var(--creme);
+    padding: 30px;
+    border-radius: 20px;
+    border: 2px solid var(--vert-menthe);
+}
+
+.concept-item .icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.concept-item h3 {
+    color: var(--rose-corail);
+    margin-bottom: 15px;
+}
+
+.concept-item h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.concept-item p {
+    line-height: 1.6;
+}
+
+/* --- AJUSTEMENTS MOUSTACHUS --- */
+.sous-titre {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    font-style: italic;
+    color: var(--gris-fonce);
+}
+
+.actions-chat {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.bouton-chat.secondaire {
+    background-color: transparent;
+    border: 2px solid #F8BBD0;
+}
+
+/* --- SECTION ATELIERS (Double action) --- */
+.ateliers {
+    padding: 80px 50px;
+    text-align: center;
+}
+
+.ateliers h2 {
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+}
+
+.atelier-double-action {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+
+.atelier-card {
+    flex: 1;
+    background-color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.atelier-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 25px;
+}
+
+.atelier-card h3 {
+    font-size: 1.8rem;
+    color: var(--rose-corail);
+    margin-bottom: 15px;
+}
+
+.atelier-card p {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.sous-titre-ateliers {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    font-style: italic;
+    color: var(--gris-fonce);
+}
+
+.description-atelier {
+    line-height: 1.7;
+    margin-bottom: 18px;
+}
+
+.impact {
+    font-size: 0.95rem;
+    margin-bottom: 22px;
+    color: var(--gris-fonce);
+}
+
+/* --- GALERIES D'IMAGES --- */
+.grille-atelier-visuels,
+.grille-espace {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    align-items: stretch;
+}
+
+.grille-espace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.visuel-card {
+    overflow: hidden;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.visuel-card img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+}
+
+.contenu-atelier {
+    padding: 25px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contenu-atelier h3 {
+    color: var(--rose-corail);
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.contenu-atelier p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.bouton-secondaire {
+    background-color: var(--vert-menthe);
+    color: var(--gris-fonce);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: inline-block;
+    align-self: flex-start;
+    transition: background-color 0.3s ease;
+}
+
+.bouton-secondaire:hover {
+    background-color: #6FC1B0;
+}
+
+/* --- SECTION DOUCEURS --- */
+.douceurs {
+    padding: 80px 50px 40px;
+    text-align: center;
+}
+
+.douceurs h2,
+.attente h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+.grille-douceurs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    align-items: stretch;
+}
+
+.douceur-card {
+    overflow: hidden;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.grille-douceurs img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+}
+
+/* --- SECTION ATTENTE --- */
+.attente {
+    padding: 40px 50px 90px;
+    text-align: center;
+}
+
+.attente-banniere {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border: 4px solid var(--vert-menthe);
+    border-radius: 28px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.attente-banniere img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 20px;
+}
+
+/* --- SECTION LE REPAIRE --- */
+.le-repaire {
+    padding: 80px 50px;
+    background-color: white;
+}
+
+.repaire-container {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.repaire-texte {
+    flex: 1;
+    text-align: left;
+}
+
+.repaire-texte h2 {
+    font-family: 'Pacifico', cursive;
+    color: var(--rose-corail);
+    font-size: 2.5rem;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+
+.sous-titre-repaire {
+    font-size: 1.1rem;
+    color: var(--gris-fonce);
+    font-style: italic;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.bloc-histoire,
+.bloc-valeurs {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--creme);
+    border-left: 5px solid var(--vert-menthe);
+    border-radius: 8px;
+}
+
+.bloc-histoire h3,
+.bloc-valeurs h3 {
+    color: var(--rose-corail);
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+}
+
+.bloc-histoire p,
+.bloc-valeurs p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--gris-fonce);
+}
+
+.repaire-image {
+    flex: 1;
+}
+
+.repaire-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.repaire-galerie {
+    background-color: var(--creme);
+    text-align: center;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1100px) {
+    header,
+    .hero,
+    .grille-concept,
+    .grille-chats,
+    .atelier-double-action,
+    .grille-atelier-visuels,
+    .grille-espace,
+    .grille-douceurs,
+    .repaire-container {
+        flex-direction: column;
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        gap: 20px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero-image,
+    .hero-texte,
+    .concept-item,
+    .atelier-card,
+    .visuel-card,
+    .repaire-texte,
+    .repaire-image {
+        width: 100%;
+    }
+
+    .visuel-card img,
+    .grille-douceurs img {
+        height: 220px;
+    }
+}
+   
+
+
+
+
