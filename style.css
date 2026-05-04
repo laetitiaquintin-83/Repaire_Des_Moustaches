@@ -56,12 +56,17 @@ nav ul {
 
 /* --- LE LOOK RÉTRO DU MENU --- */
 nav a {
-    font-family: 'Pacifico', cursive; /* La police attachée */
-    font-size: 1.5rem; /* On grossit un peu */
-    color: var(--rose-corail); /* On met le texte en rose ! */
-    text-transform: capitalize; /* Enlève les majuscules */
+    font-family: 'Pacifico', cursive;
+    font-size: 1.5rem;
+    color: var(--rose-corail);
+    text-transform: capitalize;
     text-decoration: none;
     font-weight: normal;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--gris-fonce);
 }
 
 /* --- LE BOUTON RÉSERVER --- */
@@ -70,10 +75,17 @@ nav a {
     color: white;
     text-decoration: none;
     padding: 12px 25px;
-    border-radius: 30px; /* Les bords ronds du bouton ! */
+    border-radius: 30px;
     font-weight: bold;
-    font-family: 'Montserrat', sans-serif; /* Pour être sûr qu'il reste lisible */
+    font-family: 'Montserrat', sans-serif;
     font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.bouton-reserver:hover {
+    background-color: #E55C5C;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(254,123,126,0.3);
 }
 
 /* --- LA SECTION HERO (Texte + Image) --- */
@@ -113,6 +125,13 @@ nav a {
     border-radius: 30px;
     font-weight: bold;
     display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.bouton-principal:hover {
+    background-color: #6FC1B0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .hero-image {
@@ -184,6 +203,37 @@ nav a {
     
     border-radius: 50%; 
     box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+/* Les infos textuelles de chaque chat */
+.info-chat {
+    text-align: center;
+    margin-bottom: 15px;
+    max-width: 280px;
+}
+
+.info-chat h3 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+    color: var(--rose-corail);
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.chat-trait {
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--vert-menthe);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.chat-histoire {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--gris-fonce);
+    margin-bottom: 15px;
 }
 
 /* Les petits boutons roses sous les chats */
@@ -203,20 +253,34 @@ footer {
     background-color: var(--gris-fonce);
     color: var(--creme);
     text-align: center;
-    padding: 30px 50px;
-    margin-top: 50px; /* Espace au-dessus du footer */
+    padding: 40px 50px;
+    margin-top: 80px;
     font-size: 0.9rem;
+    border-top: 3px solid var(--vert-menthe);
+}
+
+footer p {
+    margin-bottom: 15px;
+    line-height: 1.6;
 }
 
 .reseaux-sociaux {
-    margin-top: 15px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
 }
 
 .reseaux-sociaux a {
     color: var(--vert-menthe);
     text-decoration: none;
     font-weight: bold;
-    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.reseaux-sociaux a:hover {
+    color: var(--rose-corail);
 }
 /* --- SECTION CONCEPT (Comment ça marche) --- */
 .concept {
@@ -244,11 +308,26 @@ footer {
     padding: 30px;
     border-radius: 20px;
     border: 2px solid var(--vert-menthe);
+    overflow: hidden;
 }
 
 .concept-item .icon {
-    font-size: 3rem;
-    margin-bottom: 15px;
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.concept-item .icon img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .concept-item h3 {
