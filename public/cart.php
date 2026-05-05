@@ -104,7 +104,7 @@ foreach ($cart as $item) {
                 <?php foreach ($cart as $produit_id => $item): ?>
                     <div class="carte-panier">
                         <div class="panier-img-container">
-                            <img src="../images/placeholder.jpg" alt="Produit" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23FFF8E7\'/><text x=\'50\' y=\'50\' font-family=\'sans-serif\' font-size=\'30\' text-anchor=\'middle\' dominant-baseline=\'middle\'>🛍️</text></svg>'">
+                            <img src="<?php echo $item['image_url'] ? htmlspecialchars($item['image_url']) : '../images/placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($item['nom']); ?>" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23FFF8E7\'/><text x=\'50\' y=\'50\' font-family=\'sans-serif\' font-size=\'30\' text-anchor=\'middle\' dominant-baseline=\'middle\'>🛍️</text></svg>'">
                         </div>
                         
                         <div class="panier-info">

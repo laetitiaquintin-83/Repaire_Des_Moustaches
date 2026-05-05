@@ -197,47 +197,47 @@ SET @cat_cat_lovers = (SELECT id FROM categories_produits WHERE nom = 'cat_lover
 SET @cat_solidaire = (SELECT id FROM categories_produits WHERE nom = 'solidaire' LIMIT 1);
 
 -- Produits Diner
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Milkshake Fraise', 'Milkshake maison creme et fraises', 6.50, @cat_diner
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Milkshake Fraise', 'Milkshake maison creme et fraises', 6.50, @cat_diner, 'images/produits/milkshake-fraise.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Milkshake Fraise');
 
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Burger Veggie Moustache', 'Burger vegetarien sauce maison', 12.90, @cat_diner
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Burger Veggie Moustache', 'Burger vegetarien sauce maison', 12.90, @cat_diner, 'images/produits/burger-veggie.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Burger Veggie Moustache');
 
 -- Goodies Diner Retro
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Mug Diner', 'Mug en céramique épaisse style 50s américain, logo floqué', 12.99, @cat_diner_retro
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Mug Diner', 'Mug en céramique épaisse style 50s américain, logo floqué', 12.99, @cat_diner_retro, 'images/produits/mug-diner.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Mug Diner');
 
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Tablier Vintage', 'Tablier de cuisine retro pastel avec logo du Repaire', 19.99, @cat_diner_retro
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Tablier Vintage', 'Tablier de cuisine retro pastel avec logo du Repaire', 19.99, @cat_diner_retro, 'images/produits/tablier-vintage.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Tablier Vintage');
 
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Pins Emailles', 'Set de 3 pins émaillés (milkshake, burger, chat moustache)', 8.99, @cat_diner_retro
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Pins Emailles', 'Set de 3 pins émaillés (milkshake, burger, chat moustache)', 8.99, @cat_diner_retro, 'images/produits/pins-emailles.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Pins Emailles');
 
 -- Goodies Cat Lovers
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Tote Bag Solidaire', 'Sac en toile recyclée avec punchline "Mon cœur appartient à un moustachu"', 13.99, @cat_cat_lovers
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Tote Bag Solidaire', 'Sac en toile recyclée avec punchline "Mon cœur appartient à un moustachu"', 13.99, @cat_cat_lovers, 'images/produits/tote-bag.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Tote Bag Solidaire');
 
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Jouets Catnip Deluxe', 'Set de 3 jouets (frites, donut, hot-dog) remplis d''herbe à chat', 9.99, @cat_cat_lovers
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Jouets Catnip Deluxe', 'Set de 3 jouets (frites, donut, hot-dog) remplis d''herbe à chat', 9.99, @cat_cat_lovers, 'images/produits/jouets-catnip.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Jouets Catnip Deluxe');
 
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Planches de Stickers Retro', 'Pack de 24 autocollants vintage style 50s et chats', 5.99, @cat_cat_lovers
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Planches de Stickers Retro', 'Pack de 24 autocollants vintage style 50s et chats', 5.99, @cat_cat_lovers, 'images/produits/stickers-retro.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Planches de Stickers Retro');
 
 -- Goodies Solidaires
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Cartes Postales Polaroid', 'Set de 6 cartes photos rétro de nos pensionnaires. 1 carte = 1 repas financé', 9.99, @cat_solidaire
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Cartes Postales Polaroid', 'Set de 6 cartes photos rétro de nos pensionnaires. 1 carte = 1 repas financé', 9.99, @cat_solidaire, 'images/produits/cartes-postales.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Cartes Postales Polaroid');
 
-INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Badge Solidaire', 'Badge 56mm "Soutien officiel du Repaire des Moustaches"', 3.99, @cat_solidaire
+INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+SELECT 'Badge Solidaire', 'Badge 56mm "Soutien officiel du Repaire des Moustaches"', 3.99, @cat_solidaire, 'images/produits/badge-solidaire.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Badge Solidaire');
 
 -- -----------------------------------------------------

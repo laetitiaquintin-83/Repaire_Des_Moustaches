@@ -155,6 +155,7 @@ CREATE TABLE produits (
   description TEXT,
   prix DECIMAL(10,2) NOT NULL,
   categorie_id INT NOT NULL,
+  image_url VARCHAR(255),
   CONSTRAINT fk_produits_categorie
     FOREIGN KEY (categorie_id) REFERENCES categories_produits(id)
     ON UPDATE CASCADE ON DELETE RESTRICT,

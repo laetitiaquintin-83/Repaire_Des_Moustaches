@@ -20,7 +20,7 @@ if ($produit_id <= 0) {
 }
 
 // Vérifier que le produit existe et récupérer ses infos
-$stmt = $pdo->prepare('SELECT id, nom, prix FROM produits WHERE id = ?');
+$stmt = $pdo->prepare('SELECT id, nom, prix, image_url FROM produits WHERE id = ?');
 $stmt->execute([$produit_id]);
 $produit = $stmt->fetch();
 
@@ -44,6 +44,7 @@ if (isset($_SESSION['cart'][$produit_id])) {
         'id' => $produit_id,
         'nom' => $produit['nom'],
         'prix' => $produit['prix'],
+        'image_url' => $produit['image_url'],
         'quantite' => $quantite
     ];
 }
