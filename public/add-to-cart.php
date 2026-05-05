@@ -50,7 +50,8 @@ if (isset($_SESSION['cart'][$produit_id])) {
 
 $response['success'] = true;
 $response['message'] = htmlspecialchars($produit['nom']) . ' ajouté au panier !';
-$response['cart_count'] = count($_SESSION['cart']);
+// CORRECTION ICI : on additionne toutes les quantités pour avoir le vrai nombre d'articles
+$response['cart_count'] = array_sum(array_column($_SESSION['cart'], 'quantite'));
 $response['cart_total'] = array_sum(array_map(function($item) {
     return $item['prix'] * $item['quantite'];
 }, $_SESSION['cart']));
