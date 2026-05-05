@@ -47,18 +47,18 @@ function getCategoryConfig(string $cat): array
 
 function getImagePath(string $productName): string
 {
-    // Mapping direct produit → image (toutes dans images/)
+    // Mapping direct produit → image (toutes dans images/produits/)
     $imageMap = [
-        'Milkshake Fraise' => 'images/milkshake.jpg',
-        'Burger Veggie Moustache' => 'images/burger.jpg',
-        'Mug Diner' => 'images/mug.jpg',
-        'Tablier Vintage' => 'images/tablier.jpg',
-        'Pins Emailles' => 'images/pin.png',
-        'Tote Bag Solidaire' => 'images/bag.jpg',
-        'Jouets Catnip Deluxe' => 'images/jouet.png',
-        'Planches de Stickers Retro' => 'images/autocollant.png',
-        'Cartes Postales Polaroid' => 'images/carte.png',
-        'Badge Solidaire' => 'images/badge.png',
+        'Milkshake Fraise' => 'images/produits/milkshake-fraise.jpg',
+        'Burger Veggie Moustache' => 'images/produits/burger-veggie.jpg',
+        'Mug Diner' => 'images/produits/mug-diner.jpg',
+        'Tablier Vintage' => 'images/produits/tablier-vintage.jpg',
+        'Pins Emailles' => 'images/produits/pins-emailles.jpg',
+        'Tote Bag Solidaire' => 'images/produits/tote-bag.jpg',
+        'Jouets Catnip Deluxe' => 'images/produits/jouets-catnip.jpg',
+        'Planches de Stickers Retro' => 'images/produits/stickers-retro.jpg',
+        'Cartes Postales Polaroid' => 'images/produits/cartes-postales.jpg',
+        'Badge Solidaire' => 'images/produits/badge-solidaire.jpg',
     ];
     
     return $imageMap[$productName] ?? 'images/placeholder.jpg';

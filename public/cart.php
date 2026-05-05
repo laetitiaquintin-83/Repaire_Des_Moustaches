@@ -48,6 +48,25 @@ $total_price = 0;
 foreach ($cart as $item) {
     $total_price += (float)$item['prix'] * (int)$item['quantite'];
 }
+
+// Fonction pour mapper les noms de produits à leurs images
+function getImagePath(string $productName): string
+{
+    $imageMap = [
+        'Milkshake Fraise' => '../images/produits/milkshake-fraise.jpg',
+        'Burger Veggie Moustache' => '../images/produits/burger-veggie.jpg',
+        'Mug Diner' => '../images/produits/mug-diner.jpg',
+        'Tablier Vintage' => '../images/produits/tablier-vintage.jpg',
+        'Pins Emailles' => '../images/produits/pins-emailles.jpg',
+        'Tote Bag Solidaire' => '../images/produits/tote-bag.jpg',
+        'Jouets Catnip Deluxe' => '../images/produits/jouets-catnip.jpg',
+        'Planches de Stickers Retro' => '../images/produits/stickers-retro.jpg',
+        'Cartes Postales Polaroid' => '../images/produits/cartes-postales.jpg',
+        'Badge Solidaire' => '../images/produits/badge-solidaire.jpg',
+    ];
+    
+    return $imageMap[$productName] ?? '../images/placeholder.jpg';
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -104,7 +123,7 @@ foreach ($cart as $item) {
                 <?php foreach ($cart as $produit_id => $item): ?>
                     <div class="carte-panier">
                         <div class="panier-img-container">
-                            <img src="<?php echo $item['image_url'] ? htmlspecialchars($item['image_url']) : '../images/placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($item['nom']); ?>" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23FFF8E7\'/><text x=\'50\' y=\'50\' font-family=\'sans-serif\' font-size=\'30\' text-anchor=\'middle\' dominant-baseline=\'middle\'>🛍️</text></svg>'">
+                            <img src="<?php echo htmlspecialchars(getImagePath((string) $item['nom']), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item['nom']); ?>" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23FFF8E7\'/><text x=\'50\' y=\'50\' font-family=\'sans-serif\' font-size=\'30\' text-anchor=\'middle\' dominant-baseline=\'middle\'>🛍️</text></svg>'">
                         </div>
                         
                         <div class="panier-info">

@@ -20,9 +20,23 @@ if ($produit_id <= 0) {
 }
 
 // Vérifier que le produit existe et récupérer ses infos
-$stmt = $pdo->prepare('SELECT id, nom, prix, image_url FROM produits WHERE id = ?');
+$stmt = $pdo->prepare('SELECT id, nom, prix FROM produits WHERE id = ?');
 $stmt->execute([$produit_id]);
 $produit = $stmt->fetch();
+
+// Essayer de récupérer l'image si elle existe
+if ($produit) {
+    try {
+        $stmt_img = $pdo->prepare('SELECT image_url FROM produits WHERE id = ?');
+        $stmt_img->execute([$produit_id]);
+        $img_result = $stmt_img->fetch();
+        if ($img_result) {
+            $produit['image_url'] = $img_result['image_url'];
+        }
+    } catch (Exception $e) {
+        $produit['image_url'] = null;
+    }
+}
 
 if (!$produit) {
     $response['message'] = 'Produit introuvable';
