@@ -5,6 +5,7 @@ Projet web pour le titre professionnel **DWWM (Développeur Web et Web Mobile)**
 ## 📋 Concept
 
 **Le Repaire des Moustaches** est un tiers-lieu hybride combinant :
+
 - 🍔 **Dîner rétro** (style années 50 américain)
 - 🐈 **Refuge de chats** (adoption solidaire)
 - 🛠️ **Ateliers solidaires** (création, bien-être, administratif, pâtisserie)
@@ -17,18 +18,21 @@ Basé à Toulon, c'est un lieu libre d'accès où chacun peut rencontrer les pen
 ## 🎨 Architecture du Projet
 
 ### Frontend
+
 - **HTML5** sémantique sur 6 pages + redirection espace.html
 - **CSS3** responsive avec variables de couleurs et hover effects
 - **Google Fonts** : Montserrat (body) + Pacifico (titres rétro)
 - **Palette** : Crème #FFF8E7 | Menthe #85D6CD | Rose #FE7B7E | Gris #2B2B2B
 
 ### Backend (Infrastructure)
+
 - **PHP 7.2+** avec PDO (sécurité SQL injection)
 - **MySQL 5.7+** (12 tables normalisées, FK, CHECK constraints)
 - **Config** : `config/database.php` (singleton PDO pattern)
 - **Démo** : `schema.sql` + `demo_data.sql` prêts à l'import
 
 ### Structure des fichiers
+
 ```
 Repaire_Des_Moustaches/
 ├── index.html              # Accueil (hero + 5 cartes navigation)
@@ -82,14 +86,14 @@ Repaire_Des_Moustaches/
 
 ## 📱 Pages Principales
 
-| Page | Contenu |
-|------|---------|
-| **index.html** | Landing page - Hero section + 5 cartes de navigation (Concept, Équipage, Ateliers, Repaire, Douceurs) |
-| **concept.html** | Explique 3 piliers (Dîner & Goodies, Ateliers Solidaires, Coup de Foudre adoption) |
-| **equipage.html** | Galerie 3 chats + "Son histoire" + "Le rencontrer" buttons |
-| **ateliers.html** | 4 ateliers (images + titles + descriptions + CTAs variés) |
-| **repaire.html** | Histoire + Engagements + Image ambiance |
-| **douceurs.html** | Galerie gourmande (4 visuels produits/pâtisseries) |
+| Page              | Contenu                                                                                               |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| **index.html**    | Landing page - Hero section + 5 cartes de navigation (Concept, Équipage, Ateliers, Repaire, Douceurs) |
+| **concept.html**  | Explique 3 piliers (Dîner & Goodies, Ateliers Solidaires, Coup de Foudre adoption)                    |
+| **equipage.html** | Galerie 3 chats + "Son histoire" + "Le rencontrer" buttons                                            |
+| **ateliers.html** | 4 ateliers (images + titles + descriptions + CTAs variés)                                             |
+| **repaire.html**  | Histoire + Engagements + Image ambiance                                                               |
+| **douceurs.html** | Galerie gourmande (4 visuels produits/pâtisseries)                                                    |
 
 ---
 
@@ -115,14 +119,16 @@ Schéma normalisé avec foreign keys et constraints :
 ## 🎨 Customization CSS
 
 Toutes les couleurs sont des **variables CSS** :
+
 ```css
 :root {
-    --creme: #FFF8E7;
-    --vert-menthe: #85D6CD;
-    --rose-corail: #FE7B7E;
-    --gris-fonce: #2B2B2B;
+  --creme: #fff8e7;
+  --vert-menthe: #85d6cd;
+  --rose-corail: #fe7b7e;
+  --gris-fonce: #2b2b2b;
 }
 ```
+
 Pour changer le thème : modifier les 4 values en `:root`.
 
 ---
@@ -161,6 +167,7 @@ git push -u origin main
 Concept inspiré du "Repaire des Moustaches" réel (tiers-lieu Toulon).
 
 Livrable pour démonstration à l'examen :
+
 - Site web production-ready (Frontend ✅)
 - Architecture base de données (SQL ✅)
 - Fondation backend PHP (Scaffold ✅)
@@ -171,6 +178,7 @@ Livrable pour démonstration à l'examen :
 ## 📞 Support
 
 Questions sur le projet ? Vérifier :
+
 1. Accents français (tous les .html)
 2. Footer sur toutes les pages
 3. Responsive design (resize browser)
@@ -181,4 +189,3 @@ Questions sur le projet ? Vérifier :
 
 **Version** : 1.0 (2026-05-04)  
 **Status** : ✅ Frontend & Database finalisés | ⏳ Admin backend en cours
-

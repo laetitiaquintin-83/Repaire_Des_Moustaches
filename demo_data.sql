@@ -4,6 +4,8 @@
 -- =====================================================
 
 USE repaire_des_moustaches;
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
@@ -15,7 +17,15 @@ VALUES ('diner')
 ON DUPLICATE KEY UPDATE nom = VALUES(nom);
 
 INSERT INTO categories_produits (nom)
-VALUES ('goodies')
+VALUES ('diner_retro')
+ON DUPLICATE KEY UPDATE nom = VALUES(nom);
+
+INSERT INTO categories_produits (nom)
+VALUES ('cat_lovers')
+ON DUPLICATE KEY UPDATE nom = VALUES(nom);
+
+INSERT INTO categories_produits (nom)
+VALUES ('solidaire')
 ON DUPLICATE KEY UPDATE nom = VALUES(nom);
 
 -- -----------------------------------------------------
@@ -182,8 +192,11 @@ WHERE NOT EXISTS (
 -- 10) Produits (diner + goodies)
 -- -----------------------------------------------------
 SET @cat_diner = (SELECT id FROM categories_produits WHERE nom = 'diner' LIMIT 1);
-SET @cat_goodies = (SELECT id FROM categories_produits WHERE nom = 'goodies' LIMIT 1);
+SET @cat_diner_retro = (SELECT id FROM categories_produits WHERE nom = 'diner_retro' LIMIT 1);
+SET @cat_cat_lovers = (SELECT id FROM categories_produits WHERE nom = 'cat_lovers' LIMIT 1);
+SET @cat_solidaire = (SELECT id FROM categories_produits WHERE nom = 'solidaire' LIMIT 1);
 
+-- Produits Diner
 INSERT INTO produits (nom, description, prix, categorie_id)
 SELECT 'Milkshake Fraise', 'Milkshake maison creme et fraises', 6.50, @cat_diner
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Milkshake Fraise');
@@ -192,33 +205,60 @@ INSERT INTO produits (nom, description, prix, categorie_id)
 SELECT 'Burger Veggie Moustache', 'Burger vegetarien sauce maison', 12.90, @cat_diner
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Burger Veggie Moustache');
 
+-- Goodies Diner Retro
 INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Mug Le Repaire', 'Mug ceramique edition solidaire', 9.90, @cat_goodies
-WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Mug Le Repaire');
+SELECT 'Mug Diner', 'Mug en céramique épaisse style 50s américain, logo floqué', 12.99, @cat_diner_retro
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Mug Diner');
 
 INSERT INTO produits (nom, description, prix, categorie_id)
-SELECT 'Tote Bag Moustaches', 'Sac coton bio imprime', 11.00, @cat_goodies
-WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Tote Bag Moustaches');
+SELECT 'Tablier Vintage', 'Tablier de cuisine retro pastel avec logo du Repaire', 19.99, @cat_diner_retro
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Tablier Vintage');
+
+INSERT INTO produits (nom, description, prix, categorie_id)
+SELECT 'Pins Emailles', 'Set de 3 pins émaillés (milkshake, burger, chat moustache)', 8.99, @cat_diner_retro
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Pins Emailles');
+
+-- Goodies Cat Lovers
+INSERT INTO produits (nom, description, prix, categorie_id)
+SELECT 'Tote Bag Solidaire', 'Sac en toile recyclée avec punchline "Mon cœur appartient à un moustachu"', 13.99, @cat_cat_lovers
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Tote Bag Solidaire');
+
+INSERT INTO produits (nom, description, prix, categorie_id)
+SELECT 'Jouets Catnip Deluxe', 'Set de 3 jouets (frites, donut, hot-dog) remplis d''herbe à chat', 9.99, @cat_cat_lovers
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Jouets Catnip Deluxe');
+
+INSERT INTO produits (nom, description, prix, categorie_id)
+SELECT 'Planches de Stickers Retro', 'Pack de 24 autocollants vintage style 50s et chats', 5.99, @cat_cat_lovers
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Planches de Stickers Retro');
+
+-- Goodies Solidaires
+INSERT INTO produits (nom, description, prix, categorie_id)
+SELECT 'Cartes Postales Polaroid', 'Set de 6 cartes photos rétro de nos pensionnaires. 1 carte = 1 repas financé', 9.99, @cat_solidaire
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Cartes Postales Polaroid');
+
+INSERT INTO produits (nom, description, prix, categorie_id)
+SELECT 'Badge Solidaire', 'Badge 56mm "Soutien officiel du Repaire des Moustaches"', 3.99, @cat_solidaire
+WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Badge Solidaire');
 
 -- -----------------------------------------------------
 -- 11) Commande de demo
 -- -----------------------------------------------------
 INSERT INTO commandes (utilisateur_id, montant_total, statut)
-SELECT @u1, 19.40, 'payee'
+SELECT @u1, 19.89, 'payee'
 WHERE NOT EXISTS (
-  SELECT 1 FROM commandes WHERE utilisateur_id = @u1 AND montant_total = 19.40
+  SELECT 1 FROM commandes WHERE utilisateur_id = @u1 AND montant_total = 19.89
 );
 
 SET @commande_demo = (
   SELECT id
   FROM commandes
-  WHERE utilisateur_id = @u1 AND montant_total = 19.40
+  WHERE utilisateur_id = @u1 AND montant_total = 19.89
   ORDER BY id DESC
   LIMIT 1
 );
 
 SET @prod_milkshake = (SELECT id FROM produits WHERE nom = 'Milkshake Fraise' LIMIT 1);
-SET @prod_mug = (SELECT id FROM produits WHERE nom = 'Mug Le Repaire' LIMIT 1);
+SET @prod_mug = (SELECT id FROM produits WHERE nom = 'Mug Diner' LIMIT 1);
 
 INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire)
 SELECT @commande_demo, @prod_milkshake, 1, 6.50
@@ -228,7 +268,7 @@ WHERE NOT EXISTS (
 );
 
 INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire)
-SELECT @commande_demo, @prod_mug, 1, 9.90
+SELECT @commande_demo, @prod_mug, 1, 12.99
 WHERE NOT EXISTS (
   SELECT 1 FROM lignes_commandes
   WHERE commande_id = @commande_demo AND produit_id = @prod_mug

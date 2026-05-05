@@ -517,13 +517,41 @@ footer p {
     border-radius: 18px;
     background: white;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.douceur-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12);
 }
 
 .grille-douceurs img {
     width: 100%;
-    height: 260px;
+    height: 220px;
     object-fit: cover;
     display: block;
+}
+
+.douceur-info {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.douceur-info h3 {
+    font-size: 1.2rem;
+    color: var(--rose-corail);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.douceur-info p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--gris-fonce);
 }
 
 /* --- SECTION ATTENTE --- */
@@ -621,6 +649,301 @@ footer p {
 .repaire-galerie {
     background-color: var(--creme);
     text-align: center;
+}
+
+/* --- SECTION BELLES HISTOIRES --- */
+.belles-histoires-section {
+    padding: 80px 50px 90px;
+    text-align: center;
+}
+
+.belles-histoires-liste {
+    padding: 40px 50px 60px;
+}
+
+.liste-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.liste-header h1 {
+    font-family: 'Pacifico', cursive;
+    color: var(--rose-corail);
+    font-size: 3rem;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+
+.liste-header p {
+    font-size: 1.2rem;
+    color: var(--gris-fonce);
+    font-style: italic;
+}
+
+.grille-histoires {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.carte-histoire {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carte-histoire:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12);
+}
+
+.histoire-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--vert-menthe);
+    padding-bottom: 15px;
+}
+
+.histoire-header h2 {
+    font-family: 'Pacifico', cursive;
+    color: var(--rose-corail);
+    font-size: 1.8rem;
+    font-weight: normal;
+    margin-bottom: 8px;
+}
+
+.histoire-date {
+    font-size: 0.85rem;
+    color: var(--gris-fonce);
+    font-style: italic;
+}
+
+.histoire-contenu {
+    flex-grow: 1;
+}
+
+.histoire-contenu p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--gris-fonce);
+    text-align: justify;
+}
+
+.page-liste {
+    min-height: calc(100vh - 200px);
+}
+
+/* --- SECTION BOUTIQUE --- */
+.boutique-principale {
+    background-color: var(--creme);
+}
+
+.boutique-hero-catalog {
+    padding: 60px 50px 40px;
+    text-align: center;
+}
+
+.grille-categories-boutique {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.categorie-preview {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.categorie-preview:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12);
+}
+
+.categorie-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.categorie-preview h3 {
+    font-size: 1.5rem;
+    color: var(--rose-corail);
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.categorie-preview p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--gris-fonce);
+}
+
+.boutique-section {
+    padding: 50px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.boutique-section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.boutique-section-header h2 {
+    font-family: 'Pacifico', cursive;
+    color: var(--rose-corail);
+    font-size: 2rem;
+    font-weight: normal;
+    margin-bottom: 8px;
+}
+
+.boutique-section-description {
+    font-size: 0.95rem;
+    color: var(--gris-fonce);
+    font-style: italic;
+}
+
+.grille-produits-boutique {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    align-items: stretch;
+}
+
+.carte-produit-boutique {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.carte-produit-boutique:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.produit-image-boutique {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--creme) 0%, #f5f5f5 100%);
+    position: relative;
+}
+
+.produit-image-boutique img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.carte-produit-boutique:hover .produit-image-boutique img {
+    transform: scale(1.08);
+}
+
+.produit-info-boutique {
+    padding: 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.produit-info-boutique h3 {
+    font-size: 1.25rem;
+    color: var(--rose-corail);
+    margin-bottom: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.produit-description-boutique {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--gris-fonce);
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.produit-footer-boutique {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 2px solid #f0f0f0;
+    gap: 12px;
+}
+
+.produit-prix-boutique {
+    font-weight: 700;
+    color: var(--rose-corail);
+    font-size: 1.2rem;
+    white-space: nowrap;
+}
+
+.bouton-ajouter-panier {
+    background-color: var(--vert-menthe);
+    color: var(--gris-fonce);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.bouton-ajouter-panier:hover {
+    background-color: #6FC1B0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(133, 214, 205, 0.3);
+}
+
+.boutique-info-finales {
+    border-top: 3px solid var(--vert-menthe);
+}
+
+/* --- RESPONSIVE BOUTIQUE --- */
+@media (max-width: 768px) {
+    .grille-produits-boutique {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+    
+    .produit-image-boutique {
+        height: 200px;
+    }
+    
+    .boutique-section {
+        padding: 30px 20px;
+    }
+    
+    .boutique-section-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .grille-categories-boutique {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* --- RESPONSIVE --- */
