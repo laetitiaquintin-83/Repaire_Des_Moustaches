@@ -5,6 +5,7 @@
 **URL**: `http://localhost/Repaire_Des_Moustaches/login.php`
 
 **Identifiants de démo**:
+
 - Email: `admin@repaire.local`
 - Mot de passe: `admin123`
 
@@ -20,33 +21,40 @@
 ## Fonctionnalités Admin
 
 ### 📊 Dashboard
+
 - Vue d'ensemble des statistiques
 - Nombre d'histoires à modérer
 - Nombre total de produits, commandes, ateliers, utilisateurs
 
 ### 📖 Belles Histoires - Modération
+
 - **Tab "À modérer"** : Voir les histoires en attente
   - Cliquer "Publier" pour accepter
   - Cliquer "Rejeter" pour refuser
 - **Tab "Publiées"** : Voir les histoires déjà publiées
 
 ### 🎨 Ateliers (En développement)
+
 - Page stub créée, à compléter
 
 ### 🛍️ Produits (En développement)
+
 - Page stub créée
 - 10 produits déjà en base
 
 ### 📦 Commandes (En développement)
+
 - Page stub créée
 - Système de panier/paiement à implémenter
 
 ### 👥 Utilisateurs (En développement)
+
 - Page stub créée
 
 ## Architecture Technique
 
 ### Fichiers Admin
+
 ```
 admin/
 ├── dashboard.php           # Vue d'ensemble
@@ -61,6 +69,7 @@ logout.php                   # Déconnexion
 ```
 
 ### Sécurité
+
 - ✓ Sessions PHP avec `session_start()`
 - ✓ Vérification de `$_SESSION['admin_id']` sur chaque page
 - ✓ Mots de passe hashés avec bcrypt (`password_hash()`)
@@ -68,6 +77,7 @@ logout.php                   # Déconnexion
 - ✓ Redirection automatique vers login.php si pas connecté
 
 ### Base de Données
+
 - Table `admin_users` avec email/mot_de_passe
 - Champs de modération dans `belles_histoires` :
   - `statut` (en_attente, publiee, refusee)
