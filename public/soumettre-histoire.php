@@ -2,38 +2,47 @@
 
 declare(strict_types=1);
 
+session_start();
+
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
+$csrf_token = generateCSRFToken();
 $message = '';
 $error = '';
 
 // Traiter le formulaire soumis
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titre = isset($_POST['titre']) ? trim((string) $_POST['titre']) : '';
-    $contenu = isset($_POST['contenu']) ? trim((string) $_POST['contenu']) : '';
-    $utilisateur_id = isset($_POST['utilisateur_id']) ? (int) $_POST['utilisateur_id'] : 0;
-
-    // Validations
-    if (empty($titre)) {
-        $error = 'Le titre est obligatoire.';
-    } elseif (empty($contenu)) {
-        $error = 'L\'histoire est obligatoire.';
-    } elseif ($utilisateur_id <= 0) {
-        $error = 'Veuillez sélectionner un auteur.';
+    // Valider le token CSRF
+    $csrf_check = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_check)) {
+        $error = 'Erreur de sécurité : token CSRF invalide';
     } else {
-        // Insérer l'histoire en base (statut "en_attente" pour modération)
-        $sql = 'INSERT INTO belles_histoires (utilisateur_id, titre, contenu, statut, date_publication)
-                VALUES (:utilisateur_id, :titre, :contenu, "en_attente", NOW())';
-        
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':utilisateur_id' => $utilisateur_id,
-            ':titre' => $titre,
-            ':contenu' => $contenu,
-        ]);
-        
-        $message = '✨ Votre histoire a été soumise ! Elle sera vérifiée avant publication.';
+        $titre = isset($_POST['titre']) ? trim((string) $_POST['titre']) : '';
+        $contenu = isset($_POST['contenu']) ? trim((string) $_POST['contenu']) : '';
+        $utilisateur_id = isset($_POST['utilisateur_id']) ? (int) $_POST['utilisateur_id'] : 0;
+
+        // Validations
+        if (empty($titre)) {
+            $error = 'Le titre est obligatoire.';
+        } elseif (empty($contenu)) {
+            $error = 'L\'histoire est obligatoire.';
+        } elseif ($utilisateur_id <= 0) {
+            $error = 'Veuillez sélectionner un auteur.';
+        } else {
+            // Insérer l'histoire en base (statut "en_attente" pour modération)
+            $sql = 'INSERT INTO belles_histoires (utilisateur_id, titre, contenu, statut, date_publication)
+                    VALUES (:utilisateur_id, :titre, :contenu, "en_attente", NOW())';
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':utilisateur_id' => $utilisateur_id,
+                ':titre' => $titre,
+                ':contenu' => $contenu,
+            ]);
+            
+            $message = '✨ Votre histoire a été soumise ! Elle sera vérifiée avant publication.';
+        }
     }
 }
 
@@ -47,6 +56,9 @@ $utilisateurs = $pdo->query($sqlUsers)->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soumettre une histoire - Le Repaire des Moustaches</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         .formulaire-histoire {
@@ -201,6 +213,7 @@ $utilisateurs = $pdo->query($sqlUsers)->fetchAll();
             </div>
 
             <form method="POST" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                 <div class="form-group">
                     <label for="utilisateur_id">Qui êtes-vous ? *</label>
                     <select id="utilisateur_id" name="utilisateur_id" required>

@@ -111,6 +111,9 @@ foreach ($cart as $item) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commande - Le Repaire des Moustaches</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         body {
@@ -414,7 +417,7 @@ foreach ($cart as $item) {
                 
                 <div class="resume-total">
                     <span>Total:</span>
-                    <span><?php echo number_format($total_price, 2, ',', ' '); ?> €</span>
+                    <span><?php echo number_format((float)$total_price, 2, ',', ' '); ?> €</span>
                 </div>
             </div>
         </div>

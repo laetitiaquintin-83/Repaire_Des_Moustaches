@@ -212,6 +212,138 @@ Les prochaines etapes possibles sont :
 - mettre en place les formulaires et la validation cote serveur
 - preparer les captures d'ecran pour le dossier final
 
-## 10. Conclusion
+## 10. Intégration et Tests (11 mai 2026)
 
-Le projet est deja solide sur la partie base de donnees et structuration fonctionnelle. La suite logique consiste maintenant a relier cette base au front-end, puis a mettre en place les formulaires, la connexion utilisateur et l'espace administrateur.
+### 10.1 Corrections apportées
+
+**Cohérence des polices**:
+
+- Ajout de Google Fonts (Montserrat + Pacifico) à tous les fichiers PHP
+- Tous les fichiers `public/*.php` et `admin/*.php` importent maintenant:
+  ```html
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap"
+    rel="stylesheet"
+  />
+  ```
+
+**Cohérence des chemins**:
+
+- Pages HTML au root (index.html) pointent vers `public/*.php` ✓
+- Pages PHP dans `public/` pointent vers `../*.html` ✓
+- Pages admin pointent vers `../` pour revenir au root ✓
+- Tous les chemins relatifs testés et validés ✓
+
+### 10.2 Tests d'intégration effectués
+
+**Navigation**:
+
+- [x] Accueil (index.html) charge correctement
+- [x] Tous les 11 fichiers HTML existent
+- [x] Navigation vers les pages dynamiques PHP fonctionne
+- [x] Belles histoires (public/belles-histoires.php) affiche 2 histoires de la BDD
+- [x] Formulaire de soumission histoire charge (public/soumettre-histoire.php)
+- [x] Boutique charge avec 10 produits groupés par catégories
+- [x] Panier accessible (public/cart.php)
+
+**Authentification et Admin**:
+
+- [x] Page de connexion (login.php) charge avec identifiants démo
+- [x] Connexion avec admin@repaire.local / admin123 fonctionne
+- [x] Dashboard affiche les 6 statistiques correctes
+- [x] Tous les menus admin fonctionnent (Dashboard, Histoires, Ateliers, Produits, Commandes, Utilisateurs)
+- [x] Déconnexion (logout.php) accessible
+
+**Statistiques actuelles**:
+
+- Utilisateurs: 3
+- Ateliers: 2 (Repair café, Création jouets)
+- Histoires publiées: 2
+- Produits: 10 (4 catégories)
+- Commandes: 1
+- À modérer: 0
+
+### 10.3 Points de sécurité vérifiés et corrigés
+
+**✅ Bonnes pratiques**:
+
+- Prepared statements utilisés (protection injection SQL)
+- htmlspecialchars() avec ENT_QUOTES et UTF-8 en output
+- Pas d'utilisation de GET pour opérations destructrices
+- Confirmation JavaScript sur suppressions
+- Sessions PHP correctement configurées
+- Redirection après connexion
+
+**✅ CORRECTIONS APPLIQUÉES (11 mai 2026)**:
+
+- **Tokens CSRF ajoutés** à tous les formulaires POST:
+  - Fonctions `generateCSRFToken()` et `validateCSRFToken()` dans `config/database.php`
+  - Tokens validés dans: `admin/ateliers.php`, `admin/produits.php`, `public/soumettre-histoire.php`, `public/add-to-cart.php`, `public/boutique.php`
+  - Token transmis en `<input type="hidden" name="csrf_token">`
+  - Validation effectuée AVANT tout traitement POST
+
+**⚠️ À revoir (bonne pratique - non critique)**:
+
+- Données échappées AVANT insertion en BDD (au lieu d'APRÈS)
+- Consequence: contenu stocké avec entities HTML (`&lt;` au lieu de `<`)
+- Recommandation: Revoir l'ordre d'échappement pour future amélioration
+
+### 10.3.1 Implémentation des tokens CSRF
+
+**Méthode utilisée**:
+
+1. Génération d'un token aléatoire 32-byte stocké en session: `$_SESSION['csrf_token']`
+2. Le token est transmis dans chaque formulaire POST via un input hidden
+3. Avant tout traitement POST, le token est validé avec `hash_equals()` pour éviter les attaques par timing
+
+**Code d'implémentation** (config/database.php):
+
+```php
+function generateCSRFToken(): string {
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCSRFToken(string $token): bool {
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+```
+
+**Fichiers protégés**:
+
+- admin/ateliers.php (CRUD ateliers)
+- admin/produits.php (CRUD produits)
+- public/soumettre-histoire.php (soumission d'histoires)
+- public/boutique.php (ajout au panier)
+- public/add-to-cart.php (traitement panier)
+
+### 10.4 Recommandations avant l'examen
+
+1. **Sécurité (✅ SÉCURISÉE)**:
+   - [x] Ajouter protection CSRF avec tokens - **FAIT**
+   - [ ] Revoir logique d'échappement XSS - À documenter
+   - [x] Documenter les choix de sécurité - **En cours**
+
+2. **Tests supplémentaires à compléter**:
+   - [ ] Responsive design (mobile, tablette, desktop)
+   - [ ] Complet workflow soumission histoire
+   - [ ] Complet workflow panier + checkout
+   - [ ] Modification/suppression ateliers en admin
+   - [ ] Modération des histoires
+   - [ ] Création de produits
+
+3. **Documentation**:
+   - [x] Archiver les tests effectués - **Sauvegardé en session**
+   - [ ] Screenshots des fonctionnalités pour l'oral
+
+## 11. Conclusion
+
+Le projet est maintenant **techniquement fonctionnel et intégré**. La base de données communique correctement avec le frontend, l'authentification fonctionne, et l'interface admin est accessible.
+
+Les corrections de police garantissent la cohérence visuelle, et les chemins relatifs permettent un déploiement cohérent sur n'importe quel serveur web.
+
+**Prochaines étapes**: Ajouter les protections CSRF et peaufiner la sécurité avant déploiement en production.

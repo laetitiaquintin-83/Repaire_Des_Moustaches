@@ -12,6 +12,7 @@ if (!isset($_SESSION['admin_id'])) {
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
+$csrf_token = generateCSRFToken();
 $message = '';
 $error = '';
 
@@ -21,53 +22,59 @@ $admin_id = (int)$_SESSION['admin_id'];
 // Traitement des actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
-        $action = $_POST['action'];
-        
-        if ($action === 'ajouter' || $action === 'modifier') {
-            $titre = htmlspecialchars($_POST['titre'] ?? '');
-            $description = htmlspecialchars($_POST['description'] ?? '');
-            $date_heure = $_POST['date_heure'] ?? '';
-            $capacite_max = (int)($_POST['capacite_max'] ?? 0);
+        // Valider le token CSRF
+        $csrf_token = $_POST['csrf_token'] ?? '';
+        if (!validateCSRFToken($csrf_token)) {
+            $error = 'Erreur de sécurité : token CSRF invalide';
+        } else {
+            $action = $_POST['action'];
             
-            if (!$titre || !$date_heure || $capacite_max <= 0) {
-                $error = 'Tous les champs sont obligatoires';
-            } else {
-                try {
-                    if ($action === 'ajouter') {
-                        $stmt = $pdo->prepare('
-                            INSERT INTO ateliers (titre, description, date_heure, capacite_max, admin_id)
-                            VALUES (?, ?, ?, ?, ?)
-                        ');
-                        $stmt->execute([$titre, $description, $date_heure, $capacite_max, $admin_id]);
-                        $message = '✓ Atelier créé avec succès !';
-                    } else {
-                        $id = (int)($_POST['id'] ?? 0);
-                        $stmt = $pdo->prepare('
-                            UPDATE ateliers 
-                            SET titre = ?, description = ?, date_heure = ?, capacite_max = ?
-                            WHERE id = ?
-                        ');
-                        $stmt->execute([$titre, $description, $date_heure, $capacite_max, $id]);
-                        $message = '✓ Atelier modifié avec succès !';
+            if ($action === 'ajouter' || $action === 'modifier') {
+                $titre = htmlspecialchars($_POST['titre'] ?? '');
+                $description = htmlspecialchars($_POST['description'] ?? '');
+                $date_heure = $_POST['date_heure'] ?? '';
+                $capacite_max = (int)($_POST['capacite_max'] ?? 0);
+                
+                if (!$titre || !$date_heure || $capacite_max <= 0) {
+                    $error = 'Tous les champs sont obligatoires';
+                } else {
+                    try {
+                        if ($action === 'ajouter') {
+                            $stmt = $pdo->prepare('
+                                INSERT INTO ateliers (titre, description, date_heure, capacite_max, admin_id)
+                                VALUES (?, ?, ?, ?, ?)
+                            ');
+                            $stmt->execute([$titre, $description, $date_heure, $capacite_max, $admin_id]);
+                            $message = '✓ Atelier créé avec succès !';
+                        } else {
+                            $id = (int)($_POST['id'] ?? 0);
+                            $stmt = $pdo->prepare('
+                                UPDATE ateliers 
+                                SET titre = ?, description = ?, date_heure = ?, capacite_max = ?
+                                WHERE id = ?
+                            ');
+                            $stmt->execute([$titre, $description, $date_heure, $capacite_max, $id]);
+                            $message = '✓ Atelier modifié avec succès !';
+                        }
+                    } catch (PDOException $e) {
+                        $error = 'Erreur lors de l\'enregistrement';
                     }
-                } catch (PDOException $e) {
-                    $error = 'Erreur lors de l\'enregistrement';
                 }
-            }
-        } elseif ($action === 'supprimer') {
-            $id = (int)($_POST['id'] ?? 0);
-            if ($id > 0) {
-                try {
-                    // Supprimer d'abord les réservations
-                    $stmt = $pdo->prepare('DELETE FROM reservations_ateliers WHERE atelier_id = ?');
-                    $stmt->execute([$id]);
-                    
-                    // Puis l'atelier
-                    $stmt = $pdo->prepare('DELETE FROM ateliers WHERE id = ?');
-                    $stmt->execute([$id]);
-                    $message = '✓ Atelier supprimé avec succès !';
-                } catch (PDOException $e) {
-                    $error = 'Erreur lors de la suppression';
+            } elseif ($action === 'supprimer') {
+                $id = (int)($_POST['id'] ?? 0);
+                if ($id > 0) {
+                    try {
+                        // Supprimer d'abord les réservations
+                        $stmt = $pdo->prepare('DELETE FROM reservations_ateliers WHERE atelier_id = ?');
+                        $stmt->execute([$id]);
+                        
+                        // Puis l'atelier
+                        $stmt = $pdo->prepare('DELETE FROM ateliers WHERE id = ?');
+                        $stmt->execute([$id]);
+                        $message = '✓ Atelier supprimé avec succès !';
+                    } catch (PDOException $e) {
+                        $error = 'Erreur lors de la suppression';
+                    }
                 }
             }
         }
@@ -101,6 +108,9 @@ foreach ($ateliers as $atelier) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Ateliers - Repaire Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         .admin-form {
@@ -335,6 +345,7 @@ foreach ($ateliers as $atelier) {
                 <h3><?php echo $edit_atelier ? 'Modifier l\'atelier' : 'Ajouter un nouvel atelier'; ?></h3>
                 
                 <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                     <input type="hidden" name="action" value="<?php echo $edit_atelier ? 'modifier' : 'ajouter'; ?>">
                     <?php if ($edit_atelier): ?>
                         <input type="hidden" name="id" value="<?php echo $edit_atelier['id']; ?>">
@@ -407,6 +418,7 @@ foreach ($ateliers as $atelier) {
                                 <div class="atelier-actions">
                                     <a href="ateliers.php?edit=<?php echo $atelier['id']; ?>" class="btn btn-edit">✏️ Modifier</a>
                                     <form method="POST" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                         <input type="hidden" name="action" value="supprimer">
                                         <input type="hidden" name="id" value="<?php echo $atelier['id']; ?>">
                                         <button type="submit" class="btn btn-edit" style="background: #FE7B7E;">🗑️ Supprimer</button>

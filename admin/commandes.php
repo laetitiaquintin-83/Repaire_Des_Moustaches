@@ -78,6 +78,9 @@ $commandes = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Commandes - Repaire Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         .alert {
@@ -301,7 +304,7 @@ $commandes = $stmt->fetchAll();
                         </div>
                         <div class="detail-item">
                             <div class="detail-item-label">Montant total</div>
-                            <div class="detail-item-value"><?php echo number_format($commande_detail['montant_total'], 2, ',', ' '); ?> €</div>
+                            <div class="detail-item-value"><?php echo number_format((float)$commande_detail['montant_total'], 2, ',', ' '); ?> €</div>
                         </div>
                     </div>
                     
@@ -334,8 +337,8 @@ $commandes = $stmt->fetchAll();
                                 <tr>
                                     <td><?php echo htmlspecialchars($ligne['produit_nom']); ?></td>
                                     <td><?php echo $ligne['quantite']; ?></td>
-                                    <td><?php echo number_format($ligne['prix_unitaire'], 2, ',', ' '); ?> €</td>
-                                    <td><?php echo number_format($ligne['prix_unitaire'] * $ligne['quantite'], 2, ',', ' '); ?> €</td>
+                                    <td><?php echo number_format((float)$ligne['prix_unitaire'], 2, ',', ' '); ?> €</td>
+                                    <td><?php echo number_format((float)$ligne['prix_unitaire'] * (int)$ligne['quantite'], 2, ',', ' '); ?> €</td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -369,7 +372,7 @@ $commandes = $stmt->fetchAll();
                                             <td><?php echo $cmd['id']; ?></td>
                                             <td><?php echo htmlspecialchars($cmd['prenom'] . ' ' . $cmd['nom']); ?></td>
                                             <td><?php echo date('d/m/Y', strtotime($cmd['date_commande'])); ?></td>
-                                            <td><?php echo number_format($cmd['montant_total'], 2, ',', ' '); ?> €</td>
+                                            <td><?php echo number_format((float)$cmd['montant_total'], 2, ',', ' '); ?> €</td>
                                             <td>
                                                 <span class="status-badge status-<?php echo $cmd['statut']; ?>">
                                                     <?php echo ucfirst(str_replace('_', ' ', $cmd['statut'])); ?>

@@ -6,7 +6,19 @@ session_start();
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
+$csrf_token = generateCSRFToken();
 $response = ['success' => false, 'message' => ''];
+
+// Vérifier le token CSRF pour les requêtes POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf_check = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_check)) {
+        $response['message'] = 'Erreur de sécurité : token CSRF invalide';
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+}
 
 // Récupérer l'ID du produit
 $produit_id = (int)($_POST['produit_id'] ?? $_GET['produit_id'] ?? 0);

@@ -12,64 +12,71 @@ if (!isset($_SESSION['admin_id'])) {
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
+$csrf_token = generateCSRFToken();
 $message = '';
 $error = '';
 
 // Traitement des actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
-        $action = $_POST['action'];
-        
-        if ($action === 'ajouter' || $action === 'modifier') {
-            $nom = htmlspecialchars($_POST['nom'] ?? '');
-            $description = htmlspecialchars($_POST['description'] ?? '');
-            $prix = (float)($_POST['prix'] ?? 0);
-            $categorie_id = (int)($_POST['categorie_id'] ?? 0);
+        // Valider le token CSRF
+        $csrf_check = $_POST['csrf_token'] ?? '';
+        if (!validateCSRFToken($csrf_check)) {
+            $error = 'Erreur de sécurité : token CSRF invalide';
+        } else {
+            $action = $_POST['action'];
             
-            if (!$nom || $prix <= 0 || $categorie_id <= 0) {
-                $error = 'Tous les champs sont obligatoires et le prix doit être > 0';
-            } else {
-                try {
-                    if ($action === 'ajouter') {
-                        $stmt = $pdo->prepare('
-                            INSERT INTO produits (nom, description, prix, categorie_id)
-                            VALUES (?, ?, ?, ?)
-                        ');
-                        $stmt->execute([$nom, $description, $prix, $categorie_id]);
-                        $message = '✓ Produit créé avec succès !';
-                    } else {
-                        $id = (int)($_POST['id'] ?? 0);
-                        $stmt = $pdo->prepare('
-                            UPDATE produits 
-                            SET nom = ?, description = ?, prix = ?, categorie_id = ?
-                            WHERE id = ?
-                        ');
-                        $stmt->execute([$nom, $description, $prix, $categorie_id, $id]);
-                        $message = '✓ Produit modifié avec succès !';
+            if ($action === 'ajouter' || $action === 'modifier') {
+                $nom = htmlspecialchars($_POST['nom'] ?? '');
+                $description = htmlspecialchars($_POST['description'] ?? '');
+                $prix = (float)($_POST['prix'] ?? 0);
+                $categorie_id = (int)($_POST['categorie_id'] ?? 0);
+                
+                if (!$nom || $prix <= 0 || $categorie_id <= 0) {
+                    $error = 'Tous les champs sont obligatoires et le prix doit être > 0';
+                } else {
+                    try {
+                        if ($action === 'ajouter') {
+                            $stmt = $pdo->prepare('
+                                INSERT INTO produits (nom, description, prix, categorie_id)
+                                VALUES (?, ?, ?, ?)
+                            ');
+                            $stmt->execute([$nom, $description, $prix, $categorie_id]);
+                            $message = '✓ Produit créé avec succès !';
+                        } else {
+                            $id = (int)($_POST['id'] ?? 0);
+                            $stmt = $pdo->prepare('
+                                UPDATE produits 
+                                SET nom = ?, description = ?, prix = ?, categorie_id = ?
+                                WHERE id = ?
+                            ');
+                            $stmt->execute([$nom, $description, $prix, $categorie_id, $id]);
+                            $message = '✓ Produit modifié avec succès !';
+                        }
+                    } catch (PDOException $e) {
+                        $error = 'Erreur lors de l\'enregistrement';
                     }
-                } catch (PDOException $e) {
-                    $error = 'Erreur lors de l\'enregistrement';
                 }
-            }
-        } elseif ($action === 'supprimer') {
-            $id = (int)($_POST['id'] ?? 0);
-            if ($id > 0) {
-                try {
-                    // Vérifier si le produit est utilisé dans une commande
-                    $stmt = $pdo->prepare('SELECT COUNT(*) FROM lignes_commandes WHERE produit_id = ?');
-                    $stmt->execute([$id]);
-                    $count = $stmt->fetchColumn();
-                    
-                    if ($count > 0) {
-                        $error = 'Impossible de supprimer ce produit car il est utilisé dans des commandes';
-                    } else {
-                        // Supprimer le produit
-                        $stmt = $pdo->prepare('DELETE FROM produits WHERE id = ?');
+            } elseif ($action === 'supprimer') {
+                $id = (int)($_POST['id'] ?? 0);
+                if ($id > 0) {
+                    try {
+                        // Vérifier si le produit est utilisé dans une commande
+                        $stmt = $pdo->prepare('SELECT COUNT(*) FROM lignes_commandes WHERE produit_id = ?');
                         $stmt->execute([$id]);
-                        $message = '✓ Produit supprimé avec succès !';
+                        $count = $stmt->fetchColumn();
+                        
+                        if ($count > 0) {
+                            $error = 'Impossible de supprimer ce produit car il est utilisé dans des commandes';
+                        } else {
+                            // Supprimer le produit
+                            $stmt = $pdo->prepare('DELETE FROM produits WHERE id = ?');
+                            $stmt->execute([$id]);
+                            $message = '✓ Produit supprimé avec succès !';
+                        }
+                    } catch (PDOException $e) {
+                        $error = 'Erreur lors de la suppression';
                     }
-                } catch (PDOException $e) {
-                    $error = 'Erreur lors de la suppression';
                 }
             }
         }
@@ -105,6 +112,9 @@ $produits = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Produits - Repaire Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         .admin-form {
@@ -306,6 +316,7 @@ $produits = $stmt->fetchAll();
                 <h3><?php echo $edit_produit ? 'Modifier le produit' : 'Ajouter un nouveau produit'; ?></h3>
                 
                 <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                     <input type="hidden" name="action" value="<?php echo $edit_produit ? 'modifier' : 'ajouter'; ?>">
                     <?php if ($edit_produit): ?>
                         <input type="hidden" name="id" value="<?php echo $edit_produit['id']; ?>">
@@ -380,12 +391,13 @@ $produits = $stmt->fetchAll();
                                 <tr>
                                     <td><?php echo htmlspecialchars($produit['nom']); ?></td>
                                     <td><?php echo htmlspecialchars($produit['categorie']); ?></td>
-                                    <td><?php echo number_format($produit['prix'], 2, ',', ' '); ?> €</td>
+                                    <td><?php echo number_format((float)$produit['prix'], 2, ',', ' '); ?> €</td>
                                     <td><?php echo htmlspecialchars(substr($produit['description'] ?? '', 0, 50)); ?><?php echo strlen($produit['description'] ?? '') > 50 ? '...' : ''; ?></td>
                                     <td>
                                         <div class="actions">
                                             <a href="produits.php?edit=<?php echo $produit['id']; ?>" class="btn btn-edit">✏️</a>
                                             <form method="POST" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                                 <input type="hidden" name="action" value="supprimer">
                                                 <input type="hidden" name="id" value="<?php echo $produit['id']; ?>">
                                                 <button type="submit" class="btn btn-edit" style="background: #FE7B7E;">🗑️</button>
@@ -415,7 +427,7 @@ $produits = $stmt->fetchAll();
             <div class="section">
                 <div class="coming-soon">
                     <h2>⚙️ En développement</h2>
-                    <p><?php echo $count; ?> produit(s) en base</p>
+                    <p><?php echo count($produits); ?> produit(s) en base</p>
                 </div>
             </div>
         </main>

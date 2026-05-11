@@ -147,12 +147,12 @@ function getImagePath(string $productName): string
                 
                 <div class="resume-ligne">
                     <span>Sous-total :</span>
-                    <span><?php echo number_format($total_price, 2, ',', ' '); ?> €</span>
+                    <span><?php echo number_format((float)$total_price, 2, ',', ' '); ?> €</span>
                 </div>
                 
                 <div class="resume-total">
                     <span>Total :</span>
-                    <span><?php echo number_format($total_price, 2, ',', ' '); ?> €</span>
+                    <span><?php echo number_format((float)$total_price, 2, ',', ' '); ?> €</span>
                 </div>
                 
                 <a href="checkout.php" class="bouton-checkout">Passer la commande</a>
