@@ -336,8 +336,10 @@ foreach ($cart as $item) {
             <a href="../index.html" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <a href="../index.html">Accueil</a>
-                <a href="../public/boutique.php">Boutique</a>
+                <a href="boutique.php">Boutique</a>
+                <a href="belles-histoires.php">Histoires</a>
                 <a href="cart.php" style="color: #2B2B2B;">🛒 Panier</a>
+                <a href="../login.php" style="color: #85D6CD; font-weight: bold;">Admin</a>
             </div>
         </nav>
     </header>
@@ -425,7 +427,12 @@ foreach ($cart as $item) {
 
     <!-- Footer -->
     <footer style="background: #2B2B2B; color: white; padding: 30px; text-align: center; margin-top: 60px;">
-        <p>&copy; 2024 Le Repaire des Moustaches. Tous droits réservés.</p>
+        <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
+        <div style="margin-top: 15px;">
+            <a href="#" style="color: white; text-decoration: none; margin: 0 15px;">Facebook</a> |
+            <a href="#" style="color: white; text-decoration: none; margin: 0 15px;">Instagram</a> |
+            <a href="../login.php" style="color: #85D6CD; text-decoration: none; margin: 0 15px;">Admin</a>
+        </div>
     </footer>
 </body>
 </html>

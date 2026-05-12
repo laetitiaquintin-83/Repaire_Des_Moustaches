@@ -80,8 +80,8 @@ function getImagePath(string $productName): string
 <body>
     
     <header>
-        <div class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></div>
-        <nav><ul><li><a href="../index.html">Accueil</a></li><li><a href="../concept.html">Le Concept</a></li><li><a href="boutique.php">Boutique</a></li><li><a href="cart.php">🛒 Panier</a></li></ul></nav>
+        <a href="../index.html" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
+        <nav><ul><li><a href="../index.html">Accueil</a></li><li><a href="../concept.html">Le Concept</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li><li><a href="cart.php">🛒 Panier</a></li></ul></nav>
         <div class="action"><a href="../formulaire.html" class="bouton-reserver">Réserver</a></div>
     </header>
 
@@ -168,12 +168,11 @@ function getImagePath(string $productName): string
     </main>
 
     <footer>
-        <p>Le Repaire des Moustaches - Le bar à chats le plus cosy de la ville.</p>
-        <p>&copy; 2024 Tous droits réservés.</p>
+        <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
         <div class="reseaux-sociaux">
-            <a href="#">Instagram</a>
-            <a href="#">Facebook</a>
-            <a href="#">TikTok</a>
+            <a href="#">Facebook</a> |
+            <a href="#">Instagram</a> |
+            <a href="../login.php">Admin</a>
         </div>
     </footer>
 

@@ -126,14 +126,28 @@
                     </div>
 
                     <button type="submit" class="btn-envoyer">Envoyer ma demande 🐾</button>
-                    
+                    <div id="success-message" style="display: none; margin-top: 20px; padding: 15px; background-color: #85D6CD; color: #2B2B2B; border-radius: 8px; text-align: center; font-weight: bold;">
+                        ✅ Merci ! Votre demande a été reçue. Nous vous recontacterons dans les 24h à l'adresse email fournie.
+                    </div>
                 </form>
             </div>
         </section>
     </main>
 
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Afficher le message de succès
+            document.getElementById('success-message').style.display = 'block';
+            // Réinitialiser le formulaire
+            this.reset();
+            // Faire défiler vers le message
+            document.getElementById('success-message').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+
     <footer>
-        <p>&copy; 2026 Le Repaire des Moustaches. Créé avec ❤️ pour les chats et les gens qui les aiment.</p>
+        <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
         <div class="reseaux-sociaux">
             <a href="#">Facebook</a> |
             <a href="#">Instagram</a> |

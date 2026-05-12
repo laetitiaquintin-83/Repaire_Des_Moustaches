@@ -16,7 +16,12 @@ $histoires = $pdo->query($sql)->fetchAll();
 function formatDate(string $date): string
 {
     $dt = new DateTime($date);
-    return $dt->format('d F Y');
+    $mois_fr = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
+                'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    $jour = (int)$dt->format('d');
+    $mois = $mois_fr[(int)$dt->format('m') - 1];
+    $annee = $dt->format('Y');
+    return "$jour $mois $annee";
 }
 ?>
 <!DOCTYPE html>
@@ -32,9 +37,9 @@ function formatDate(string $date): string
 </head>
 <body>
     <header>
-        <div class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></div>
-        <nav><ul><li><a href="../index.html">Accueil</a></li><li><a href="../concept.html">Le Concept</a></li><li><a href="../equipage.html">L'équipage</a></li><li><a href="../ateliers.html">Les Ateliers</a></li><li><a href="../boutique.html">Boutique</a></li></ul></nav>
-        <div class="action"><a href="../ateliers.html" class="bouton-reserver">Réserver</a></div>
+        <a href="../index.html" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
+        <nav><ul><li><a href="../index.html">Accueil</a></li><li><a href="../concept.html">Le Concept</a></li><li><a href="../equipage.html">L'équipage</a></li><li><a href="../ateliers.html">Les Ateliers</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li></ul></nav>
+        <div class="action"><a href="../formulaire.html" class="bouton-reserver">Réserver</a></div>
     </header>
     <main class="page-liste belles-histoires-liste">
         <section class="liste-header">
@@ -62,13 +67,18 @@ function formatDate(string $date): string
                 <?php endforeach; ?>
             <?php endif; ?>
         </section>
+
+        <section style="text-align: center; margin-top: 60px; padding: 40px;">
+            <h2 style="margin-bottom: 20px;">Vous aussi, partagez votre histoire !</h2>
+            <a href="soumettre-histoire.php" class="bouton-reserver" style="background-color: #85D6CD;">📝 Partager mon histoire</a>
+        </section>
     </main>
     <footer>
         <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
         <div class="reseaux-sociaux">
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-            <a href="#">Contact</a>
+            <a href="#">Facebook</a> |
+            <a href="#">Instagram</a> |
+            <a href="../login.php">Admin</a>
         </div>
     </footer>
 </body>

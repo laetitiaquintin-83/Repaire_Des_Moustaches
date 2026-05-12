@@ -257,7 +257,12 @@ if ($commande_id > 0) {
 
     <!-- Footer -->
     <footer style="background: #2B2B2B; color: white; padding: 30px; text-align: center; margin-top: 60px;">
-        <p>&copy; 2024 Le Repaire des Moustaches. Tous droits réservés.</p>
+        <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
+        <div style="margin-top: 15px;">
+            <a href="#" style="color: white; text-decoration: none; margin: 0 15px;">Facebook</a> |
+            <a href="#" style="color: white; text-decoration: none; margin: 0 15px;">Instagram</a> |
+            <a href="../login.php" style="color: #85D6CD; text-decoration: none; margin: 0 15px;">Admin</a>
+        </div>
     </footer>
 </body>
 </html>
