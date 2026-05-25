@@ -1,4 +1,5 @@
 # Dossier Professionnel - Développeur Web et Web Mobile
+
 ## "Le Repaire des Moustaches" - Titre professionnel (Niveau 5 - RNCP 2023)
 
 ---
@@ -8,12 +9,14 @@
 ### Alignement avec les 2 blocs de compétences
 
 **Bloc 1 - Développement Front-end (Interfaces)**:
+
 - ✅ Conception et maquettage d'interfaces responsives
 - ✅ HTML5, CSS3, cohérence visuelle
 - ✅ Respect de la charte graphique et accessibilité
 - ✅ Polices Google (Montserrat, Pacifico)
 
 **Bloc 2 - Développement Back-end (Données et serveur)**:
+
 - ✅ Architecture PHP avec PDO
 - ✅ Base de données relationnelle MySQL
 - ✅ Gestion des utilisateurs et authentification
@@ -604,33 +607,33 @@ CONFORMITÉ RGPD:
 ARGUMENTS POUR L'ORAL:
 
 1. Compréhension métier:
-   "J'ai pris le temps de comprendre le concept avant de coder: tiers-lieu 
-   solidaire, adoptions responsables, ateliers à prix libre. Ce n'est pas 
-   juste une boutique e-commerce, c'est un modèle économique basé sur 
+   "J'ai pris le temps de comprendre le concept avant de coder: tiers-lieu
+   solidaire, adoptions responsables, ateliers à prix libre. Ce n'est pas
+   juste une boutique e-commerce, c'est un modèle économique basé sur
    la solidarité."
 
 2. Architecture sécurisée:
-   "Même sur un petit projet de test, j'ai appliqué les recommandations 
-   OWASP: prepared statements pour SQL injection, htmlspecialchars pour XSS, 
-   tokens CSRF avec hash_equals. C'est une habitude que j'ai prise dès le 
+   "Même sur un petit projet de test, j'ai appliqué les recommandations
+   OWASP: prepared statements pour SQL injection, htmlspecialchars pour XSS,
+   tokens CSRF avec hash_equals. C'est une habitude que j'ai prise dès le
    début."
 
 3. Code professionnel:
-   "La base de données est normalisée (12 tables relationnelles), les chemins 
-   sont relatifs (déploiement flexible), la structure est claire 
+   "La base de données est normalisée (12 tables relationnelles), les chemins
+   sont relatifs (déploiement flexible), la structure est claire
    (config/, admin/, public/). C'est du code qu'on peut maintenir."
 
 4. Tests réels:
-   "J'ai testé chaque fonctionnalité: navigation (10+ pages), formulaires, 
-   authentification, CRUD admin, panier, affichage données BD. Le projet 
+   "J'ai testé chaque fonctionnalité: navigation (10+ pages), formulaires,
+   authentification, CRUD admin, panier, affichage données BD. Le projet
    fonctionne end-to-end."
 
 5. Documentation:
-   "J'ai documenté mes choix: DOSSIER_EXAMEN.md, README.md, code commenté. 
+   "J'ai documenté mes choix: DOSSIER_EXAMEN.md, README.md, code commenté.
    Le prochain développeur peut reprendre le projet sans questions."
 
 6. Conformité:
-   "RGAA (accessibilité), RGPD (données), OWASP (sécurité) ne sont pas 
+   "RGAA (accessibilité), RGPD (données), OWASP (sécurité) ne sont pas
    des boîtes à cocher pour moi. C'est intégré dans ma façon de coder."
 ```
 
@@ -669,35 +672,35 @@ VERBES D'ACTION ADAPTÉS:
 
 ```
 Q: Pourquoi 12 tables et pas moins?
-R: "Chaque table représente une entité métier: utilisateurs, ateliers, 
-   produits, commandes, etc. Cette normalisation évite les redondances et 
-   les anomalies. Si j'ajoute un produit, je le fais une fois dans 'produits', 
+R: "Chaque table représente une entité métier: utilisateurs, ateliers,
+   produits, commandes, etc. Cette normalisation évite les redondances et
+   les anomalies. Si j'ajoute un produit, je le fais une fois dans 'produits',
    pas 10 fois dans 'commandes'."
 
 Q: C'est vraiment sécurisé?
-R: "Pour ce projet de test oui. Les vulnerabilités OWASP majeures sont 
-   adressées: SQL injection (prepared statements), XSS (htmlspecialchars), 
-   CSRF (tokens). En production, j'ajouterais HTTPS, bcrypt sur passwords, 
+R: "Pour ce projet de test oui. Les vulnerabilités OWASP majeures sont
+   adressées: SQL injection (prepared statements), XSS (htmlspecialchars),
+   CSRF (tokens). En production, j'ajouterais HTTPS, bcrypt sur passwords,
    rate limiting, CSP headers."
 
 Q: Pourquoi PDO et pas MySQLi?
-R: "PDO est plus abstrait et portable. Si je change MySQL en PostgreSQL, 
+R: "PDO est plus abstrait et portable. Si je change MySQL en PostgreSQL,
    mon code s'adapte. MySQLi est MySQL-only. PDO est le standard moderne."
 
 Q: Et si l'utilisateur désactive JavaScript?
-R: "Le panier fonctionne aussi avec formulaires POST. Les validations 
-   critiques sont côté serveur, pas côté client. Le site marche sans JS, 
+R: "Le panier fonctionne aussi avec formulaires POST. Les validations
+   critiques sont côté serveur, pas côté client. Le site marche sans JS,
    c'est juste moins fluide."
 
 Q: Pourquoi ces couleurs/polices?
-R: "Menthe et Rose-Corail créent une atmosphère chaleureuse et rétro (années 50). 
-   Montserrat (modère) + Pacifico (ludique) reflètent le ton: professionnel 
+R: "Menthe et Rose-Corail créent une atmosphère chaleureuse et rétro (années 50).
+   Montserrat (modère) + Pacifico (ludique) reflètent le ton: professionnel
    mais convivial. C'est intentionnel, pas par défaut."
 
 Q: Comment tu trouves les bugs?
-R: "Je teste les chemins heureux (ça marche) et les chemins tristes 
-   (erreurs, injection, accès non-autorisé). Warnings/erreurs PHP: je les 
-   lis avec 'display_errors'. Logging: je pourrais améliorer avec fichiers 
+R: "Je teste les chemins heureux (ça marche) et les chemins tristes
+   (erreurs, injection, accès non-autorisé). Warnings/erreurs PHP: je les
+   lis avec 'display_errors'. Logging: je pourrais améliorer avec fichiers
    de log."
 ```
 
@@ -710,27 +713,27 @@ R: "Je teste les chemins heureux (ça marche) et les chemins tristes
 ```
 PRÉSENTATION COURTE (2 min):
 
-"Mon projet s'appelle Le Repaire des Moustaches. C'est un tiers-lieu solidaire 
-combinant un dîner rétro, un espace de rencontre avec des chats, et des ateliers 
+"Mon projet s'appelle Le Repaire des Moustaches. C'est un tiers-lieu solidaire
+combinant un dîner rétro, un espace de rencontre avec des chats, et des ateliers
 citoyens à prix libre.
 
-Techniquement, j'ai conçu une base de données relationnelle (12 tables MySQL) 
-qui gère les utilisateurs, les ateliers, les adhésions annuelles à 5€, les 
+Techniquement, j'ai conçu une base de données relationnelle (12 tables MySQL)
+qui gère les utilisateurs, les ateliers, les adhésions annuelles à 5€, les
 produits (10 goodies/repas), et les commandes.
 
-Le front-end combine des pages HTML5 statiques pour la présentation avec des 
+Le front-end combine des pages HTML5 statiques pour la présentation avec des
 pages PHP dynamiques pour les contenus (histoires adoptions, boutique, panier).
 
-J'ai appliqué les recommandations OWASP pour la sécurité: prepared statements 
-contre les injections SQL, htmlspecialchars contre le XSS, tokens CSRF avec 
-hash_equals pour éviter les attaques CSRF. Le projet respecte aussi RGAA 
+J'ai appliqué les recommandations OWASP pour la sécurité: prepared statements
+contre les injections SQL, htmlspecialchars contre le XSS, tokens CSRF avec
+hash_equals pour éviter les attaques CSRF. Le projet respecte aussi RGAA
 (accessibilité) et RGPD (données).
 
-Chaque page est testée end-to-end: navigation, authentification admin, CRUD 
-complet (créer/modifier/supprimer ateliers et produits), gestion du panier, 
+Chaque page est testée end-to-end: navigation, authentification admin, CRUD
+complet (créer/modifier/supprimer ateliers et produits), gestion du panier,
 modération des contenus.
 
-Le code est structuré (config/, admin/, public/), documenté, et prêt à être 
+Le code est structuré (config/, admin/, public/), documenté, et prêt à être
 repris par un autre développeur."
 
 PRÉSENTATION LONGUE AVEC DÉMO (5 min + démo):
@@ -986,11 +989,14 @@ Tables vérifiées:
 ### ✅ 10 PROBLÈMES RÉSOLUS
 
 #### 1. **Footer Incohérent** 🎯
-**Avant**: 
+
+**Avant**:
+
 - Copyrights différents (2024, 2026 mélangés)
 - Messages disparates ("Créé avec ❤️", "Tous droits réservés", "tiers-lieu solidaire")
 
 **Après**:
+
 - ✅ Tous les footers = "© 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains."
 - ✅ Liens uniformes: Facebook | Instagram | Admin
 
@@ -999,10 +1005,12 @@ Tables vérifiées:
 ---
 
 #### 2. **Logo Non Cliquable (Pages PHP)** 🖱️
+
 **Avant**: Logo = `<div>` sur pages dynamiques → pas retour accueil
 
 **Après**:
-- ✅ public/boutique.php: Logo = `<a href="../index.html">` 
+
+- ✅ public/boutique.php: Logo = `<a href="../index.html">`
 - ✅ public/belles-histoires.php: Logo cliquable
 - ✅ public/cart.php: Logo cliquable
 - ✅ Consistent avec pages statiques
@@ -1010,11 +1018,14 @@ Tables vérifiées:
 ---
 
 #### 3. **Navigation Disparate** 🗺️
+
 **Avant**:
+
 - Pages statiques: Concept, Projet, Équipage, Ateliers, Belles Histoires, Boutique
 - Pages dynamiques (public/): Accueil, Concept, Équipage, Ateliers, Boutique (manque "Histoires")
 
 **Après**:
+
 - ✅ Pages dynamiques: Accueil, Concept, Équipage, Ateliers, **Histoires**, **Boutique** (cohérent)
 - ✅ Tous les boutons "Réserver" pointent vers formulaire.html (pas vers ateliers.html)
 
@@ -1023,11 +1034,14 @@ Tables vérifiées:
 ---
 
 #### 4. **Lien "Partager Histoire" Manquant** 💬
-**Avant**: 
+
+**Avant**:
+
 - belles-histoires.html (statique) → lien "Partager mon histoire" ✓
 - public/belles-histoires.php (dynamique) → pas de lien! ✗
 
 **Après**:
+
 - ✅ CTA ajoutée: "Vous aussi, partagez votre histoire!"
 - ✅ Bouton 📝 Partager mon histoire → public/soumettre-histoire.php
 - ✅ Cohérent avec version statique
@@ -1035,9 +1049,11 @@ Tables vérifiées:
 ---
 
 #### 5. **Dates en Anglais** 📅
+
 **Avant**: "Publié le 05 May 2026" (mélange français/anglais)
 
 **Après**:
+
 - ✅ Fonction `formatDate()` rewrite pour français
 - ✅ Affichage: "5 mai 2026" (100% français)
 - ✅ Appliqué à public/belles-histoires.php
@@ -1045,11 +1061,14 @@ Tables vérifiées:
 ---
 
 #### 6. **Admin Link Manquant** 👨‍💼
-**Avant**: 
+
+**Avant**:
+
 - Certains footers (pages PHP) manquaient lien Admin
 - Footer public/belles-histoires.php: Facebook, Instagram, Contact (pas Admin!)
 
 **Après**:
+
 - ✅ Tous les footers: Facebook | Instagram | **Admin**
 - ✅ Admin accessible depuis partout (logo → accueil → login.php)
 
@@ -1058,12 +1077,15 @@ Tables vérifiées:
 ---
 
 #### 7. **Formulaire Silence** 🤐
-**Avant**: 
+
+**Avant**:
+
 - Utilisateur remplit formulaire.html
 - Clique "Envoyer" → rien ne se passe (pas de feedback)
 - Doute: "Ma demande a-t-elle été enregistrée?"
 
 **Après**:
+
 - ✅ JavaScript event listener sur form submit
 - ✅ Message success: "✅ Merci ! Votre demande a été reçue. Nous vous recontacterons dans les 24h à l'adresse email fournie."
 - ✅ Message scroll smooth vers élément
@@ -1073,12 +1095,15 @@ Tables vérifiées:
 ---
 
 #### 8. **Pages Statiques vs Dynamiques Déconnectées** 🔄
-**Avant**: 
+
+**Avant**:
+
 - Deux versions de belles-histoires (HTML + PHP)
 - Utilisateur confus: "C'est quelle page la vraie?"
 - Lien "Partager" sur statique mais pas sur dynamique
 
 **Après**:
+
 - ✅ Navigation uniforme entre deux versions
 - ✅ Même structure, même footer, même CTA
 - ✅ Cohérence : utilisateur navigue sans surprise
@@ -1086,22 +1111,28 @@ Tables vérifiées:
 ---
 
 #### 9. **Checkout Header Incomplet** 📋
-**Avant**: 
+
+**Avant**:
+
 - public/checkout.php: Header minimaliste (juste "Repaire", Panier, pas Admin)
 - Utilisateur ne sait pas où il est
 
 **Après**:
+
 - ✅ Header amélioré: Logo | Accueil | Boutique | Histoires | 🛒 Panier | **Admin**
 - ✅ Cohérent avec checkout experience
 
 ---
 
 #### 10. **Message Démo Clarté** 💳
-**Avant**: 
+
+**Avant**:
+
 - Checkout form → info "En demo, le paiement..." pas visible
 - Utilisateur hésite: "Vais-je être débité?"
 
 **Après**:
+
 - ✅ Message prominent au checkout: "💡 À savoir: En demo, le paiement ne sera pas débité. Vous recevrez un email de confirmation."
 - ✅ Transparence = confiance utilisateur
 
@@ -1110,6 +1141,7 @@ Tables vérifiées:
 ### **📊 RÉSULTATS TESTS VALIDATION**
 
 #### A. Flux E-Commerce Complet
+
 ```
 ✅ Boutique.php → 10 produits chargés
 ✅ "Ajouter" → produit appear dans panier (session persistence)
@@ -1120,6 +1152,7 @@ Tables vérifiées:
 ```
 
 #### B. Navigation & Cohérence
+
 ```
 ✅ Footer identique sur toutes pages (15 fichiers)
 ✅ Logo cliquable partout
@@ -1129,6 +1162,7 @@ Tables vérifiées:
 ```
 
 #### C. Formulaires & Feedback
+
 ```
 ✅ formulaire.html → message success après submit
 ✅ Utilisateur sait que demande est reçue
@@ -1136,6 +1170,7 @@ Tables vérifiées:
 ```
 
 #### D. Cohérence Marque
+
 ```
 ✅ Copyright unifié: "© 2026... tiers-lieu solidaire"
 ✅ Réseaux sociaux: Facebook | Instagram | Admin (partout)
@@ -1150,6 +1185,7 @@ Tables vérifiées:
 **Après polish**: Site = **9,2/10** (Technique impeccable + UX cohérente)
 
 **Jury perception**:
+
 - ✅ Attention aux détails (footer unifié = respect code quality)
 - ✅ Pensée UX (feedback formulaire = empathie utilisateur)
 - ✅ Cohérence (navigation logique = architecture solide)
@@ -1161,15 +1197,15 @@ Tables vérifiées:
 
 Pour votre présentation oral:
 
-*"Après tests exhaustifs, j'ai identifié des incohérences UX qui n'affectaient pas la fonctionnalité mais impactaient la perception professionnelle. J'ai donc déployé un audit critique et appliqué 10 corrections majeures:*
+_"Après tests exhaustifs, j'ai identifié des incohérences UX qui n'affectaient pas la fonctionnalité mais impactaient la perception professionnelle. J'ai donc déployé un audit critique et appliqué 10 corrections majeures:_
 
-*- Footer unifié (copyright, branding, liens)*
-*- Navigation cohérente (statique ↔ dynamique)*
-*- Feedback utilisateur (formulaire success message)*
-*- Logo cliquable (retour accueil accessible)*
-*- Localisation (dates en français, messages clairs)*
+_- Footer unifié (copyright, branding, liens)_
+_- Navigation cohérente (statique ↔ dynamique)_
+_- Feedback utilisateur (formulaire success message)_
+_- Logo cliquable (retour accueil accessible)_
+_- Localisation (dates en français, messages clairs)_
 
-*C'est l'importance de tester du point de vue utilisateur, pas seulement technique. Un site peut être 'correct' techniquement mais donner impression amateur si l'UX est disparate.*"
+_C'est l'importance de tester du point de vue utilisateur, pas seulement technique. Un site peut être 'correct' techniquement mais donner impression amateur si l'UX est disparate._"
 
 ---
 
