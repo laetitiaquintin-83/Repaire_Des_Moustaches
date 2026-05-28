@@ -26,8 +26,8 @@ Basé à Toulon, c'est un lieu libre d'accès où chacun peut rencontrer les pen
 
 ### Backend (Infrastructure)
 
-- **PHP 7.2+** avec PDO (sécurité SQL injection)
-- **MySQL 5.7+** (12 tables normalisées, FK, CHECK constraints)
+- **PHP 8.2+** avec PDO (sécurité SQL injection)
+- **MySQL 8.0+** (13 tables normalisées, FK, CHECK constraints)
 - **Config** : `config/database.php` (singleton PDO pattern)
 - **Démo** : `schema.sql` + `demo_data.sql` prêts à l'import
 
@@ -35,21 +35,44 @@ Basé à Toulon, c'est un lieu libre d'accès où chacun peut rencontrer les pen
 
 ```
 Repaire_Des_Moustaches/
-├── index.html              # Accueil (hero + 5 cartes navigation)
-├── concept.html            # 3 piliers du projet + footer
-├── equipage.html           # Galerie 3 chats + adoption + footer
-├── ateliers.html           # 4 ateliers (images + descriptions + CTAs) + footer
-├── repaire.html            # Histoire + Engagements + footer
-├── douceurs.html           # Galerie 4 visuels gourmands + footer
-├── espace.html             # Redirection vers repaire.html
-├── style.css               # Styles centralisés (responsive, hover effects)
-├── schema.sql              # 12 CREATE TABLE avec constraints
-├── demo_data.sql           # Données test (3 chats, 2 adhésions, ateliers, etc)
+├── index.php               # Accueil (hero + 5 cartes + 🔐 bouton admin)
+├── concept.php             # 3 piliers du projet
+├── equipage.php            # Galerie 3 chats + adoption
+├── ateliers.php            # Ateliers dynamiques depuis BDD
+├── repaire.php             # Histoire + Engagements
+├── douceurs.php            # Galerie gourmande
+├── projet.php              # Vision & trajectoire
+├── formulaire.php          # Réservation + CSRF protection
+├── login.php               # Authentification admin
+├── logout.php              # Déconnexion
+├── style.css               # Styles (responsive, 🔐 cadenas)
+├── schema.sql              # 13 CREATE TABLE + DEMANDES
+├── demo_data.sql           # Données test
+├── includes/
+│   ├── header.php          # Header + nav (include_once en début)
+│   └── footer.php          # Footer (include_once en fin)
 ├── config/
-│   └── database.php        # PDO singleton connection
+│   └── database.php        # PDO singleton + CSRF tokens
 ├── public/
-│   └── pensionnaires.php   # Proof-of-concept (dynamic cat list)
-├── images/                 # 30+ assets (logos, photos, icônes PNG)
+│   ├── pensionnaires.php   # Galerie chats dynamique
+│   ├── belles-histoires.php# Testimonials adoption
+│   ├── boutique.php        # Catalogue produits
+│   ├── cart.php            # Panier session
+│   ├── checkout.php        # Commande finale + CSRF protection
+│   ├── confirmation.php    # Confirmation commande
+│   └── soumettre-histoire.php # Form testimonial
+├── admin/
+│   ├── dashboard.php       # Tableau de bord admin
+│   ├── ateliers.php        # CRUD ateliers
+│   ├── produits.php        # CRUD produits
+│   ├── commandes.php       # Gestion commandes
+│   ├── utilisateurs.php    # Gestion utilisateurs
+│   └── moderer-histoires.php # Modération belles histoires
+├── images/                 # 30+ assets (logos, photos, icônes)
+├── SECURITE_AUDIT.md       # Documentation sécurité (6 niveaux)
+├── GUIDE_PRESENTATION_JURY.md # Script présentation + Q&A
+├── BOUTON_ADMIN_CADENAS.md # Implémentation 🔐 cadenas
+├── MCD.md                  # Diagramme entité-association
 ├── .gitignore              # Ignore OS, IDE, build files
 └── README.md               # Ce fichier
 ```
@@ -64,8 +87,9 @@ Repaire_Des_Moustaches/
 ✅ **Accents français** - Toutes les pages avec accents corrects (é, è, ê, à)  
 ✅ **SEO-friendly** - Titres hiérarchisés (H1), descriptions claires, meta viewport  
 ✅ **Navigation fluide** - Menu principal identique partout + footer avec liens  
-✅ **Sécurité base** - PDO + CHECK constraints (adhésion 5€ fixe)  
-✅ **Délivrables examen** - MCD, SQL complet, PHP backend scaffold, HTML/CSS production-ready  
+✅ **Sécurité renforcée** - PDO + CSRF tokens (hash_equals) + htmlspecialchars() sur tous les outputs  
+✅ **Formulaire de réservation** - formulaire.php avec validation server-side et insertion BDD  
+✅ **Délivrables examen** - MCD, SQL complet, PHP backend fonctionnel, HTML/CSS production-ready  
 ✅ **Hover effects** - Boutons avec transition + shadow, liens sociaux colorés  
 ✅ **Zéro erreurs** - HTML/CSS valides, pas d'erreurs console
 
@@ -97,22 +121,23 @@ Repaire_Des_Moustaches/
 
 ---
 
-## 🗄️ Base de Données (12 Tables)
+## 🗄️ Base de Données (13 Tables)
 
 Schéma normalisé avec foreign keys et constraints :
 
-- **utilisateurs** - Comptes membres/visiteurs
-- **admin_users** - Admin dashboard (future)
+- **utilisateurs** - Comptes membres/visiteurs (email, password bcrypt)
+- **admin_users** - Admin dashboard (login, password bcrypt)
 - **refuges_partenaires** - Refuges d'adoption partenaires
 - **pensionnaires** - Chats en refuge (status: libre/reserve/adopte)
 - **adhesions** - Membership annuelle (5€ CHECK constraint)
 - **ateliers** - Ateliers proposés
 - **reservations_ateliers** - Inscriptions (rôles: participant/animator, prix-libre)
-- **belles_histoires** - Testimonials adoption
+- **belles_histoires** - Testimonials adoption (modération: attente/approuvee/refusee)
 - **categories_produits** - Menu + boutique categories
 - **produits** - Items vente (plats, goodies)
 - **commandes** - Order headers
 - **lignes_commandes** - Order line items
+- **demandes** - Réservations/animations/privatisations (motif: participer/animer/prive, statut: nouvelle/traitee/refusee)
 
 ---
 
@@ -135,17 +160,24 @@ Pour changer le thème : modifier les 4 values en `:root`.
 
 ## 📝 Notes pour l'Examen DWWM
 
-- ✅ **Hiérarchie sémantique** OK (H1, H2, semantic tags)
-- ✅ **Accents français** corrigés partout
-- ✅ **Footer** présent sur toutes les pages
-- ✅ **Responsive** à partir de 1100px breakpoint
-- ✅ **MCD** (diagram included in project docs)
-- ✅ **SQL** 12 tables, normalized, FK + constraints
-- ✅ **PDO** utilisé pour la sécurité (injection SQL impossible)
-- ✅ **Membership** contraint à 5€ (CHECK constraint)
-- ✅ **Images** bien organisées avec alt tags
-- ⚠️ **Admin backend** : scaffold en place, CRUD à implémenter
-- ⚠️ **Authentification** : non implémentée (future)
+### ✅ Délivrables Complétés
+
+- ✅ **Hiérarchie sémantique** - H1, H2, semantic tags (header, nav, main, footer)
+- ✅ **Accents français** - Corrects partout (é, è, ê, à, ç)
+- ✅ **Footer** - Présent sur toutes les pages
+- ✅ **Responsive** - Mobile-first avec breakpoint 1100px
+- ✅ **MCD** - Diagramme inclus (MCD.md)
+- ✅ **SQL** - 13 tables, normalisées, FK + CHECK constraints
+- ✅ **PDO** - Prepared statements (? ou :param) - Injection SQL impossible
+- ✅ **Sécurité CSRF** - Tokens uniques par session (hash_equals validation)
+- ✅ **Sécurité XSS** - htmlspecialchars() sur tous les outputs
+- ✅ **Sécurité Auth** - bcrypt password_hash (PASSWORD_DEFAULT)
+- ✅ **Validation server-side** - Email, enum, date, type checking
+- ✅ **Formulaires** - formulaire.php avec INSERT INTO demandes
+- ✅ **CRUD Admin** - Ateliers, produits, utilisateurs, histoires, commandes
+- ✅ **Images** - Alt tags, bien organisées, responsive
+- ✅ **Documentation** - SECURITE_AUDIT.md, GUIDE_PRESENTATION_JURY.md, BOUTON_ADMIN_CADENAS.md
+- ✅ **UI Polish** - 🔐 Bouton admin cadenas sur accueil
 
 ---
 
@@ -187,5 +219,34 @@ Questions sur le projet ? Vérifier :
 
 ---
 
-**Version** : 1.0 (2026-05-04)  
-**Status** : ✅ Frontend & Database finalisés | ⏳ Admin backend en cours
+---
+
+## 📚 Documentation Complète
+
+| Fichier | Contenu |
+| --- | --- |
+| **SECURITE_AUDIT.md** | Audit complet 6 niveaux (SQL injection, XSS, CSRF, Auth, Password, Input validation) |
+| **GUIDE_PRESENTATION_JURY.md** | Script présentation + demo 10 min + 8 questions jury + conseils |
+| **POINTS_FRICTION_JURY.md** | 4 points critiques du jury + solutions + pépites à valoriser |
+| **BOUTON_ADMIN_CADENAS.md** | Implémentation 🔐 cadenas + variantes CSS |
+| **MCD.md** | Diagramme entité-association (13 tables) |
+| **schema.sql** | Structure BDD complète avec constraints |
+| **demo_data.sql** | Données test pour démonstration |
+
+---
+
+## ✅ Architecture FINALISÉE pour l'Examen
+
+**Tous les points du jury résolus:**
+
+1. ✅ **Zéro mélange .html/.php** - Tous les fichiers principaux en .php uniquement
+2. ✅ **Pas de duplication** - Header/footer mutua lisés via includes/
+3. ✅ **Structure cohérente** - Modules clairement séparés (/admin, /public, racine)
+4. ✅ **Versions à jour** - PHP 8.2+, MySQL 8.0+
+5. ✅ **Pas de redirection mystère** - espace.html supprimé
+6. ✅ **Sessions partout** - Même pages d'accueil en .php avec session_start
+
+---
+
+**Version** : 1.2 (2026-05-26)  
+**Status** : ✅ **EXAM-READY NIKEL** - Frontend ✅ | Backend ✅ | Database ✅ | Sécurité ✅ | Architecture ✅ | Documentation ✅

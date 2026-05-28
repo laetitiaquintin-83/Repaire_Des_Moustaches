@@ -130,15 +130,15 @@ if (isset($_SESSION['cart'])) {
 </head>
 <body>
     <header>
-        <a href="../index.html" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
-        <nav><ul><li><a href="../index.html">Accueil</a></li><li><a href="../concept.html">Le Concept</a></li><li><a href="../equipage.html">L'équipage</a></li><li><a href="../ateliers.html">Les Ateliers</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li></ul></nav>
+        <a href="../index.php" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
+        <nav><ul><li><a href="../index.php">Accueil</a></li><li><a href="../concept.php">Le Concept</a></li><li><a href="../equipage.php">L'équipage</a></li><li><a href="../ateliers.php">Les Ateliers</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li></ul></nav>
         <div class="action">
             <a href="cart.php" class="panier-link">
                 🛒 Panier 
                 <?php if ($cart_count > 0): ?>
                     <span class="panier-count"><?php echo $cart_count; ?></span>
                 <?php endif; ?>
-            </a>
+            </a><a href="../login.php" class="btn-admin-lock" title="Accès administrateur">🔐</a>
         </div>
     </header>
 

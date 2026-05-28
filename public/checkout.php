@@ -8,6 +8,7 @@ require_once __DIR__ . '/../config/database.php';
 $pdo = getPDO();
 $message = '';
 $error = '';
+$csrf_token = generateCSRFToken();
 
 // Vérifier que le panier n'est pas vide
 $cart = $_SESSION['cart'] ?? [];
@@ -26,75 +27,81 @@ if (isset($_SESSION['user_id'])) {
 
 // Traiter le formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $prenom = htmlspecialchars($_POST['prenom'] ?? '');
-    $nom = htmlspecialchars($_POST['nom'] ?? '');
-    $email = htmlspecialchars($_POST['email'] ?? '');
-    $adresse = htmlspecialchars($_POST['adresse'] ?? '');
-    $code_postal = htmlspecialchars($_POST['code_postal'] ?? '');
-    $ville = htmlspecialchars($_POST['ville'] ?? '');
-    
-    if (!$prenom || !$nom || !$email || !$adresse || !$code_postal || !$ville) {
-        $error = 'Tous les champs sont obligatoires';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Email invalide';
+    // Valider le CSRF token
+    $csrf_check = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_check)) {
+        $error = 'Erreur de sécurité : token CSRF invalide. Veuillez réessayer.';
     } else {
-        try {
-            // Déterminer l'user_id
-            $utilisateur_id = $_SESSION['user_id'] ?? null;
-            
-            // Si pas connecté, créer un utilisateur temporaire pour cette commande
-            if (!$utilisateur_id) {
-                // Vérifier si l'email existe
-                $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
-                $stmt->execute([$email]);
-                $existing_user = $stmt->fetch();
+        $prenom = htmlspecialchars($_POST['prenom'] ?? '');
+        $nom = htmlspecialchars($_POST['nom'] ?? '');
+        $email = htmlspecialchars($_POST['email'] ?? '');
+        $adresse = htmlspecialchars($_POST['adresse'] ?? '');
+        $code_postal = htmlspecialchars($_POST['code_postal'] ?? '');
+        $ville = htmlspecialchars($_POST['ville'] ?? '');
+        
+        if (!$prenom || !$nom || !$email || !$adresse || !$code_postal || !$ville) {
+            $error = 'Tous les champs sont obligatoires';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Email invalide';
+        } else {
+            try {
+                // Déterminer l'user_id
+                $utilisateur_id = $_SESSION['user_id'] ?? null;
                 
-                if ($existing_user) {
-                    $utilisateur_id = $existing_user['id'];
-                } else {
-                    // Créer un nouvel utilisateur
-                    $mot_de_passe = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare('
-                        INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, date_inscription)
-                        VALUES (?, ?, ?, ?, NOW())
-                    ');
-                    $stmt->execute([$nom, $prenom, $email, $mot_de_passe]);
-                    $utilisateur_id = (int)$pdo->lastInsertId();
+                // Si pas connecté, créer un utilisateur temporaire pour cette commande
+                if (!$utilisateur_id) {
+                    // Vérifier si l'email existe
+                    $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
+                    $stmt->execute([$email]);
+                    $existing_user = $stmt->fetch();
+                    
+                    if ($existing_user) {
+                        $utilisateur_id = $existing_user['id'];
+                    } else {
+                        // Créer un nouvel utilisateur
+                        $mot_de_passe = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
+                        $stmt = $pdo->prepare('
+                            INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, date_inscription)
+                            VALUES (?, ?, ?, ?, NOW())
+                        ');
+                        $stmt->execute([$nom, $prenom, $email, $mot_de_passe]);
+                        $utilisateur_id = (int)$pdo->lastInsertId();
+                    }
                 }
-            }
-            
-            // Calculer le total
-            $total = 0;
-            foreach ($cart as $item) {
-                $total += (float)$item['prix'] * (int)$item['quantite'];
-            }
-            
-            // Créer la commande
-            $stmt = $pdo->prepare('
-                INSERT INTO commandes (utilisateur_id, date_commande, montant_total, statut)
-                VALUES (?, NOW(), ?, "en_attente")
-            ');
-            $stmt->execute([$utilisateur_id, $total]);
-            $commande_id = (int)$pdo->lastInsertId();
-            
-            // Créer les lignes de commande
-            foreach ($cart as $produit_id => $item) {
+                
+                // Calculer le total
+                $total = 0;
+                foreach ($cart as $item) {
+                    $total += (float)$item['prix'] * (int)$item['quantite'];
+                }
+                
+                // Créer la commande
                 $stmt = $pdo->prepare('
-                    INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO commandes (utilisateur_id, date_commande, montant_total, statut)
+                    VALUES (?, NOW(), ?, "en_attente")
                 ');
-                $stmt->execute([$commande_id, $produit_id, $item['quantite'], $item['prix']]);
+                $stmt->execute([$utilisateur_id, $total]);
+                $commande_id = (int)$pdo->lastInsertId();
+                
+                // Créer les lignes de commande
+                foreach ($cart as $produit_id => $item) {
+                    $stmt = $pdo->prepare('
+                        INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire)
+                        VALUES (?, ?, ?, ?)
+                    ');
+                    $stmt->execute([$commande_id, $produit_id, $item['quantite'], $item['prix']]);
+                }
+                
+                // Vider le panier
+                unset($_SESSION['cart']);
+                
+                // Rediriger vers confirmation
+                header('Location: confirmation.php?commande_id=' . $commande_id);
+                exit;
+                
+            } catch (PDOException $e) {
+                $error = 'Erreur lors de la création de la commande';
             }
-            
-            // Vider le panier
-            unset($_SESSION['cart']);
-            
-            // Rediriger vers confirmation
-            header('Location: confirmation.php?commande_id=' . $commande_id);
-            exit;
-            
-        } catch (PDOException $e) {
-            $error = 'Erreur lors de la création de la commande';
         }
     }
 }
@@ -333,9 +340,9 @@ foreach ($cart as $item) {
     <!-- Header -->
     <header style="background: white; border-bottom: 2px solid #85D6CD; position: sticky; top: 0; z-index: 100;">
         <nav style="max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="../index.html" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
+            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
             <div style="display: flex; gap: 20px; align-items: center;">
-                <a href="../index.html">Accueil</a>
+                <a href="../index.php">Accueil</a>
                 <a href="boutique.php">Boutique</a>
                 <a href="belles-histoires.php">Histoires</a>
                 <a href="cart.php" style="color: #2B2B2B;">🛒 Panier</a>
@@ -355,6 +362,7 @@ foreach ($cart as $item) {
 
         <div class="checkout-grid">
             <form method="POST" class="checkout-form">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="form-section">
                     <h3>Informations personnelles</h3>
                     

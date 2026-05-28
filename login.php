@@ -236,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="back-link">
-            <a href="index.html">← Retour au site</a>
+            <a href="index.php">← Retour au site</a>
         </div>
     </div>
 </body>

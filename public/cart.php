@@ -80,9 +80,9 @@ function getImagePath(string $productName): string
 <body>
     
     <header>
-        <a href="../index.html" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
-        <nav><ul><li><a href="../index.html">Accueil</a></li><li><a href="../concept.html">Le Concept</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li><li><a href="cart.php">🛒 Panier</a></li></ul></nav>
-        <div class="action"><a href="../formulaire.html" class="bouton-reserver">Réserver</a></div>
+        <a href="../index.php" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
+        <nav><ul><li><a href="../index.php">Accueil</a></li><li><a href="../concept.php">Le Concept</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li><li><a href="cart.php">🛒 Panier</a></li></ul></nav>
+        <div class="action"><a href="../formulaire.php" class="bouton-reserver">Réserver</a><a href="../login.php" class="btn-admin-lock" title="Accès administrateur">🔐</a></div>
     </header>
 
     <div style="padding: 20px; text-align: center;">

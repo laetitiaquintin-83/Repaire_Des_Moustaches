@@ -187,9 +187,9 @@ if ($commande_id > 0) {
     <!-- Header -->
     <header style="background: white; border-bottom: 2px solid #85D6CD; position: sticky; top: 0; z-index: 100;">
         <nav style="max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="../index.html" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
+            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
             <div style="display: flex; gap: 20px; align-items: center;">
-                <a href="../index.html">Accueil</a>
+                <a href="../index.php">Accueil</a>
                 <a href="../public/boutique.php">Boutique</a>
                 <a href="cart.php" style="color: #2B2B2B;">🛒 Panier</a>
             </div>
@@ -242,7 +242,7 @@ if ($commande_id > 0) {
                 
                 <div class="actions">
                     <a href="boutique.php" class="btn btn-primary">Continuer les achats</a>
-                    <a href="../index.html" class="btn btn-secondary">Retour à l'accueil</a>
+                    <a href="../index.php" class="btn btn-secondary">Retour à l'accueil</a>
                 </div>
             </div>
         <?php else: ?>

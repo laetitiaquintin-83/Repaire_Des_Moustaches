@@ -96,6 +96,7 @@ CREATE TABLE ateliers (
   id INT AUTO_INCREMENT PRIMARY KEY,
   titre VARCHAR(150) NOT NULL,
   description TEXT,
+  image VARCHAR(255),
   date_heure DATETIME NOT NULL,
   capacite_max INT NOT NULL,
   admin_id INT NOT NULL,
@@ -188,6 +189,23 @@ CREATE TABLE lignes_commandes (
     ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT chk_lignes_quantite CHECK (quantite > 0),
   CONSTRAINT chk_lignes_prix CHECK (prix_unitaire >= 0.00)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- DEMANDES DE FORMULAIRE (Réservations, Animations, Privatisations)
+-- =====================================================
+CREATE TABLE demandes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(150) NOT NULL,
+  email VARCHAR(190) NOT NULL,
+  motif ENUM('participer', 'animer', 'prive') NOT NULL,
+  date_souhaitee DATE NULL,
+  message TEXT NOT NULL,
+  statut ENUM('nouvelle', 'traitee', 'refusee') NOT NULL DEFAULT 'nouvelle',
+  date_demande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_demandes_motif (motif),
+  INDEX idx_demandes_statut (statut),
+  INDEX idx_demandes_date (date_demande)
 ) ENGINE=InnoDB;
 
 -- =====================================================

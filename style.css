@@ -6,6 +6,52 @@
     --gris-fonce: #2B2B2B;
 }
 
+/* --- EFFET DINER RÉTRO ÉLÉGANT --- */
+@keyframes diner-glow {
+    0% {
+        text-shadow: 
+            2px 2px 4px rgba(254, 123, 126, 0.3),
+            -2px -2px 4px rgba(133, 214, 205, 0.2);
+    }
+    50% {
+        text-shadow: 
+            2px 2px 6px rgba(254, 123, 126, 0.4),
+            -2px -2px 6px rgba(133, 214, 205, 0.3);
+    }
+    100% {
+        text-shadow: 
+            2px 2px 4px rgba(254, 123, 126, 0.3),
+            -2px -2px 4px rgba(133, 214, 205, 0.2);
+    }
+}
+
+@keyframes diner-box-glow {
+    0% {
+        box-shadow: 
+            0 4px 12px rgba(254, 123, 126, 0.2),
+            0 -2px 8px rgba(133, 214, 205, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 6px 16px rgba(254, 123, 126, 0.3),
+            0 -2px 12px rgba(133, 214, 205, 0.2);
+    }
+    100% {
+        box-shadow: 
+            0 4px 12px rgba(254, 123, 126, 0.2),
+            0 -2px 8px rgba(133, 214, 205, 0.1);
+    }
+}
+
+.neon-effect {
+    animation: diner-glow 2s ease-in-out infinite;
+    letter-spacing: 2px;
+}
+
+.neon-effect.button-style {
+    animation: diner-box-glow 2s ease-in-out infinite;
+}
+
 /* --- RESET DE BASE (Pour effacer les marges par défaut) --- */
 * {
     margin: 0;
@@ -33,40 +79,61 @@ body {
     margin-bottom: 20px;
 }
 
-/* --- L'EN-TÊTE (Header) --- */
+/* --- L'EN-TÊT E (Header) --- */
 header {
     background-color: var(--vert-menthe);
     display: flex; /* La magie pour aligner les éléments sur une ligne */
     justify-content: space-between; /* Écarte les éléments au maximum */
     align-items: center; /* Centre tout verticalement */
-    padding: 10px 50px; /* Un peu d'espace en haut/bas et sur les côtés */
+    padding: 15px 30px; /* Padding augmenté pour plus d'espace */
+    gap: 20px; /* Espace augmenté entre les éléments */
 }
 
 /* --- LE LOGO --- */
 .logo img {
-    height: 90px; /* Empêche le logo d'être géant */
+    height: 55px; /* Logo compact */
+    flex-shrink: 0; /* N'autorise pas la réduction du logo */
 }
 
 /* --- LE MENU --- */
 nav ul {
     display: flex;
-    gap: 40px; /* L'espace entre tes liens de menu */
+    gap: 25px; /* Espace entre les liens augmenté */
     list-style: none; /* Enlève les petites puces moches */
+    flex: 1; /* Prend l'espace disponible */
+    justify-content: center; /* Centre le menu */
+}
+
+nav li {
+    flex-shrink: 1; /* Autorise la réduction */
 }
 
 /* --- LE LOOK RÉTRO DU MENU --- */
 nav a {
-    font-family: 'Pacifico', cursive;
-    font-size: 1.5rem;
-    color: var(--rose-corail);
-    text-transform: capitalize;
-    text-decoration: none;
-    font-weight: normal;
-    transition: color 0.3s ease;
+    font-family: 'Pacifico', cursive !important; /* Police du logo */
+    font-size: 1.3rem !important; /* Lisible avec Pacifico */
+    font-weight: 400 !important;
+    color: var(--rose-corail) !important;
+    text-transform: capitalize !important;
+    text-decoration: none !important;
+    transition: color 0.3s ease !important;
+    white-space: nowrap !important; /* Empêche le texte de se casser sur 2 lignes */
+    display: block !important;
+    letter-spacing: 0 !important;
+    line-height: 1.2 !important;
 }
 
 nav a:hover {
     color: var(--gris-fonce);
+}
+
+/* --- CONTENEUR DES ACTIONS (Réserver + Cadenas) --- */
+.action {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-shrink: 0;
+    min-width: fit-content;
 }
 
 /* --- LE BOUTON RÉSERVER --- */
@@ -80,12 +147,37 @@ nav a:hover {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.1rem;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .bouton-reserver:hover {
     background-color: #E55C5C;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(254,123,126,0.3);
+}
+
+/* --- LE BOUTON ADMIN (Cadenas) --- */
+.btn-admin-lock {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.btn-admin-lock:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* --- LA SECTION HERO (Texte + Image) --- */
@@ -131,7 +223,6 @@ nav a:hover {
 .bouton-principal:hover {
     background-color: #6FC1B0;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .hero-image {
@@ -295,10 +386,11 @@ footer p {
 }
 
 .grille-concept {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    max-width: 1300px;
+    margin: 0 auto;
 }
 
 .concept-item {
@@ -966,8 +1058,18 @@ footer p {
     }
 
     nav ul {
-        flex-wrap: wrap;
+        flex-wrap: nowrap; /* Force une seule ligne */
         justify-content: center;
+        gap: 8px !important;
+    }
+
+    nav li {
+        flex-shrink: 0 !important; /* Empêche la réduction */
+    }
+
+    nav a {
+        font-size: 0.7rem !important;
+        white-space: nowrap !important;
     }
 
     .hero-image,
