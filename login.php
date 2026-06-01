@@ -30,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $admin = $stmt->fetch();
 
             if ($admin && password_verify($password, $admin['mot_de_passe'])) {
+                // Régénérer la session pour éviter la fixation
+                session_regenerate_id(true);
+                
                 // Connexion réussie
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_email'] = $admin['email'];

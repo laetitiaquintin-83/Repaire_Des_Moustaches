@@ -284,6 +284,7 @@ $produits = $stmt->fetchAll();
             <div class="admin-menu">
                 <h2>Admin</h2>
                 <nav>
+                    <a href="../index.php" style="color: #FE7B7E; font-weight: 700; display: block; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">🏠 Retour à l'accueil</a>
                     <a href="dashboard.php">📊 Dashboard</a>
                     <a href="moderer-histoires.php">📖 Belles Histoires</a>
                     <a href="ateliers.php">🎨 Ateliers</a>

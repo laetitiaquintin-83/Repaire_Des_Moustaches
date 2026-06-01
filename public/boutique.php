@@ -68,7 +68,7 @@ function getImagePath(string $productName): string
 // Calculer le nombre d'articles dans le panier
 $cart_count = 0;
 if (isset($_SESSION['cart'])) {
-    $cart_count = count($_SESSION['cart']);
+    $cart_count = array_sum(array_column($_SESSION['cart'], 'quantite'));
 }
 ?>
 <!DOCTYPE html>
@@ -199,7 +199,7 @@ if (isset($_SESSION['cart'])) {
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                             <input type="hidden" name="produit_id" value="<?php echo (int)$produit['id']; ?>">
                                             <input type="hidden" name="quantite" value="1">
-                                            <button type="submit" class="bouton-ajouter-panier">🛒 Ajouter</button>
+                                            <button type="button" class="bouton-ajouter-panier btn-add-to-cart">🛒 Ajouter</button>
                                         </form>
                                     </div>
                                 </div>
@@ -228,5 +228,8 @@ if (isset($_SESSION['cart'])) {
             <a href="../login.php">Admin</a>
         </div>
     </footer>
+
+    <!-- Gestion dynamique du panier avec fetch() AJAX -->
+    <script src="../js/cart.js"></script>
 </body>
 </html>

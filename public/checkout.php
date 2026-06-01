@@ -442,5 +442,8 @@ foreach ($cart as $item) {
             <a href="../login.php" style="color: #85D6CD; text-decoration: none; margin: 0 15px;">Admin</a>
         </div>
     </footer>
+
+    <!-- Validation JavaScript côté client -->
+    <script src="../js/form-validation.js"></script>
 </body>
 </html>

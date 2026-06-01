@@ -35,15 +35,16 @@ if ($action === 'rejeter' && $id > 0) {
 
 // Récupérer les histoires
 $tab = (string) ($_GET['tab'] ?? 'attente');
-$where = $tab === 'attente' ? 'WHERE statut = "en_attente"' : 'WHERE statut = "publiee"';
+$statut = $tab === 'attente' ? 'en_attente' : 'publiee';
 
-$stmt = $pdo->query('
+$stmt = $pdo->prepare('
     SELECT bh.id, bh.titre, bh.contenu, bh.statut, bh.date_publication, u.nom, u.prenom
     FROM belles_histoires bh
     LEFT JOIN utilisateurs u ON bh.utilisateur_id = u.id
-    ' . $where . '
+    WHERE bh.statut = ?
     ORDER BY bh.date_publication DESC
 ');
+$stmt->execute([$statut]);
 $histoires = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -294,6 +295,8 @@ $histoires = $stmt->fetchAll();
             </div>
             
             <ul class="admin-menu">
+                <li><a href="../index.php" style="color: #FE7B7E; font-weight: 700;">🏠 Retour à l'accueil</a></li>
+                <li style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;"></li>
                 <li><a href="dashboard.php">📊 Dashboard</a></li>
                 <li><a href="moderer-histoires.php" class="active">📖 Belles Histoires</a></li>
                 <li><a href="ateliers.php">🎨 Ateliers</a></li>

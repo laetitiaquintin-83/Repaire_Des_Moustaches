@@ -2,6 +2,23 @@
 
 declare(strict_types=1);
 
+// Configuration de la gestion des erreurs
+error_reporting(E_ALL);
+ini_set('display_errors', '0');  // Ne pas afficher les erreurs en production
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../logs/php-errors.log');
+
+// Gestionnaire d'erreurs personnalisé
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    error_log("[$errno] $errstr in $errfile:$errline");
+    
+    // Ne pas afficher les erreurs à l'utilisateur
+    if ($errno === E_USER_ERROR || $errno === E_PARSE) {
+        http_response_code(500);
+        die('Une erreur technique est survenue. Notre équipe a été notifiée.');
+    }
+});
+
 function getPDO(): PDO
 {
     static $pdo = null;

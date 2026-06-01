@@ -336,6 +336,8 @@ $histoires_recentes = $stmt->fetchAll();
             </div>
             
             <ul class="admin-menu">
+                <li><a href="../index.php" style="color: #FE7B7E; font-weight: 700;">🏠 Retour à l'accueil</a></li>
+                <li style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;"></li>
                 <li><a href="dashboard.php" class="active">📊 Dashboard</a></li>
                 <li><a href="moderer-histoires.php">📖 Belles Histoires</a></li>
                 <li><a href="ateliers.php">🎨 Ateliers</a></li>

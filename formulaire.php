@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (!$error) {
                 try {
-                    $pdo = PDOConnection::getInstance();
+                    $pdo = getPDO();
                     $sql = "INSERT INTO demandes (nom, email, motif, date_souhaitee, message, statut, date_demande) 
                             VALUES (:nom, :email, :motif, :date, :message, 'nouvelle', NOW())";
                     $stmt = $pdo->prepare($sql);
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include_once 'includes/header.php';
+require_once 'includes/header.php';
 ?>
 
 <main>
@@ -124,4 +124,7 @@ include_once 'includes/header.php';
         </section>
     </main>
 
-<?php include_once 'includes/footer.php'; ?>
+<!-- Validation JavaScript côté client pour les formulaires -->
+<script src="js/form-validation.js"></script>
+
+<?php require_once 'includes/footer.php'; ?>
