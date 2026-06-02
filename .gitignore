@@ -25,3 +25,10 @@ build/
 
 # Database
 *.sql.bak
+config/database.php
+config/*.local.php
+
+# Credentials & Secrets
+.htpasswd
+*.pem
+*.key

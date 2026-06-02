@@ -1,0 +1,40 @@
+# Format: <type>(<scope>): <subject>
+#
+# Type:
+#   feat:     Une nouvelle fonctionnalité
+#   fix:      Une correction de bug
+#   refactor: Refactorisation de code (sans changement fonctionnel)
+#   perf:     Amélioration des performances
+#   docs:     Modifications de documentation
+#   style:    Formatage du code, missing semicolons, etc
+#   test:     Ajout/modification de tests
+#   chore:    Tâches de build, dépendances, etc
+#
+# Scope:
+#   auth:       Authentification & Sécurité
+#   cart:       Panier & Commandes
+#   checkout:   Paiement & Confirmation
+#   admin:      Interface d'administration
+#   ui:         Interface utilisateur
+#   db:         Base de données & Schéma
+#
+# Subject:
+#   - Utiliser l'impératif présent ("ajoute", "corrige", pas "ajouté", "corrigé")
+#   - Pas de majuscule au début
+#   - Pas de point à la fin
+#
+# Body (optionnel):
+#   - Expliquer le POURQUOI, pas le QUOI
+#   - Wraper à 72 caractères
+#
+# Footer (optionnel):
+#   - Références aux issues: "Closes #123"
+#   - Breaking changes: "BREAKING CHANGE: description"
+#
+# Exemple:
+# feat(cart): ajoute la validation du panier en session
+#
+# Améliore la sécurité en validant les articles du panier
+# côté serveur avant le checkout.
+#
+# Closes #42
