@@ -7,12 +7,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.min.css">
+    <!-- Preload critical image (logo) -->
+    <link rel="preload" as="image" href="images/logo.webp" type="image/webp">
+    <link rel="preload" as="image" href="images/logo.svg" type="image/svg+xml">
 </head>
 <body>
     <header>
         <a href="index.php" class="logo">
-            <img src="images/logo.png" alt="Logo du Repaire des Moustaches">
+            <picture>
+                <source srcset="images/logo.webp" type="image/webp">
+                <source srcset="images/logo.svg" type="image/svg+xml">
+                <img src="images/logo.png" alt="Logo du Repaire des Moustaches" width="100" height="55">
+            </picture>
         </a>
 
         <nav>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Diner/Restaurant concept -->
+  <defs>
+    <style>
+      .icon-base { fill: #FE7B7E; }
+      .icon-detail { fill: #2B2B2B; }
+      .icon-accent { fill: #85D6CD; }
+    </style>
+  </defs>
+  
+  <!-- Fork and knife -->
+  <g>
+    <!-- Fork -->
+    <rect x="30" y="60" width="12" height="100" class="icon-base" rx="6"/>
+    <circle cx="36" cy="60" r="8" class="icon-base"/>
+    <rect x="20" y="40" width="8" height="20" class="icon-detail" rx="4"/>
+    <rect x="34" y="40" width="8" height="20" class="icon-detail" rx="4"/>
+    <rect x="48" y="40" width="8" height="20" class="icon-detail" rx="4"/>
+    
+    <!-- Knife -->
+    <rect x="130" y="70" width="40" height="12" class="icon-accent" rx="6" transform="rotate(25 150 76)"/>
+    <circle cx="110" cy="70" r="10" class="icon-detail"/>
+  </g>
+</svg>

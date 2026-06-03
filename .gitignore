@@ -3,6 +3,19 @@
 Thumbs.db
 *.log
 
+# Node.js
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+
+# Build scripts
+minify-assets.js
+minify-assets.sh
+optimize-images.js
+
 # IDE
 .vscode/
 .idea/

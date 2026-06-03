@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Repaire / Home -->
+  <defs>
+    <style>
+      .house { fill: #85D6CD; }
+      .house-roof { fill: #FE7B7E; }
+      .house-detail { fill: #2B2B2B; }
+    </style>
+  </defs>
+  
+  <!-- Roof -->
+  <polygon points="100,30 30,100 50,100 50,150 150,150 150,100 170,100" class="house-roof"/>
+  
+  <!-- House body -->
+  <rect x="50" y="100" width="100" height="80" class="house"/>
+  
+  <!-- Door -->
+  <rect x="85" y="120" width="30" height="60" class="house-detail" fill="#FFF8E7"/>
+  <circle cx="113" cy="150" r="3" class="house-detail"/>
+  
+  <!-- Windows -->
+  <rect x="60" y="110" width="15" height="15" class="house-detail" fill="#FFF8E7"/>
+  <rect x="65" y="115" width="5" height="5" class="house-detail" fill="#85D6CD"/>
+  
+  <rect x="125" y="110" width="15" height="15" class="house-detail" fill="#FFF8E7"/>
+  <rect x="130" y="115" width="5" height="5" class="house-detail" fill="#FE7B7E"/>
+  
+  <!-- Door handle -->
+  <circle cx="112" cy="150" r="2" fill="#FE7B7E"/>
+  
+  <!-- Chimney -->
+  <rect x="160" y="50" width="12" height="50" class="house-detail"/>
+</svg>

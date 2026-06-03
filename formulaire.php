@@ -73,7 +73,10 @@ require_once 'includes/header.php';
 
         <section class="ateliers-container">
             <div class="ateliers-image">
-                <img src="images/formulaire.jpg" alt="Illustration des ateliers au Repaire des Moustaches">
+                <picture>
+                    <source srcset="images/formulaire.webp" type="image/webp">
+                    <img src="images/formulaire.jpg" alt="Illustration des ateliers au Repaire des Moustaches" width="400" height="400" loading="lazy">
+                </picture>
             </div>
 
             <div class="formulaire-box">

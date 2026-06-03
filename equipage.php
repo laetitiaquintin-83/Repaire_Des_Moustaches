@@ -6,7 +6,10 @@
             <p class="sous-titre">Les trois mousquetaires du Repaire, chacun avec sa personnalité attachante. Venez les rencontrer pour un moment de ronrons et de tendresse.</p>
             <div class="grille-chats">
                 <article class="carte-chat">
-                    <img src="images/chat1.jpg" alt="Velours, chat roux élégant">
+                    <picture>
+                        <source srcset="images/chat1.webp" type="image/webp">
+                        <img src="images/chat1.jpg" alt="Velours, chat roux élégant" width="300" height="250" loading="lazy">
+                    </picture>
                     <div class="info-chat">
                         <h3>Velours</h3>
                         <p class="chat-trait">Le luxe rétro incarné</p>
@@ -18,7 +21,10 @@
                     </div>
                 </article>
                 <article class="carte-chat">
-                    <img src="images/chat2.jpg" alt="Biscuit, petit chat gourmand">
+                    <picture>
+                        <source srcset="images/chat2.webp" type="image/webp">
+                        <img src="images/chat2.jpg" alt="Biscuit, petit chat gourmand" width="300" height="250" loading="lazy">
+                    </picture>
                     <div class="info-chat">
                         <h3>Biscuit</h3>
                         <p class="chat-trait">Le petit gourmand turbulent</p>
@@ -30,7 +36,10 @@
                     </div>
                 </article>
                 <article class="carte-chat">
-                    <img src="images/chat3.jpg" alt="Moonlight, chat mélancolique et poète">
+                    <picture>
+                        <source srcset="images/chat3.webp" type="image/webp">
+                        <img src="images/chat3.jpg" alt="Moonlight, chat mélancolique et poète" width="300" height="250" loading="lazy">
+                    </picture>
                     <div class="info-chat">
                         <h3>Moonlight</h3>
                         <p class="chat-trait">Le poète des toits parisiens</p>

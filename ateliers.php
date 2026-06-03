@@ -26,11 +26,20 @@ try {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.min.css">
+    <!-- Preload critical image (logo) -->
+    <link rel="preload" as="image" href="images/logo.webp" type="image/webp">
+    <link rel="preload" as="image" href="images/logo.svg" type="image/svg+xml">
 </head>
 <body>
     <header>
-        <a href="index.php" class="logo"><img src="images/logo.png" alt="Logo du Repaire des Moustaches"></a>
+        <a href="index.php" class="logo">
+            <picture>
+                <source srcset="images/logo.webp" type="image/webp">
+                <source srcset="images/logo.svg" type="image/svg+xml">
+                <img src="images/logo.png" alt="Logo du Repaire des Moustaches" width="100" height="55">
+            </picture>
+        </a>
         <nav>
             <ul>
                 <li><a href="concept.php">Le Concept</a></li>
@@ -55,8 +64,16 @@ try {
                     $image = !empty($atelier['image']) ? $atelier['image'] : 'images/atelier-default.jpg';
                 ?>
                 <article class="visuel-card">
-                    <img src="<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>" 
-                         alt="<?php echo htmlspecialchars($atelier['titre'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <picture>
+                        <?php 
+                            $imagePath = htmlspecialchars($image, ENT_QUOTES, 'UTF-8');
+                            $webpPath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $imagePath);
+                        ?>
+                        <source srcset="<?php echo $webpPath; ?>" type="image/webp">
+                        <img src="<?php echo $imagePath; ?>" 
+                             alt="<?php echo htmlspecialchars($atelier['titre'], ENT_QUOTES, 'UTF-8'); ?>" 
+                             width="300" height="200" loading="lazy">
+                    </picture>
                     <div class="contenu-atelier">
                         <h3><?php echo htmlspecialchars($atelier['titre'], ENT_QUOTES, 'UTF-8'); ?></h3>
                         <p><?php echo htmlspecialchars($atelier['description'], ENT_QUOTES, 'UTF-8'); ?></p>

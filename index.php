@@ -9,7 +9,11 @@
             </div>
 
             <div class="hero-image">
-                <img src="images/diner-jukebox.png" alt="Interieur du Repaire des Moustaches avec jukebox et arbres a chat">
+                <picture>
+                    <source srcset="images/diner-jukebox.webp" type="image/webp">
+                    <source srcset="images/diner-jukebox.svg" type="image/svg+xml">
+                    <img src="images/diner-jukebox.png" alt="Interieur du Repaire des Moustaches avec jukebox et arbres a chat" width="500" height="350">
+                </picture>
             </div>
         </section>
 
@@ -17,25 +21,49 @@
             <h2>Entrer dans le Repaire</h2>
             <div class="grille-concept">
                 <article class="concept-item">
-                    <div class="icon"><img src="images/concept.png" alt="Icône concept"></div>
+                    <div class="icon">
+                        <picture>
+                            <source srcset="images/concept.webp" type="image/webp">
+                            <source srcset="images/concept.svg" type="image/svg+xml">
+                            <img src="images/concept.png" alt="Icône concept" width="80" height="80">
+                        </picture>
+                    </div>
                     <h3><a href="concept.php">Le Concept</a></h3>
                     <p>Une version simple du lieu et de ses regles.</p>
                 </article>
 
                 <article class="concept-item">
-                    <div class="icon"><img src="images/equipage.png" alt="Icône équipage"></div>
+                    <div class="icon">
+                        <picture>
+                            <source srcset="images/equipage.webp" type="image/webp">
+                            <source srcset="images/equipage.svg" type="image/svg+xml">
+                            <img src="images/equipage.png" alt="Icône équipage" width="80" height="80">
+                        </picture>
+                    </div>
                     <h3><a href="equipage.php">L'équipage</a></h3>
                     <p>Velours, Biscuit, Moonlight : trois histoires de ronrons et de tendresse qui attendent leur happy end.</p>
                 </article>
 
                 <article class="concept-item">
-                    <div class="icon"><img src="images/pelote.png" alt="Icône ateliers"></div>
+                    <div class="icon">
+                        <picture>
+                            <source srcset="images/pelote.webp" type="image/webp">
+                            <source srcset="images/pelote.svg" type="image/svg+xml">
+                            <img src="images/pelote.png" alt="Icône ateliers" width="80" height="80">
+                        </picture>
+                    </div>
                     <h3><a href="ateliers.php">Les Ateliers</a></h3>
                     <p>Créer, apprendre, transmettre. Des moments solidaires à prix libre, au cœur du Repaire.</p>
                 </article>
 
                 <article class="concept-item">
-                    <div class="icon"><img src="images/repaire.png" alt="Icône repaire"></div>
+                    <div class="icon">
+                        <picture>
+                            <source srcset="images/repaire.webp" type="image/webp">
+                            <source srcset="images/repaire.svg" type="image/svg+xml">
+                            <img src="images/repaire.png" alt="Icône repaire" width="80" height="80">
+                        </picture>
+                    </div>
                     <h3><a href="repaire.php">Le repaire</a></h3>
                     <p>Voir l'ambiance et les espaces du lieu.</p>
                 </article>
