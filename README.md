@@ -19,7 +19,7 @@ Basé à Toulon, c'est un lieu libre d'accès où chacun peut rencontrer les pen
 
 ### Frontend
 
-- **HTML5** sémantique sur 6 pages + redirection espace.html
+- **PHP 8.2+** avec HTML5 sémantique sur 6 pages principales
 - **CSS3** responsive avec variables de couleurs et hover effects
 - **Google Fonts** : Montserrat (body) + Pacifico (titres rétro)
 - **Palette** : Crème #FFF8E7 | Menthe #85D6CD | Rose #FE7B7E | Gris #2B2B2B
@@ -112,12 +112,12 @@ Repaire_Des_Moustaches/
 
 | Page              | Contenu                                                                                               |
 | ----------------- | ----------------------------------------------------------------------------------------------------- |
-| **index.html**    | Landing page - Hero section + 5 cartes de navigation (Concept, Équipage, Ateliers, Repaire, Douceurs) |
-| **concept.html**  | Explique 3 piliers (Dîner & Goodies, Ateliers Solidaires, Coup de Foudre adoption)                    |
-| **equipage.html** | Galerie 3 chats + "Son histoire" + "Le rencontrer" buttons                                            |
-| **ateliers.html** | 4 ateliers (images + titles + descriptions + CTAs variés)                                             |
-| **repaire.html**  | Histoire + Engagements + Image ambiance                                                               |
-| **douceurs.html** | Galerie gourmande (4 visuels produits/pâtisseries)                                                    |
+| **index.php**     | Landing page - Hero section + 5 cartes de navigation (Concept, Équipage, Ateliers, Repaire, Douceurs) |
+| **concept.php**   | Explique 3 piliers (Dîner & Goodies, Ateliers Solidaires, Coup de Foudre adoption)                    |
+| **equipage.php**  | Galerie 3 chats + "Son histoire" + "Le rencontrer" buttons                                            |
+| **ateliers.php**  | 4 ateliers (images + titles + descriptions + CTAs variés)                                             |
+| **repaire.php**   | Histoire + Engagements + Image ambiance                                                               |
+| **douceurs.php**  | Galerie gourmande (4 visuels produits/pâtisseries)                                                    |
 
 ---
 
