@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 session_start();
 
-// Vérifier si connecté
-if (!isset($_SESSION['admin_id'])) {
+// ============================================================
+// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
+// ============================================================
+if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
+// ============================================================
 
 require_once __DIR__ . '/../config/database.php';
 
@@ -432,8 +435,8 @@ foreach ($ateliers as $atelier) {
             </div>
         </main>
     </div>
-</body>
-</html>
+
+    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
                 <li><a href="utilisateurs.php">👥 Utilisateurs</a></li>
             </ul>
             <div class="admin-user-info">

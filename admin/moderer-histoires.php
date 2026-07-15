@@ -13,7 +13,6 @@ if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
 // ============================================================
 
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../includes/functions.php'; // Pour generateCSRFToken() et validateCSRFToken()
 
 $pdo = getPDO();
 $message = '';
@@ -491,5 +490,5 @@ $stats['refusee'] = $stats['refusee'] ?? 0;
             </div>
         </main>
     </div>
-</body>
-</html>
+
+    <?php require_once __DIR__ . '/../includes/footer.php'; ?>

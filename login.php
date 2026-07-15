@@ -242,5 +242,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php">← Retour au site</a>
         </div>
     </div>
-</body>
-</html>
+
+    <?php require_once __DIR__ . '/includes/footer.php'; ?>

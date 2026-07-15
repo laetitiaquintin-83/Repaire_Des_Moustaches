@@ -3,21 +3,28 @@ declare(strict_types=1);
 
 session_start();
 
-// Vérifier si connecté
-if (!isset($_SESSION['admin_id'])) {
+// ============================================================
+// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
+// ============================================================
+if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
+// ============================================================
 
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
+$csrf_token = generateCSRFToken();
 $message = '';
 $error = '';
 
 // Traitement des actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
+    $csrf_check = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_check)) {
+        $error = 'Erreur de sécurité : token CSRF invalide.';
+    } elseif (isset($_POST['action'])) {
         $action = $_POST['action'];
         
         if ($action === 'changer_statut') {
@@ -310,6 +317,7 @@ $commandes = $stmt->fetchAll();
                     
                     <div style="margin-bottom: 20px;">
                         <form method="POST" style="display: flex; gap: 10px;">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                             <input type="hidden" name="action" value="changer_statut">
                             <input type="hidden" name="id" value="<?php echo $commande_detail['id']; ?>">
                             <select name="statut" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
@@ -393,8 +401,8 @@ $commandes = $stmt->fetchAll();
             <?php endif; ?>
         </main>
     </div>
-</body>
-</html>
+
+    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>

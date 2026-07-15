@@ -223,5 +223,5 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
             </a>
         </div>
     </div>
-</body>
-</html>
+
+    <?php require_once __DIR__ . '/../includes/footer.php'; ?>

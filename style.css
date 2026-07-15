@@ -63,7 +63,7 @@
 body {
     background-color: var(--creme);
     color: var(--gris-fonce);
-    font-family: 'Montserrat', sans-serif; /* On applique Montserrat partout par défaut */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .page-section {
@@ -79,45 +79,44 @@ body {
     margin-bottom: 20px;
 }
 
-/* --- L'EN-TÊT E (Header) --- */
+/* ==========================================================================
+   L'EN-TÊTE (Header)
+   ========================================================================== */
 header {
     background-color: var(--vert-menthe);
-    display: flex; /* La magie pour aligner les éléments sur une ligne */
-    justify-content: space-between; /* Écarte les éléments au maximum */
-    align-items: center; /* Centre tout verticalement */
-    padding: 15px 30px; /* Padding augmenté pour plus d'espace */
-    gap: 20px; /* Espace augmenté entre les éléments */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    gap: 20px;
 }
 
-/* --- LE LOGO --- */
 .logo img {
-    height: 55px; /* Logo compact */
-    flex-shrink: 0; /* N'autorise pas la réduction du logo */
+    height: 55px;
+    flex-shrink: 0;
 }
 
-/* --- LE MENU --- */
 nav ul {
     display: flex;
-    gap: 25px; /* Espace entre les liens augmenté */
-    list-style: none; /* Enlève les petites puces moches */
-    flex: 1; /* Prend l'espace disponible */
-    justify-content: center; /* Centre le menu */
+    gap: 25px;
+    list-style: none;
+    flex: 1;
+    justify-content: center;
 }
 
 nav li {
-    flex-shrink: 1; /* Autorise la réduction */
+    flex-shrink: 1;
 }
 
-/* --- LE LOOK RÉTRO DU MENU --- */
 nav a {
-    font-family: 'Pacifico', cursive !important; /* Police du logo */
-    font-size: 1.3rem !important; /* Lisible avec Pacifico */
+    font-family: 'Pacifico', cursive !important;
+    font-size: 1.3rem !important;
     font-weight: 400 !important;
     color: var(--rose-corail) !important;
     text-transform: capitalize !important;
     text-decoration: none !important;
     transition: color 0.3s ease !important;
-    white-space: nowrap !important; /* Empêche le texte de se casser sur 2 lignes */
+    white-space: nowrap !important;
     display: block !important;
     letter-spacing: 0 !important;
     line-height: 1.2 !important;
@@ -127,7 +126,6 @@ nav a:hover {
     color: var(--gris-fonce);
 }
 
-/* --- CONTENEUR DES ACTIONS (Réserver + Cadenas) --- */
 .action {
     display: flex;
     align-items: center;
@@ -136,7 +134,6 @@ nav a:hover {
     min-width: fit-content;
 }
 
-/* --- LE BOUTON RÉSERVER --- */
 .bouton-reserver {
     background-color: var(--rose-corail);
     color: white;
@@ -156,7 +153,6 @@ nav a:hover {
     box-shadow: 0 5px 15px rgba(254,123,126,0.3);
 }
 
-/* --- LE BOUTON ADMIN (Cadenas) --- */
 .btn-admin-lock {
     font-size: 1.4rem;
     display: flex;
@@ -180,23 +176,24 @@ nav a:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* --- LA SECTION HERO (Texte + Image) --- */
+/* ==========================================================================
+   HERO
+   ========================================================================== */
 .hero {
-    display: flex; /* Met le texte et l'image côte à côte */
-    align-items: center; /* Centre le tout verticalement */
+    display: flex;
+    align-items: center;
     padding: 50px;
-    gap: 50px; /* L'espace entre le texte et l'image */
+    gap: 50px;
 }
 
 .hero-texte {
-    flex: 1; /* Le texte prend la moitié de l'écran */
+    flex: 1;
 }
 
-/* --- LE LOOK RÉTRO DU GROS TITRE --- */
 .hero-texte h1 {
-    font-family: 'Pacifico', cursive; /* La police attachée */
-    color: var(--rose-corail); /* Le fameux rose ! */
-    font-size: 3.5rem; /* Un titre bien gros */
+    font-family: 'Pacifico', cursive;
+    color: var(--rose-corail);
+    font-size: 3.5rem;
     font-weight: normal;
     line-height: 1.2;
     margin-bottom: 20px;
@@ -208,7 +205,6 @@ nav a:hover {
     margin-bottom: 30px;
 }
 
-/* Le bouton sous le texte */
 .bouton-principal {
     background-color: var(--vert-menthe);
     color: var(--gris-fonce);
@@ -226,20 +222,22 @@ nav a:hover {
 }
 
 .hero-image {
-    flex: 1; /* L'image prend l'autre moitié de l'écran */
+    flex: 1;
 }
 
 .hero-image img {
-    max-width: 100%; /* L'image ne peut plus déborder ! */
-    border-radius: 20px; /* Arrondit les angles de ton image */
-    box-shadow: 0px 10px 20px rgba(0,0,0,0.1); /* Une petite ombre légère */
+    max-width: 100%;
+    border-radius: 20px;
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
 }
 
-/* --- SECTION SERVICES (Les 3 petites cartes) --- */
+/* ==========================================================================
+   SERVICES
+   ========================================================================== */
 .services {
-    display: flex; /* Met les cartes côte à côte */
-    justify-content: center; /* Centre le groupe de cartes sur la page */
-    gap: 50px; /* L'espace entre chaque carte */
+    display: flex;
+    justify-content: center;
+    gap: 50px;
     padding: 50px;
 }
 
@@ -247,20 +245,23 @@ nav a:hover {
     background-color: var(--vert-menthe);
     color: var(--gris-fonce);
     padding: 50px 30px;
-    border-radius: 20px; /* Les jolis bords arrondis */
-    text-align: center; /* Centre le texte à l'intérieur */
-    width: 250px; /* Donne une largeur fixe pour qu'elles fassent toutes la même taille */
-    box-shadow: 0px 8px 15px rgba(0,0,0,0.05); /* Une toute petite ombre douce */
+    border-radius: 20px;
+    text-align: center;
+    width: 250px;
+    box-shadow: 0px 8px 15px rgba(0,0,0,0.05);
 }
 
 .carte h3 {
     font-size: 1.5rem;
     font-weight: bold;
 }
-/* --- SECTION MOUSTACHUS (L'équipage) --- */
+
+/* ==========================================================================
+   MOUSTACHUS (PENSIONNAIRES)
+   ========================================================================== */
 .moustachus {
     padding: 80px 50px;
-    text-align: center; /* Centre le titre */
+    text-align: center;
 }
 
 .moustachus h2 {
@@ -268,36 +269,29 @@ nav a:hover {
     margin-bottom: 50px;
 }
 
-/* La boîte qui contient les 3 chats */
 .grille-chats {
     display: flex;
     justify-content: center;
-    gap: 60px; /* L'espace entre chaque chat */
+    gap: 60px;
 }
 
-/* La colonne individuelle de chaque chat (Photo + Bouton) */
 .carte-chat {
     display: flex;
-    flex-direction: column; /* Empile la photo et le bouton de haut en bas */
-    align-items: center; /* Centre le contenu */
-    gap: 20px; /* L'espace entre la photo et le bouton */
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
-/* La magie des photos rondes et cadrées proprement */
 .carte-chat img {
     width: 220px;
     height: 220px;
-    object-fit: cover; 
-    
-    /* LA NOUVELLE LIGNE POUR RECADRER LA TÊTE */
-    object-position: center 20%; 
-    
-    border-radius: 50%; 
+    object-fit: cover;
+    object-position: center 20%;
+    border-radius: 50%;
     box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
     margin-bottom: 15px;
 }
 
-/* Les infos textuelles de chaque chat */
 .info-chat {
     text-align: center;
     margin-bottom: 15px;
@@ -327,9 +321,8 @@ nav a:hover {
     margin-bottom: 15px;
 }
 
-/* Les petits boutons roses sous les chats */
 .bouton-chat {
-    background-color: #F8BBD0; /* Un rose un peu plus doux pour les badges */
+    background-color: #F8BBD0;
     color: var(--gris-fonce);
     text-decoration: none;
     padding: 12px 25px;
@@ -339,7 +332,104 @@ nav a:hover {
     font-size: 0.9rem;
     text-align: center;
 }
-/* --- PIED DE PAGE (Footer) --- */
+
+/* ==========================================================================
+   NOUVEAU : GRILLE PENSIONNAIRES (version moderne)
+   ========================================================================== */
+.grille-pensionnaires {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 20px 0;
+}
+
+.carte-pensionnaire {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carte-pensionnaire:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.pensionnaire-photo {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.pensionnaire-photo.placeholder {
+    height: 220px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: #ccc;
+}
+
+.pensionnaire-info {
+    padding: 20px;
+}
+
+.pensionnaire-info h2 {
+    font-family: 'Pacifico', cursive;
+    color: #2B2B2B;
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin: 0 0 8px 0;
+}
+
+.statut-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-secondary {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.badge-default {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.pensionnaire-age {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 5px 0 10px 0;
+}
+
+.pensionnaire-description {
+    color: #444;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
 footer {
     background-color: var(--gris-fonce);
     color: var(--creme);
@@ -373,11 +463,14 @@ footer p {
 .reseaux-sociaux a:hover {
     color: var(--rose-corail);
 }
-/* --- SECTION CONCEPT (Comment ça marche) --- */
+
+/* ==========================================================================
+   CONCEPT
+   ========================================================================== */
 .concept {
     padding: 60px 50px;
     text-align: center;
-    background-color: white; /* Démarque cette section du fond crème */
+    background-color: white;
 }
 
 .concept h2 {
@@ -436,27 +529,9 @@ footer p {
     line-height: 1.6;
 }
 
-/* --- AJUSTEMENTS MOUSTACHUS --- */
-.sous-titre {
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-    font-style: italic;
-    color: var(--gris-fonce);
-}
-
-.actions-chat {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-}
-
-.bouton-chat.secondaire {
-    background-color: transparent;
-    border: 2px solid #F8BBD0;
-}
-
-/* --- SECTION ATELIERS (Double action) --- */
+/* ==========================================================================
+   ATELIERS
+   ========================================================================== */
 .ateliers {
     padding: 80px 50px;
     text-align: center;
@@ -521,7 +596,9 @@ footer p {
     color: var(--gris-fonce);
 }
 
-/* --- GALERIES D'IMAGES --- */
+/* ==========================================================================
+   GALERIES
+   ========================================================================== */
 .grille-atelier-visuels,
 .grille-espace {
     display: grid;
@@ -585,7 +662,9 @@ footer p {
     background-color: #6FC1B0;
 }
 
-/* --- SECTION DOUCEURS --- */
+/* ==========================================================================
+   DOUCEURS
+   ========================================================================== */
 .douceurs {
     padding: 80px 50px 40px;
     text-align: center;
@@ -646,7 +725,9 @@ footer p {
     color: var(--gris-fonce);
 }
 
-/* --- SECTION ATTENTE --- */
+/* ==========================================================================
+   ATTENTE
+   ========================================================================== */
 .attente {
     padding: 40px 50px 90px;
     text-align: center;
@@ -669,7 +750,9 @@ footer p {
     border-radius: 20px;
 }
 
-/* --- SECTION LE REPAIRE --- */
+/* ==========================================================================
+   LE REPAIRE
+   ========================================================================== */
 .le-repaire {
     padding: 80px 50px;
     background-color: white;
@@ -743,7 +826,9 @@ footer p {
     text-align: center;
 }
 
-/* --- SECTION BELLES HISTOIRES --- */
+/* ==========================================================================
+   BELLES HISTOIRES
+   ========================================================================== */
 .belles-histoires-section {
     padding: 80px 50px 90px;
     text-align: center;
@@ -832,7 +917,9 @@ footer p {
     min-height: calc(100vh - 200px);
 }
 
-/* --- SECTION BOUTIQUE --- */
+/* ==========================================================================
+   BOUTIQUE
+   ========================================================================== */
 .boutique-principale {
     background-color: var(--creme);
 }
@@ -1014,84 +1101,9 @@ footer p {
     border-top: 3px solid var(--vert-menthe);
 }
 
-/* --- RESPONSIVE BOUTIQUE --- */
-@media (max-width: 768px) {
-    .grille-produits-boutique {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-    }
-    
-    .produit-image-boutique {
-        height: 200px;
-    }
-    
-    .boutique-section {
-        padding: 30px 20px;
-    }
-    
-    .boutique-section-header h2 {
-        font-size: 1.6rem;
-    }
-
-    .grille-categories-boutique {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* --- RESPONSIVE --- */
-@media (max-width: 1100px) {
-    header,
-    .hero,
-    .grille-concept,
-    .grille-chats,
-    .atelier-double-action,
-    .grille-atelier-visuels,
-    .grille-espace,
-    .grille-douceurs,
-    .repaire-container {
-        flex-direction: column;
-        grid-template-columns: 1fr;
-    }
-
-    header {
-        gap: 20px;
-    }
-
-    nav ul {
-        flex-wrap: nowrap; /* Force une seule ligne */
-        justify-content: center;
-        gap: 8px !important;
-    }
-
-    nav li {
-        flex-shrink: 0 !important; /* Empêche la réduction */
-    }
-
-    nav a {
-        font-size: 0.7rem !important;
-        white-space: nowrap !important;
-    }
-
-    .hero-image,
-    .hero-texte,
-    .concept-item,
-    .atelier-card,
-    .visuel-card,
-    .repaire-texte,
-    .repaire-image {
-        width: 100%;
-    }
-
-    .visuel-card img,
-    .grille-douceurs img {
-        height: 220px;
-    }
-}
-   
 /* ==========================================================================
-   SECTION PANIER (CART) - Le Repaire des Moustaches
+   PANIER (CART)
    ========================================================================== */
-
 .panier-section {
     padding: 50px;
     max-width: 1200px;
@@ -1117,9 +1129,8 @@ footer p {
     margin-bottom: 20px;
 }
 
-/* --- COLONNE GAUCHE : LISTE DES ARTICLES --- */
 .panier-articles {
-    flex: 2; /* Prend 2/3 de l'espace */
+    flex: 2;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -1141,7 +1152,6 @@ footer p {
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Image du produit dans le panier */
 .panier-img-container {
     width: 100px;
     height: 100px;
@@ -1157,7 +1167,6 @@ footer p {
     object-fit: cover;
 }
 
-/* Infos du produit (Nom + Prix unitaire) */
 .panier-info {
     flex-grow: 1;
 }
@@ -1174,7 +1183,6 @@ footer p {
     font-weight: 600;
 }
 
-/* Contrôleur de quantité (- 1 +) */
 .panier-quantite {
     display: flex;
     align-items: center;
@@ -1214,7 +1222,6 @@ footer p {
     outline: none;
 }
 
-/* Prix total de la ligne */
 .panier-prix-total {
     font-weight: 700;
     font-size: 1.2rem;
@@ -1223,7 +1230,6 @@ footer p {
     text-align: right;
 }
 
-/* Bouton supprimer (Petite icône discrète) */
 .btn-supprimer {
     background: none;
     border: none;
@@ -1239,15 +1245,14 @@ footer p {
     transform: scale(1.1);
 }
 
-/* --- COLONNE DROITE : RÉSUMÉ (CHECKOUT) --- */
 .panier-resume {
-    flex: 1; /* Prend 1/3 de l'espace */
+    flex: 1;
     background: white;
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     border-top: 5px solid var(--vert-menthe);
-    position: sticky; /* Reste visible quand on scrolle */
+    position: sticky;
     top: 120px;
 }
 
@@ -1255,104 +1260,116 @@ footer p {
     font-family: 'Pacifico', cursive;
     font-size: 1.8rem;
     color: var(--gris-fonce);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     text-align: center;
 }
 
-.resume-ligne {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    font-size: 1rem;
-    color: var(--gris-fonce);
-}
-
-.resume-total {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px dashed #EAEAEA;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--rose-corail);
-}
-
-.bouton-checkout {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background-color: var(--rose-corail);
-    color: white;
-    text-decoration: none;
-    padding: 15px 20px;
-    border-radius: 30px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    margin-top: 30px;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.bouton-checkout:hover {
-    background-color: #E55C5C;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(254,123,126,0.3);
-}
-
-.lien-continuer {
-    display: block;
-    text-align: center;
-    margin-top: 15px;
-    color: var(--vert-menthe);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-.lien-continuer:hover {
-    color: var(--gris-fonce);
-}
-
-/* --- RESPONSIVE PANIER --- */
-@media (max-width: 900px) {
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1100px) {
+    header,
+    .hero,
+    .grille-concept,
+    .grille-chats,
+    .atelier-double-action,
+    .grille-atelier-visuels,
+    .grille-espace,
+    .grille-douceurs,
+    .repaire-container,
     .panier-section {
         flex-direction: column;
+        grid-template-columns: 1fr;
     }
-    
-    .panier-articles, .panier-resume {
+
+    header {
+        gap: 20px;
+    }
+
+    nav ul {
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 8px !important;
+    }
+
+    nav li {
+        flex-shrink: 0 !important;
+    }
+
+    nav a {
+        font-size: 0.7rem !important;
+        white-space: nowrap !important;
+    }
+
+    .hero-image,
+    .hero-texte,
+    .concept-item,
+    .atelier-card,
+    .visuel-card,
+    .repaire-texte,
+    .repaire-image {
         width: 100%;
     }
-    
+
+    .visuel-card img,
+    .grille-douceurs img {
+        height: 220px;
+    }
+
     .panier-resume {
         position: static;
     }
-}
 
-@media (max-width: 600px) {
     .carte-panier {
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: center;
+        text-align: center;
     }
-    
+
     .panier-img-container {
         width: 80px;
         height: 80px;
     }
-    
-    .panier-info {
-        width: calc(100% - 100px);
+}
+
+@media (max-width: 768px) {
+    .grille-produits-boutique {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
     }
     
-    .panier-quantite {
-        order: 3;
+    .produit-image-boutique {
+        height: 200px;
     }
     
-    .panier-prix-total {
-        order: 4;
+    .boutique-section {
+        padding: 30px 20px;
+    }
+    
+    .boutique-section-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .grille-categories-boutique {
+        grid-template-columns: 1fr;
+    }
+
+    .grille-histoires {
+        grid-template-columns: 1fr;
+    }
+
+    .grille-pensionnaires {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
 }
 
-
-
+@media (max-width: 480px) {
+    .grille-pensionnaires {
+        grid-template-columns: 1fr;
+    }
+    
+    .pensionnaire-photo {
+        height: 180px;
+    }
+}
