@@ -9,8 +9,17 @@ $pdo = getPDO();
 $message = '';
 $error = '';
 
+// Génération du token CSRF pour les formulaires
+$csrf_token = generateCSRFToken();
+
 // Traiter les actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Vérification CSRF pour toutes les actions POST
+    $csrf_check = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_check)) {
+        die('Erreur de sécurité : token CSRF invalide');
+    }
+
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
         
@@ -40,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Calculer les totaux
+// Calculer les totaux (corrigé : array_sum pour les quantités)
 $cart = $_SESSION['cart'] ?? [];
-$total_items = count($cart);
+$total_items = array_sum(array_column($cart, 'quantite'));
 $total_price = 0;
 
 foreach ($cart as $item) {
@@ -120,6 +129,7 @@ function getImagePath(string $productName): string
                         <form method="POST" class="panier-quantite">
                             <input type="hidden" name="action" value="update_quantity">
                             <input type="hidden" name="produit_id" value="<?php echo $produit_id; ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                             <input type="number" name="quantite" class="input-quantite" value="<?php echo $item['quantite']; ?>" min="1" max="100">
                             <button type="submit" class="btn-quantite" title="Mettre à jour">↻</button>
                         </form>
@@ -131,6 +141,7 @@ function getImagePath(string $productName): string
                         <form method="POST" style="margin: 0;">
                             <input type="hidden" name="action" value="remove">
                             <input type="hidden" name="produit_id" value="<?php echo $produit_id; ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                             <button type="submit" class="btn-supprimer" title="Retirer l'article">🗑️</button>
                         </form>
                     </div>
@@ -160,6 +171,7 @@ function getImagePath(string $productName): string
                 
                 <form method="POST" onsubmit="return confirm('Vider complètement le panier ?');" style="margin-top: 20px;">
                     <input type="hidden" name="action" value="clear">
+                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                     <button type="submit" class="lien-continuer" style="width: 100%; border: none; background: transparent; cursor: pointer; color: var(--rose-corail);">Vider le panier</button>
                 </form>
             </aside>

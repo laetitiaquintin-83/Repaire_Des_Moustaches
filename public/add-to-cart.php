@@ -1,28 +1,34 @@
 <?php
 declare(strict_types=1);
 
+// ============================================================
+// 🔒 BLOCAGE DES REQUÊTES GET (sécurité)
+// ============================================================
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    die('Méthode non autorisée. Utilisez POST pour ajouter au panier.');
+}
+// ============================================================
+
 session_start();
 
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
-$csrf_token = generateCSRFToken();
 $response = ['success' => false, 'message' => ''];
 
-// Vérifier le token CSRF pour les requêtes POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrf_check = $_POST['csrf_token'] ?? '';
-    if (!validateCSRFToken($csrf_check)) {
-        $response['message'] = 'Erreur de sécurité : token CSRF invalide';
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit;
-    }
+// Vérification CSRF (toujours obligatoire en POST)
+$csrf_check = $_POST['csrf_token'] ?? '';
+if (!validateCSRFToken($csrf_check)) {
+    $response['message'] = 'Erreur de sécurité : token CSRF invalide';
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 // Récupérer l'ID du produit
-$produit_id = (int)($_POST['produit_id'] ?? $_GET['produit_id'] ?? 0);
-$quantite = (int)($_POST['quantite'] ?? $_GET['quantite'] ?? 1);
+$produit_id = (int)($_POST['produit_id'] ?? 0);
+$quantite = (int)($_POST['quantite'] ?? 1);
 
 if ($produit_id <= 0) {
     $response['message'] = 'Produit invalide';
@@ -31,24 +37,10 @@ if ($produit_id <= 0) {
     exit;
 }
 
-// Vérifier que le produit existe et récupérer ses infos
+// Vérifier que le produit existe
 $stmt = $pdo->prepare('SELECT id, nom, prix FROM produits WHERE id = ?');
 $stmt->execute([$produit_id]);
 $produit = $stmt->fetch();
-
-// Essayer de récupérer l'image si elle existe
-if ($produit) {
-    try {
-        $stmt_img = $pdo->prepare('SELECT image_url FROM produits WHERE id = ?');
-        $stmt_img->execute([$produit_id]);
-        $img_result = $stmt_img->fetch();
-        if ($img_result) {
-            $produit['image_url'] = $img_result['image_url'];
-        }
-    } catch (Exception $e) {
-        $produit['image_url'] = null;
-    }
-}
 
 if (!$produit) {
     $response['message'] = 'Produit introuvable';
@@ -57,12 +49,12 @@ if (!$produit) {
     exit;
 }
 
-// Initialiser le panier s'il n'existe pas
+// Initialiser le panier
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// Ajouter le produit au panier
+// Ajouter ou mettre à jour
 if (isset($_SESSION['cart'][$produit_id])) {
     $_SESSION['cart'][$produit_id]['quantite'] += $quantite;
 } else {
@@ -70,25 +62,25 @@ if (isset($_SESSION['cart'][$produit_id])) {
         'id' => $produit_id,
         'nom' => $produit['nom'],
         'prix' => $produit['prix'],
-        'image_url' => $produit['image_url'],
         'quantite' => $quantite
     ];
 }
 
 $response['success'] = true;
 $response['message'] = htmlspecialchars($produit['nom']) . ' ajouté au panier !';
-// CORRECTION ICI : on additionne toutes les quantités pour avoir le vrai nombre d'articles
 $response['cart_count'] = array_sum(array_column($_SESSION['cart'], 'quantite'));
 $response['cart_total'] = array_sum(array_map(function($item) {
     return $item['prix'] * $item['quantite'];
 }, $_SESSION['cart']));
 
-// Si c'est une requête JSON, retourner JSON
-if (isset($_POST['json']) || isset($_GET['json'])) {
+// Détection AJAX fiable
+$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+          strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+if ($isAjax) {
     header('Content-Type: application/json');
     echo json_encode($response);
 } else {
-    // Sinon, rediriger vers le panier
     header('Location: cart.php');
 }
 exit;

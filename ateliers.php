@@ -61,7 +61,10 @@ try {
 
             <div class="grille-atelier-visuels">
                 <?php foreach ($ateliers as $atelier): 
-                    $image = !empty($atelier['image']) ? $atelier['image'] : 'images/atelier-default.jpg';
+                    $image = !empty($atelier['image']) ? $atelier['image'] : 'images/ateliers/atelier-default.jpg';
+                    if (str_starts_with($image, 'images/atelier') && !str_starts_with($image, 'images/ateliers/')) {
+                        $image = 'images/ateliers/' . basename($image);
+                    }
                 ?>
                 <article class="visuel-card">
                     <picture>

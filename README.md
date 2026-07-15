@@ -19,7 +19,7 @@ Basé à Toulon, c'est un lieu libre d'accès où chacun peut rencontrer les pen
 
 ### Frontend
 
-- **PHP 8.2+** avec HTML5 sémantique sur 6 pages principales
+- **PHP 8.2+** avec HTML5 sémantique sur les pages principales du site
 - **CSS3** responsive avec variables de couleurs et hover effects
 - **Google Fonts** : Montserrat (body) + Pacifico (titres rétro)
 - **Palette** : Crème #FFF8E7 | Menthe #85D6CD | Rose #FE7B7E | Gris #2B2B2B
@@ -45,6 +45,7 @@ Repaire_Des_Moustaches/
 ├── formulaire.php          # Réservation + CSRF protection
 ├── login.php               # Authentification admin
 ├── logout.php              # Déconnexion
+├── cgv.php                 # Conditions générales de vente
 ├── style.css               # Styles (responsive, 🔐 cadenas)
 ├── schema.sql              # 13 CREATE TABLE + DEMANDES
 ├── demo_data.sql           # Données test
@@ -89,9 +90,9 @@ Repaire_Des_Moustaches/
 ✅ **Navigation fluide** - Menu principal identique partout + footer avec liens  
 ✅ **Sécurité renforcée** - PDO + CSRF tokens (hash_equals) + htmlspecialchars() sur tous les outputs  
 ✅ **Formulaire de réservation** - formulaire.php avec validation server-side et insertion BDD  
-✅ **Délivrables examen** - MCD, SQL complet, PHP backend fonctionnel, HTML/CSS production-ready  
+✅ **Délivrables examen** - MCD, SQL complet, PHP backend fonctionnel, HTML/CSS prêt pour la démonstration
 ✅ **Hover effects** - Boutons avec transition + shadow, liens sociaux colorés  
-✅ **Zéro erreurs** - HTML/CSS valides, pas d'erreurs console
+✅ **Stabilité** - HTML/CSS vérifiés et absence d'erreurs bloquantes connues
 
 ---
 
@@ -160,7 +161,7 @@ Pour changer le thème : modifier les 4 values en `:root`.
 
 ## 📝 Notes pour l'Examen DWWM
 
-### ✅ Délivrables Complétés
+### ✅ Délivrables Présents
 
 - ✅ **Hiérarchie sémantique** - H1, H2, semantic tags (header, nav, main, footer)
 - ✅ **Accents français** - Corrects partout (é, è, ê, à, ç)
@@ -200,7 +201,7 @@ Concept inspiré du "Repaire des Moustaches" réel (tiers-lieu Toulon).
 
 Livrable pour démonstration à l'examen :
 
-- Site web production-ready (Frontend ✅)
+- Site web prêt pour la démonstration (Frontend ✅)
 - Architecture base de données (SQL ✅)
 - Fondation backend PHP (Scaffold ✅)
 - Délivrables d'examen (MCD, SQL, HTML/CSS/JS)
@@ -211,7 +212,7 @@ Livrable pour démonstration à l'examen :
 
 Questions sur le projet ? Vérifier :
 
-1. Accents français (tous les .html)
+1. Accents français sur les pages principales
 2. Footer sur toutes les pages
 3. Responsive design (resize browser)
 4. Images présentes dans `images/` folder
@@ -237,16 +238,16 @@ Questions sur le projet ? Vérifier :
 
 ## ✅ Architecture FINALISÉE pour l'Examen
 
-**Tous les points du jury résolus:**
+**Points de jury traités:**
 
 1. ✅ **Zéro mélange .html/.php** - Tous les fichiers principaux en .php uniquement
 2. ✅ **Pas de duplication** - Header/footer mutua lisés via includes/
 3. ✅ **Structure cohérente** - Modules clairement séparés (/admin, /public, racine)
 4. ✅ **Versions à jour** - PHP 8.2+, MySQL 8.0+
-5. ✅ **Pas de redirection mystère** - espace.html supprimé
+5. ✅ **Pas de redirection mystère** - navigation clarifiée et page CGV à la racine
 6. ✅ **Sessions partout** - Même pages d'accueil en .php avec session_start
 
 ---
 
 **Version** : 1.2 (2026-05-26)  
-**Status** : ✅ **EXAM-READY NIKEL** - Frontend ✅ | Backend ✅ | Database ✅ | Sécurité ✅ | Architecture ✅ | Documentation ✅
+**Status** : ✅ **Version de démonstration prête** - Frontend ✅ | Backend ✅ | Database ✅ | Sécurité ✅ | Architecture ✅ | Documentation ✅

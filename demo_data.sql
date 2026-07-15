@@ -124,7 +124,7 @@ WHERE NOT EXISTS (
 INSERT INTO ateliers (titre, description, image, date_heure, capacite_max, admin_id)
 SELECT 'Création de Jouets Écolos',
        'Récupérez, transformez, créez ! Fabriquez des jouets stimulants pour vos futurs compagnons ou pour nos pensionnaires, à partir de matériaux recyclés. Pendant que vos mains s\'activent, Velours, Biscuit et Moonlight vous observent avec leur curiosité légendaire. Créativité garantie, fou rire inclus.',
-       'images/atelier5.jpg',
+      'images/ateliers/atelier5.jpg',
        DATE_ADD(NOW(), INTERVAL 7 DAY),
        12,
        @admin_id
@@ -135,7 +135,7 @@ WHERE NOT EXISTS (
 INSERT INTO ateliers (titre, description, image, date_heure, capacite_max, admin_id)
 SELECT 'Bien-être & Ronronthérapie',
        'Votre semaine vous a épuisé ? Les ronrons du Repaire sont votre remède. Soin, manucure, détente sous les caresses félines de nos moustachus... Laissez le stress s\'envoler dans les vapeurs apaisantes de ce rituel de self-care. Moonlight est expert en thérapie par câlins.',
-       'images/atelier2.jpg',
+      'images/ateliers/atelier2.jpg',
        DATE_ADD(NOW(), INTERVAL 10 DAY),
        8,
        @admin_id
@@ -146,7 +146,7 @@ WHERE NOT EXISTS (
 INSERT INTO ateliers (titre, description, image, date_heure, capacite_max, admin_id)
 SELECT 'Café Administratif',
        'L\'administratif vous terrifie ? Pas de panique ! Autour d\'un bon café rétro et sous les encouragements silencieux de Biscuit, nos bénévoles démystifient les papiers. Pas de jugement, juste de la solidarité. Le formulaire n\'a jamais été aussi inoffensif.',
-       'images/atelier4.jpg',
+      'images/ateliers/atelier4.jpg',
        DATE_ADD(NOW(), INTERVAL 5 DAY),
        15,
        @admin_id
@@ -157,7 +157,7 @@ WHERE NOT EXISTS (
 INSERT INTO ateliers (titre, description, image, date_heure, capacite_max, admin_id)
 SELECT 'Les Pâtisseries du Diner',
        'Plongez dans l\'univers gourmand des années 50 ! Nos animatrices vous enseignent les secrets des cupcakes mythiques, des brownies décadents et des cookies qui collent au palais. Vous repartirez avec vos créations (si la tentation de les dévorer sur place ne vous gagne pas).',
-       'images/atelier1.jpg',
+      'images/ateliers/atelier1.jpg',
        DATE_ADD(NOW(), INTERVAL 12 DAY),
        10,
        @admin_id

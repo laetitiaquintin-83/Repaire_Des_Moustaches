@@ -195,12 +195,16 @@ if (isset($_SESSION['cart'])) {
                                         <span class="produit-prix-boutique">
                                             <?php echo htmlspecialchars(formatPrice((float) $produit['prix']), ENT_QUOTES, 'UTF-8'); ?>
                                         </span>
-                                        <form method="POST" action="add-to-cart.php" style="width: 100%; margin: 0;">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                                        
+                                        <!-- ✅ FORMULAIRE CORRIGÉ : class ajoutée + bouton type="submit" -->
+                                        <form method="POST" action="add-to-cart.php" class="form-add-to-cart" style="width: 100%; margin: 0;">
+                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                                             <input type="hidden" name="produit_id" value="<?php echo (int)$produit['id']; ?>">
                                             <input type="hidden" name="quantite" value="1">
-                                            <button type="button" class="bouton-ajouter-panier btn-add-to-cart">🛒 Ajouter</button>
+                                            <button type="submit" class="bouton-ajouter-panier">🛒 Ajouter</button>
                                         </form>
+                                        <!-- FIN CORRECTION -->
+                                        
                                     </div>
                                 </div>
                             </article>

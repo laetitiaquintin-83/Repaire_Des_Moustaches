@@ -32,33 +32,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validateCSRFToken($csrf_check)) {
         $error = 'Erreur de sécurité : token CSRF invalide. Veuillez réessayer.';
     } else {
-        $prenom = htmlspecialchars($_POST['prenom'] ?? '');
-        $nom = htmlspecialchars($_POST['nom'] ?? '');
-        $email = htmlspecialchars($_POST['email'] ?? '');
-        $adresse = htmlspecialchars($_POST['adresse'] ?? '');
-        $code_postal = htmlspecialchars($_POST['code_postal'] ?? '');
-        $ville = htmlspecialchars($_POST['ville'] ?? '');
-        
+        // Récupération brute (pas d'échappement HTML ici)
+        $prenom = trim($_POST['prenom'] ?? '');
+        $nom = trim($_POST['nom'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $adresse = trim($_POST['adresse'] ?? '');
+        $code_postal = trim($_POST['code_postal'] ?? '');
+        $ville = trim($_POST['ville'] ?? '');
+
+        // ============================================================
+        // 🔍 VALIDATIONS MÉTIER RENFORCÉES
+        // ============================================================
+
+        // 1. Champs obligatoires
         if (!$prenom || !$nom || !$email || !$adresse || !$code_postal || !$ville) {
-            $error = 'Tous les champs sont obligatoires';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = 'Email invalide';
-        } else {
+            $error = 'Tous les champs sont obligatoires.';
+        }
+        // 2. Email valide
+        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Adresse email invalide.';
+        }
+        // 3. Prénom (au moins 2 caractères, lettres et accents autorisés)
+        elseif (strlen($prenom) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/', $prenom)) {
+            $error = 'Le prénom doit comporter au moins 2 caractères et ne contenir que des lettres, des espaces ou des tirets.';
+        }
+        // 4. Nom (au moins 2 caractères, lettres et accents autorisés)
+        elseif (strlen($nom) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/', $nom)) {
+            $error = 'Le nom doit comporter au moins 2 caractères et ne contenir que des lettres, des espaces ou des tirets.';
+        }
+        // 5. Adresse (au moins 5 caractères, pas de restriction stricte)
+        elseif (strlen($adresse) < 5) {
+            $error = 'L\'adresse doit comporter au moins 5 caractères.';
+        }
+        // 6. Code postal français (5 chiffres uniquement)
+        elseif (!preg_match('/^[0-9]{5}$/', $code_postal)) {
+            $error = 'Le code postal doit être composé de 5 chiffres (ex: 83000).';
+        }
+        // 7. Ville (au moins 2 caractères, lettres, espaces, tirets, accents)
+        elseif (strlen($ville) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/', $ville)) {
+            $error = 'La ville doit comporter au moins 2 caractères et ne contenir que des lettres, des espaces ou des tirets.';
+        }
+        // ✅ Toutes les validations sont passées
+        else {
             try {
-                // Déterminer l'user_id
+                // Déterminer l'utilisateur_id
                 $utilisateur_id = $_SESSION['user_id'] ?? null;
-                
-                // Si pas connecté, créer un utilisateur temporaire pour cette commande
+
                 if (!$utilisateur_id) {
-                    // Vérifier si l'email existe
+                    // Vérifier si l'email existe déjà
                     $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
                     $stmt->execute([$email]);
-                    $existing_user = $stmt->fetch();
-                    
-                    if ($existing_user) {
-                        $utilisateur_id = $existing_user['id'];
+                    $existing = $stmt->fetch();
+
+                    if ($existing) {
+                        $utilisateur_id = (int)$existing['id'];
                     } else {
-                        // Créer un nouvel utilisateur
+                        // Créer un nouvel utilisateur avec mot de passe aléatoire
                         $mot_de_passe = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
                         $stmt = $pdo->prepare('
                             INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, date_inscription)
@@ -68,45 +97,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $utilisateur_id = (int)$pdo->lastInsertId();
                     }
                 }
-                
-                // Calculer le total
+
+                // Calcul du total
                 $total = 0;
                 foreach ($cart as $item) {
                     $total += (float)$item['prix'] * (int)$item['quantite'];
                 }
-                
-                // Créer la commande
+
+                // Insérer la commande
                 $stmt = $pdo->prepare('
                     INSERT INTO commandes (utilisateur_id, date_commande, montant_total, statut)
                     VALUES (?, NOW(), ?, "en_attente")
                 ');
                 $stmt->execute([$utilisateur_id, $total]);
                 $commande_id = (int)$pdo->lastInsertId();
-                
-                // Créer les lignes de commande
+
+                // Insérer les lignes de commande
                 foreach ($cart as $produit_id => $item) {
                     $stmt = $pdo->prepare('
                         INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire)
                         VALUES (?, ?, ?, ?)
                     ');
-                    $stmt->execute([$commande_id, $produit_id, $item['quantite'], $item['prix']]);
+                    $stmt->execute([
+                        $commande_id,
+                        $produit_id,
+                        (int)$item['quantite'],
+                        (float)$item['prix']
+                    ]);
                 }
-                
+
                 // Vider le panier
                 unset($_SESSION['cart']);
-                
-                // Rediriger vers confirmation
+
+                // Redirection vers la confirmation
                 header('Location: confirmation.php?commande_id=' . $commande_id);
                 exit;
-                
+
             } catch (PDOException $e) {
-                $error = 'Erreur lors de la création de la commande';
+                // Log de l'erreur (optionnel)
+                error_log('Erreur checkout : ' . $e->getMessage());
+                $error = 'Une erreur est survenue lors de la création de la commande. Veuillez réessayer.';
             }
         }
     }
 }
 
-// Calculer le total
+// Recalcul du total pour l'affichage
 $total_price = 0;
 foreach ($cart as $item) {
     $total_price += (float)$item['prix'] * (int)$item['quantite'];
@@ -357,7 +393,7 @@ foreach ($cart as $item) {
         </div>
         
         <?php if ($error): ?>
-            <div class="alert alert-error"><?php echo $error; ?></div>
+            <div class="alert alert-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
         <?php endif; ?>
 
         <div class="checkout-grid">
@@ -370,19 +406,19 @@ foreach ($cart as $item) {
                         <div class="form-group">
                             <label for="prenom">Prénom *</label>
                             <input type="text" id="prenom" name="prenom" required 
-                                   value="<?php echo $user ? htmlspecialchars($user['prenom']) : ''; ?>">
+                                   value="<?php echo $user ? htmlspecialchars($user['prenom'], ENT_QUOTES, 'UTF-8') : ''; ?>">
                         </div>
                         <div class="form-group">
                             <label for="nom">Nom *</label>
                             <input type="text" id="nom" name="nom" required 
-                                   value="<?php echo $user ? htmlspecialchars($user['nom']) : ''; ?>">
+                                   value="<?php echo $user ? htmlspecialchars($user['nom'], ENT_QUOTES, 'UTF-8') : ''; ?>">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="email">Email *</label>
                         <input type="email" id="email" name="email" required 
-                               value="<?php echo $user ? htmlspecialchars($user['email']) : ''; ?>">
+                               value="<?php echo $user ? htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') : ''; ?>">
                     </div>
                 </div>
                 
@@ -419,8 +455,8 @@ foreach ($cart as $item) {
                 
                 <?php foreach ($cart as $item): ?>
                     <div class="resume-item">
-                        <div class="resume-item-name"><?php echo htmlspecialchars($item['nom']); ?></div>
-                        <div class="resume-item-qty">x<?php echo $item['quantite']; ?></div>
+                        <div class="resume-item-name"><?php echo htmlspecialchars($item['nom'], ENT_QUOTES, 'UTF-8'); ?></div>
+                        <div class="resume-item-qty">x<?php echo (int)$item['quantite']; ?></div>
                         <div class="resume-item-total"><?php echo number_format((float)$item['prix'] * (int)$item['quantite'], 2, ',', ' '); ?> €</div>
                     </div>
                 <?php endforeach; ?>

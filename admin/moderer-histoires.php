@@ -3,39 +3,77 @@ declare(strict_types=1);
 
 session_start();
 
-if (!isset($_SESSION['admin_id'])) {
+// ============================================================
+// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
+// ============================================================
+if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
+// ============================================================
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php'; // Pour generateCSRFToken() et validateCSRFToken()
 
 $pdo = getPDO();
 $message = '';
+$error = '';
 
-// Traiter les actions
-$action = (string) ($_GET['action'] ?? '');
-$id = (int) ($_GET['id'] ?? 0);
+// Générer un token CSRF pour les actions
+$csrf_token = generateCSRFToken();
 
-if ($action === 'publier' && $id > 0) {
-    $stmt = $pdo->prepare('
-        UPDATE belles_histoires 
-        SET statut = "publiee", admin_id = ?, date_publication = NOW()
-        WHERE id = ?
-    ');
-    $stmt->execute([$_SESSION['admin_id'], $id]);
-    $message = '✓ Histoire publiée !';
+// Traiter les actions (uniquement via POST pour la sécurité)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = (string) ($_POST['action'] ?? '');
+    $id = (int) ($_POST['id'] ?? 0);
+    $csrf_check = (string) ($_POST['csrf_token'] ?? '');
+
+    // Vérification CSRF
+    if (!validateCSRFToken($csrf_check)) {
+        $error = 'Erreur de sécurité : token CSRF invalide.';
+    } elseif ($action === 'publier' && $id > 0) {
+        $stmt = $pdo->prepare('
+            UPDATE belles_histoires 
+            SET statut = "publiee", admin_id = ?, date_publication = NOW()
+            WHERE id = ? AND statut = "en_attente"
+        ');
+        $stmt->execute([$_SESSION['admin_id'], $id]);
+        if ($stmt->rowCount() > 0) {
+            $message = '✓ Histoire publiée avec succès !';
+        } else {
+            $error = 'Histoire introuvable ou déjà traitée.';
+        }
+    } elseif ($action === 'rejeter' && $id > 0) {
+        $stmt = $pdo->prepare('
+            UPDATE belles_histoires 
+            SET statut = "refusee", admin_id = ?, date_publication = NOW()
+            WHERE id = ? AND statut = "en_attente"
+        ');
+        $stmt->execute([$_SESSION['admin_id'], $id]);
+        if ($stmt->rowCount() > 0) {
+            $message = '✓ Histoire rejetée.';
+        } else {
+            $error = 'Histoire introuvable ou déjà traitée.';
+        }
+    } else {
+        $error = 'Action invalide.';
+    }
 }
 
-if ($action === 'rejeter' && $id > 0) {
-    $stmt = $pdo->prepare('DELETE FROM belles_histoires WHERE id = ?');
-    $stmt->execute([$id]);
-    $message = '✓ Histoire supprimée !';
-}
-
-// Récupérer les histoires
+// Récupérer les histoires selon l'onglet
 $tab = (string) ($_GET['tab'] ?? 'attente');
-$statut = $tab === 'attente' ? 'en_attente' : 'publiee';
+$statut = '';
+
+if ($tab === 'attente') {
+    $statut = 'en_attente';
+} elseif ($tab === 'publiees') {
+    $statut = 'publiee';
+} elseif ($tab === 'refusees') {
+    $statut = 'refusee';
+} else {
+    $statut = 'en_attente';
+    $tab = 'attente';
+}
 
 $stmt = $pdo->prepare('
     SELECT bh.id, bh.titre, bh.contenu, bh.statut, bh.date_publication, u.nom, u.prenom
@@ -46,6 +84,16 @@ $stmt = $pdo->prepare('
 ');
 $stmt->execute([$statut]);
 $histoires = $stmt->fetchAll();
+
+// Statistiques pour les onglets
+$stats = [];
+$stmt = $pdo->query("SELECT statut, COUNT(*) FROM belles_histoires GROUP BY statut");
+while ($row = $stmt->fetch()) {
+    $stats[$row['statut']] = (int)$row['count'];
+}
+$stats['en_attente'] = $stats['en_attente'] ?? 0;
+$stats['publiee'] = $stats['publiee'] ?? 0;
+$stats['refusee'] = $stats['refusee'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -87,11 +135,6 @@ $histoires = $stmt->fetchAll();
             padding: 0 20px;
             margin-bottom: 30px;
             text-align: center;
-        }
-        
-        .admin-logo img {
-            max-width: 60px;
-            margin-bottom: 10px;
         }
         
         .admin-logo h2 {
@@ -173,6 +216,7 @@ $histoires = $stmt->fetchAll();
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .tab-btn {
@@ -199,10 +243,29 @@ $histoires = $stmt->fetchAll();
             border-color: #85D6CD;
         }
         
+        .badge {
+            background: #FE7B7E;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 5px;
+        }
+        
         .message {
             background: #E0FFE0;
             border: 1px solid #00A000;
             color: #009900;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .error-message {
+            background: #FFE0E0;
+            border: 1px solid #FE7B7E;
+            color: #C00;
             padding: 12px;
             border-radius: 6px;
             margin-bottom: 20px;
@@ -248,6 +311,7 @@ $histoires = $stmt->fetchAll();
         .actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .btn {
@@ -259,6 +323,7 @@ $histoires = $stmt->fetchAll();
             font-size: 0.85rem;
             font-weight: 700;
             transition: all 0.3s;
+            display: inline-block;
         }
         
         .btn-success {
@@ -279,10 +344,43 @@ $histoires = $stmt->fetchAll();
             background: #E66367;
         }
         
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #ccc;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: #999;
+        }
+        
+        .statut-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        
+        .statut-attente {
+            background: #FFF3CD;
+            color: #856404;
+        }
+        
+        .statut-publiee {
+            background: #D4EDDA;
+            color: #155724;
+        }
+        
+        .statut-refusee {
+            background: #F8D7DA;
+            color: #721C24;
         }
     </style>
 </head>
@@ -290,8 +388,7 @@ $histoires = $stmt->fetchAll();
     <div class="admin-container">
         <aside class="admin-sidebar">
             <div class="admin-logo">
-                <img src="../images/logo.png" alt="Logo">
-                <h2>Admin</h2>
+                <h2>🧔 Admin</h2>
             </div>
             
             <ul class="admin-menu">
@@ -308,7 +405,7 @@ $histoires = $stmt->fetchAll();
             <div class="admin-user-info">
                 <p>Connecté en tant que:</p>
                 <strong><?php echo htmlspecialchars($_SESSION['admin_email'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                <a href="../logout.php">Déconnexion</a>
+                <a href="../logout.php">🚪 Déconnexion</a>
             </div>
         </aside>
         
@@ -321,35 +418,71 @@ $histoires = $stmt->fetchAll();
                 <div class="message"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
             
+            <?php if (!empty($error)): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+            
             <div class="tabs">
                 <a href="?tab=attente" class="tab-btn <?php echo $tab === 'attente' ? 'active' : ''; ?>">
-                    ⏳ À modérer (<?php echo count(array_filter($histoires, fn($h) => $h['statut'] === 'en_attente')); ?>)
+                    ⏳ À modérer
+                    <?php if ($stats['en_attente'] > 0): ?>
+                        <span class="badge"><?php echo $stats['en_attente']; ?></span>
+                    <?php endif; ?>
                 </a>
                 <a href="?tab=publiees" class="tab-btn <?php echo $tab === 'publiees' ? 'active' : ''; ?>">
-                    ✓ Publiées (<?php echo count(array_filter($histoires, fn($h) => $h['statut'] === 'publiee')); ?>)
+                    ✓ Publiées (<?php echo $stats['publiee']; ?>)
+                </a>
+                <a href="?tab=refusees" class="tab-btn <?php echo $tab === 'refusees' ? 'active' : ''; ?>">
+                    ✕ Refusées (<?php echo $stats['refusee']; ?>)
                 </a>
             </div>
             
             <div class="section">
                 <?php if (empty($histoires)): ?>
                     <div class="empty-state">
-                        <?php echo $tab === 'attente' ? 'Aucune histoire à modérer.' : 'Aucune histoire publiée.'; ?>
+                        <?php
+                            if ($tab === 'attente') echo 'Aucune histoire en attente de modération. 🎉';
+                            elseif ($tab === 'publiees') echo 'Aucune histoire publiée pour le moment.';
+                            else echo 'Aucune histoire refusée.';
+                        ?>
                     </div>
                 <?php else: ?>
                     <?php foreach ($histoires as $histoire): ?>
                         <div class="histoire-card">
                             <h3><?php echo htmlspecialchars($histoire['titre'], ENT_QUOTES, 'UTF-8'); ?></h3>
                             <div class="histoire-meta">
+                                <span class="statut-badge statut-<?php echo $histoire['statut']; ?>">
+                                    <?php
+                                        $statutLabels = [
+                                            'en_attente' => '⏳ En attente',
+                                            'publiee' => '✓ Publiée',
+                                            'refusee' => '✕ Refusée'
+                                        ];
+                                        echo $statutLabels[$histoire['statut']] ?? $histoire['statut'];
+                                    ?>
+                                </span>
                                 Par <?php echo htmlspecialchars($histoire['prenom'] . ' ' . $histoire['nom'], ENT_QUOTES, 'UTF-8'); ?> 
-                                | Soumise le <?php echo date('d/m/Y H:i', strtotime($histoire['date_publication'])); ?>
+                                | Soumise le <?php echo date('d/m/Y à H:i', strtotime($histoire['date_publication'])); ?>
                             </div>
                             <div class="histoire-contenu">
                                 <?php echo nl2br(htmlspecialchars($histoire['contenu'], ENT_QUOTES, 'UTF-8')); ?>
                             </div>
                             <div class="actions">
                                 <?php if ($histoire['statut'] === 'en_attente'): ?>
-                                    <a href="?tab=attente&action=publier&id=<?php echo $histoire['id']; ?>" class="btn btn-success">✓ Publier</a>
-                                    <a href="?tab=attente&action=rejeter&id=<?php echo $histoire['id']; ?>" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">✕ Rejeter</a>
+                                    <!-- Formulaire POST sécurisé pour publier -->
+                                    <form method="POST" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="hidden" name="action" value="publier">
+                                        <input type="hidden" name="id" value="<?php echo (int)$histoire['id']; ?>">
+                                        <button type="submit" class="btn btn-success">✓ Publier</button>
+                                    </form>
+                                    <!-- Formulaire POST sécurisé pour rejeter -->
+                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir rejeter cette histoire ?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="hidden" name="action" value="rejeter">
+                                        <input type="hidden" name="id" value="<?php echo (int)$histoire['id']; ?>">
+                                        <button type="submit" class="btn btn-danger">✕ Rejeter</button>
+                                    </form>
                                 <?php endif; ?>
                             </div>
                         </div>
