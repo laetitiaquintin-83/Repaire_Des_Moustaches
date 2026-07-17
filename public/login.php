@@ -4,12 +4,13 @@ declare(strict_types=1);
 $sitePrefix = '';
 session_start();
 
+// Chemin depuis le dossier 'public/' vers le dossier 'config/'
 require_once __DIR__ . '/../config/database.php';
 
 $error = '';
 $success = '';
 
-// Si déjà  connecté, rediriger vers le dashboard
+// Si déjà connecté, rediriger vers le dashboard (dans le sous-dossier admin)
 if (isset($_SESSION['admin_id'])) {
     header('Location: admin/dashboard.php');
     exit;
@@ -40,13 +41,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_role'] = $admin['role'];
                 $_SESSION['admin_login_time'] = time();
 
+                // Redirection de public/ vers public/admin/dashboard.php
                 header('Location: admin/dashboard.php');
                 exit;
             } else {
                 $error = 'Email ou mot de passe incorrect.';
             }
         } catch (Exception $e) {
-            $error = 'Erreur de connexion: ' . $e->getMessage();
+            error_log('Erreur SQL Connexion Admin : ' . $e->getMessage());
+            $error = 'Une erreur technique est survenue. Veuillez réessayer ultérieurement.';
         }
     }
 }
@@ -72,9 +75,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: linear-gradient(135deg, #FFF8E7 0%, #85D6CD 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
         
         .login-container {
@@ -92,8 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .login-header img {
-            max-width: 80px;
-            margin-bottom: 20px;
+            max-width: 90px;
+            height: auto;
+            margin-bottom: 15px;
         }
         
         .login-header h1 {
@@ -101,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #FE7B7E;
             font-size: 2rem;
             font-weight: normal;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         
         .login-header p {
@@ -204,44 +215,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <img src="images/logo.png" alt="Logo">
-            <h1>Admin</h1>
-            <p>Gestion du Repaire</p>
-        </div>
-        
-        <?php if (!empty($error)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
-        <?php endif; ?>
-        
-        <?php if (!empty($success)): ?>
-            <div class="success-message"><?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?></div>
-        <?php endif; ?>
-        
-        <form method="POST">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required autofocus>
+    <div class="main-content">
+        <div class="login-container">
+            <div class="login-header">
+                <!-- Depuis public/ vers public/images/logo.png -->
+                <img src="images/logo.png" alt="Le Repaire des Moustaches Logo">
+                <h1>Admin</h1>
+                <p>Gestion du Repaire</p>
             </div>
             
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="password" required>
+            <?php if (!empty($error)): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+            
+            <?php if (!empty($success)): ?>
+                <div class="success-message"><?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
+            
+            <div class="demo-credentials">
+                <strong>Accès démo :</strong><br>
+                Email: <code>admin@repaire.local</code><br>
+                Mot de passe: <code>admin123</code>
             </div>
             
-            <button type="submit" class="btn-login">Se connecter</button>
-        </form>
-        
-        <div class="demo-credentials">
-            <strong>Accès démo :</strong><br>
-            Email: <code>admin@repaire.local</code><br>
-            Mot de passe: <code>admin123</code>
-        </div>
-        
-        <div class="back-link">
-            <a href="index.php">← Retour au site</a>
+            <div class="back-link">
+                <!-- Depuis public/login.php vers public/index.php -->
+                <a href="index.php">← Retour au site</a>
+            </div>
         </div>
     </div>
 
+    <!-- Depuis public/ vers public/includes/footer.php -->
     <?php require_once __DIR__ . '/includes/footer.php'; ?>
+</body>
+</html>

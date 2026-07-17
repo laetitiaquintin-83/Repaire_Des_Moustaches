@@ -12,32 +12,37 @@ if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
 }
 // ============================================================
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 
 // Récupérer quelques stats pour le dashboard
 $stats = [];
 
-// Nombre de commandes
-$stmt = $pdo->query('SELECT COUNT(*) FROM commandes');
-$stats['commandes'] = (int)$stmt->fetchColumn();
+try {
+    // Nombre de commandes
+    $stmt = $pdo->query('SELECT COUNT(*) FROM commandes');
+    $stats['commandes'] = (int)$stmt->fetchColumn();
 
-// Nombre de produits
-$stmt = $pdo->query('SELECT COUNT(*) FROM produits');
-$stats['produits'] = (int)$stmt->fetchColumn();
+    // Nombre de produits
+    $stmt = $pdo->query('SELECT COUNT(*) FROM produits');
+    $stats['produits'] = (int)$stmt->fetchColumn();
 
-// Nombre de réservations ateliers
-$stmt = $pdo->query('SELECT COUNT(*) FROM reservations_ateliers');
-$stats['reservations'] = (int)$stmt->fetchColumn();
+    // Nombre de réservations ateliers
+    $stmt = $pdo->query('SELECT COUNT(*) FROM reservations_ateliers');
+    $stats['reservations'] = (int)$stmt->fetchColumn();
 
-// Nombre d'utilisateurs
-$stmt = $pdo->query('SELECT COUNT(*) FROM utilisateurs');
-$stats['utilisateurs'] = (int)$stmt->fetchColumn();
+    // Nombre d'utilisateurs
+    $stmt = $pdo->query('SELECT COUNT(*) FROM utilisateurs');
+    $stats['utilisateurs'] = (int)$stmt->fetchColumn();
 
-// Nombre d'histoires en attente de modération
-$stmt = $pdo->query("SELECT COUNT(*) FROM belles_histoires WHERE statut = 'en_attente'");
-$stats['histoires_attente'] = (int)$stmt->fetchColumn();
+    // Nombre d'histoires en attente de modération
+    $stmt = $pdo->query("SELECT COUNT(*) FROM belles_histoires WHERE statut = 'en_attente'");
+    $stats['histoires_attente'] = (int)$stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log($e->getMessage());
+    die('Une erreur est survenue lors du chargement des statistiques du dashboard.');
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -48,12 +53,13 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <style>
         .dashboard-container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 20px;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .dashboard-header {
@@ -68,20 +74,22 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
             color: #FE7B7E;
             font-size: 2.5rem;
             font-weight: normal;
+            margin: 0;
         }
         
         .logout-btn {
             background: #FE7B7E;
-            color: white;
+            color: white !important;
             padding: 10px 20px;
-            border-radius: 4px;
+            border-radius: 30px;
             text-decoration: none;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
         
         .logout-btn:hover {
             background: #e06468;
+            transform: translateY(-2px);
         }
         
         .stats-grid {
@@ -93,10 +101,11 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
         
         .stat-card {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-align: center;
+            border-top: 3px solid #85D6CD;
         }
         
         .stat-card .number {
@@ -109,6 +118,7 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
             color: #666;
             font-size: 0.9rem;
             margin-top: 5px;
+            font-weight: 600;
         }
         
         .admin-menu {
@@ -119,9 +129,9 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
         
         .menu-item {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 25px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             text-decoration: none;
             color: #2B2B2B;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -133,12 +143,12 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
         
         .menu-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
         }
         
         .menu-item .icon {
             font-size: 2.5rem;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .menu-item .title {
@@ -156,30 +166,30 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
 <body>
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h1>🧔 Dashboard</h1>
+            <h1>🐱 Dashboard</h1>
             <a href="../logout.php" class="logout-btn">🚪 Déconnexion</a>
         </div>
         
         <!-- Statistiques -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="number"><?php echo $stats['commandes']; ?></div>
+                <div class="number"><?php echo htmlspecialchars((string)$stats['commandes'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="label">Commandes</div>
             </div>
             <div class="stat-card">
-                <div class="number"><?php echo $stats['produits']; ?></div>
+                <div class="number"><?php echo htmlspecialchars((string)$stats['produits'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="label">Produits</div>
             </div>
             <div class="stat-card">
-                <div class="number"><?php echo $stats['reservations']; ?></div>
+                <div class="number"><?php echo htmlspecialchars((string)$stats['reservations'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="label">Réservations ateliers</div>
             </div>
             <div class="stat-card">
-                <div class="number"><?php echo $stats['utilisateurs']; ?></div>
+                <div class="number"><?php echo htmlspecialchars((string)$stats['utilisateurs'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="label">Utilisateurs</div>
             </div>
             <div class="stat-card">
-                <div class="number"><?php echo $stats['histoires_attente']; ?></div>
+                <div class="number"><?php echo htmlspecialchars((string)$stats['histoires_attente'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="label">Histoires à modérer</div>
             </div>
         </div>
@@ -196,18 +206,19 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
                 <span class="title">Gestion des ateliers</span>
                 <span class="desc">Programmer, gérer les places</span>
             </a>
-            <a href="pensionnaires.php" class="menu-item">
-                <span class="icon">🐱</span>
-                <span class="title">Gestion des pensionnaires</span>
-                <span class="desc">Chats à l'adoption</span>
+            <!-- MODIFICATION ICI : Le bouton pointe vers la page de supervision de l'API externe -->
+            <a href="../partenaires.php" class="menu-item">
+                <span class="icon">🔗</span>
+                <span class="title">Supervision API</span>
+                <span class="desc">Flux des refuges partenaires (JSON)</span>
             </a>
             <a href="moderer-histoires.php" class="menu-item">
                 <span class="icon">📝</span>
                 <span class="title">Modérer les histoires</span>
                 <span class="desc">Valider ou refuser les témoignages</span>
                 <?php if ($stats['histoires_attente'] > 0): ?>
-                    <span style="background: #FE7B7E; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; margin-top: 5px;">
-                        <?php echo $stats['histoires_attente']; ?> en attente
+                    <span style="background: #FE7B7E; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; margin-top: 8px; font-weight: bold;">
+                        <?php echo htmlspecialchars((string)$stats['histoires_attente'], ENT_QUOTES, 'UTF-8'); ?> en attente
                     </span>
                 <?php endif; ?>
             </a>
@@ -224,4 +235,6 @@ $stats['histoires_attente'] = (int)$stmt->fetchColumn();
         </div>
     </div>
 
-    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+    <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+</body>
+</html>

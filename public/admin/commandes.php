@@ -12,7 +12,7 @@ if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
 }
 // ============================================================
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 $csrf_token = generateCSRFToken();
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([$nouveau_statut, $id]);
                     $message = '✓ Statut de la commande modifié !';
                 } catch (PDOException $e) {
-                    $error = 'Erreur lors de la modification';
+                    $error = 'Erreur lors de la modification : ' . htmlspecialchars($e->getMessage());
                 }
             }
         }
@@ -88,8 +88,28 @@ $commandes = $stmt->fetchAll();
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: #F5F5F5; }
+        .admin-container { display: flex; min-height: 100vh; }
+        .admin-sidebar { width: 250px; background: #2B2B2B; color: white; padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .admin-logo { padding: 0 20px; margin-bottom: 30px; text-align: center; }
+        .admin-logo img { max-width: 60px; margin-bottom: 10px; }
+        .admin-logo h2 { font-family: 'Pacifico', cursive; color: #85D6CD; font-size: 1.5rem; font-weight: normal; }
+        
+        .admin-menu { list-style: none; }
+        .admin-menu a { display: block; padding: 12px 20px; color: #ccc; text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
+        .admin-menu a:hover { background: rgba(133, 214, 205, 0.1); color: #85D6CD; border-left-color: #85D6CD; }
+        .admin-menu a.active { background: rgba(133, 214, 205, 0.2); color: #85D6CD; border-left-color: #85D6CD; font-weight: 700; }
+        
+        .admin-user-info { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto; }
+        .admin-user-info p { margin: 0 0 5px 0; font-size: 11px; color: #aaa; }
+        .admin-user-info strong { display: block; color: white; margin-bottom: 10px; font-size: 13px; word-break: break-all; }
+        .admin-user-info a { display: block; color: #FE7B7E; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+        
+        .admin-main { flex: 1; margin-left: 250px; padding: 30px; }
+        
         .alert {
             padding: 12px 15px;
             border-radius: 4px;
@@ -116,6 +136,8 @@ $commandes = $stmt->fetchAll();
             font-weight: 600;
             transition: all 0.3s ease;
             font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
         }
         
         .btn-primary {
@@ -245,18 +267,11 @@ $commandes = $stmt->fetchAll();
         }
         
         @media (max-width: 768px) {
-            .detail-header {
-                grid-template-columns: 1fr;
-            }
-            
-            .commandes-table {
-                font-size: 12px;
-            }
-            
-            .commandes-table th,
-            .commandes-table td {
-                padding: 8px;
-            }
+            .admin-sidebar { width: 100%; position: relative; height: auto; }
+            .admin-main { margin-left: 0; padding: 15px; }
+            .detail-header { grid-template-columns: 1fr; }
+            .commandes-table { font-size: 12px; }
+            .commandes-table th, .commandes-table td { padding: 8px; }
         }
     </style>
 </head>
@@ -264,21 +279,24 @@ $commandes = $stmt->fetchAll();
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-menu">
+            <div class="admin-logo">
+                <img src="../images/logo.png" alt="Logo">
                 <h2>Admin</h2>
-                <nav>
-                    <a href="dashboard.php">📊 Dashboard</a>
-                    <a href="moderer-histoires.php">📖 Belles Histoires</a>
-                    <a href="ateliers.php">🎨 Ateliers</a>
-                    <a href="produits.php">🛍️ Produits</a>
-                    <a href="commandes.php" class="active">📦 Commandes</a>
-                    <a href="utilisateurs.php">👥 Utilisateurs</a>
-                </nav>
             </div>
-            <div style="padding: 20px; border-top: 1px solid #444; margin-top: auto;">
-                <p style="margin: 0 0 10px 0; font-size: 12px; color: #aaa;">Connecté:</p>
-                <p style="margin: 0 0 15px 0; font-weight: 600; color: white;"><?php echo htmlspecialchars($_SESSION['admin_email']); ?></p>
-                <a href="../logout.php" style="color: #FE7B7E; text-decoration: none; font-weight: 600;">Déconnexion</a>
+            <ul class="admin-menu">
+                <li><a href="../index.php" style="color: #FE7B7E; font-weight: 700;">🏠 Retour à l'accueil</a></li>
+                <li style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;"></li>
+                <li><a href="dashboard.php">📊 Dashboard</a></li>
+                <li><a href="moderer-histoires.php">📖 Belles Histoires</a></li>
+                <li><a href="ateliers.php">🎨 Ateliers</a></li>
+                <li><a href="produits.php">🛍️ Produits</a></li>
+                <li><a href="commandes.php" class="active">📦 Commandes</a></li>
+                <li><a href="utilisateurs.php">👥 Utilisateurs</a></li>
+            </ul>
+            <div class="admin-user-info">
+                <p>Connecté en tant que :</p>
+                <strong><?php echo htmlspecialchars($_SESSION['admin_email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></strong>
+                <a href="../logout.php">Déconnexion</a>
             </div>
         </aside>
 
@@ -287,23 +305,23 @@ $commandes = $stmt->fetchAll();
             <h1>📦 Gestion des Commandes</h1>
             
             <?php if ($message): ?>
-                <div class="alert alert-success"><?php echo $message; ?></div>
+                <div class="alert alert-success"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
             
             <?php if ($error): ?>
-                <div class="alert alert-error"><?php echo $error; ?></div>
+                <div class="alert alert-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
 
             <?php if ($commande_detail): ?>
                 <!-- Vue détaillée -->
                 <div class="detail-container">
-                    <h2>Détail de la commande #<?php echo $commande_detail['id']; ?></h2>
+                    <h2>Détail de la commande #<?php echo (int)$commande_detail['id']; ?></h2>
                     
                     <div class="detail-header">
                         <div class="detail-item">
                             <div class="detail-item-label">Client</div>
-                            <div class="detail-item-value"><?php echo htmlspecialchars($commande_detail['prenom'] . ' ' . $commande_detail['nom']); ?></div>
-                            <div style="font-size: 12px; color: #666; margin-top: 4px;"><?php echo htmlspecialchars($commande_detail['email']); ?></div>
+                            <div class="detail-item-value"><?php echo htmlspecialchars($commande_detail['prenom'] . ' ' . $commande_detail['nom'], ENT_QUOTES, 'UTF-8'); ?></div>
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;"><?php echo htmlspecialchars($commande_detail['email'], ENT_QUOTES, 'UTF-8'); ?></div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-item-label">Date</div>
@@ -316,11 +334,11 @@ $commandes = $stmt->fetchAll();
                     </div>
                     
                     <div style="margin-bottom: 20px;">
-                        <form method="POST" style="display: flex; gap: 10px;">
+                        <form method="POST" style="display: flex; gap: 10px; align-items: center;">
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                             <input type="hidden" name="action" value="changer_statut">
-                            <input type="hidden" name="id" value="<?php echo $commande_detail['id']; ?>">
-                            <select name="statut" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <input type="hidden" name="id" value="<?php echo (int)$commande_detail['id']; ?>">
+                            <select name="statut" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: white; font-family: inherit;">
                                 <option value="en_attente" <?php echo $commande_detail['statut'] === 'en_attente' ? 'selected' : ''; ?>>En attente</option>
                                 <option value="payee" <?php echo $commande_detail['statut'] === 'payee' ? 'selected' : ''; ?>>Payée</option>
                                 <option value="annulee" <?php echo $commande_detail['statut'] === 'annulee' ? 'selected' : ''; ?>>Annulée</option>
@@ -343,8 +361,8 @@ $commandes = $stmt->fetchAll();
                         <tbody>
                             <?php foreach ($commande_detail['lignes'] as $ligne): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($ligne['produit_nom']); ?></td>
-                                    <td><?php echo $ligne['quantite']; ?></td>
+                                    <td><?php echo htmlspecialchars($ligne['produit_nom'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?php echo (int)$ligne['quantite']; ?></td>
                                     <td><?php echo number_format((float)$ligne['prix_unitaire'], 2, ',', ' '); ?> €</td>
                                     <td><?php echo number_format((float)$ligne['prix_unitaire'] * (int)$ligne['quantite'], 2, ',', ' '); ?> €</td>
                                 </tr>
@@ -377,18 +395,18 @@ $commandes = $stmt->fetchAll();
                                 <tbody>
                                     <?php foreach ($commandes as $cmd): ?>
                                         <tr>
-                                            <td><?php echo $cmd['id']; ?></td>
-                                            <td><?php echo htmlspecialchars($cmd['prenom'] . ' ' . $cmd['nom']); ?></td>
+                                            <td><?php echo (int)$cmd['id']; ?></td>
+                                            <td><?php echo htmlspecialchars($cmd['prenom'] . ' ' . $cmd['nom'], ENT_QUOTES, 'UTF-8'); ?></td>
                                             <td><?php echo date('d/m/Y', strtotime($cmd['date_commande'])); ?></td>
                                             <td><?php echo number_format((float)$cmd['montant_total'], 2, ',', ' '); ?> €</td>
                                             <td>
-                                                <span class="status-badge status-<?php echo $cmd['statut']; ?>">
-                                                    <?php echo ucfirst(str_replace('_', ' ', $cmd['statut'])); ?>
+                                                <span class="status-badge status-<?php echo htmlspecialchars($cmd['statut'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                    <?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $cmd['statut'])), ENT_QUOTES, 'UTF-8'); ?>
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="actions">
-                                                    <a href="commandes.php?view=<?php echo $cmd['id']; ?>" class="btn btn-primary">Voir</a>
+                                                    <a href="commandes.php?view=<?php echo (int)$cmd['id']; ?>" class="btn btn-primary">Voir</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -399,66 +417,6 @@ $commandes = $stmt->fetchAll();
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-        </main>
-    </div>
-
-    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commandes - Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Montserrat', sans-serif; background: #F5F5F5; }
-        .admin-container { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: #2B2B2B; color: white; padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; }
-        .admin-logo { padding: 0 20px; margin-bottom: 30px; text-align: center; }
-        .admin-logo img { max-width: 60px; margin-bottom: 10px; }
-        .admin-logo h2 { font-family: 'Pacifico', cursive; color: #85D6CD; font-size: 1.5rem; font-weight: normal; }
-        .admin-menu { list-style: none; }
-        .admin-menu a { display: block; padding: 12px 20px; color: #ccc; text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
-        .admin-menu a:hover { background: rgba(133, 214, 205, 0.1); color: #85D6CD; border-left-color: #85D6CD; }
-        .admin-menu a.active { background: rgba(133, 214, 205, 0.2); color: #85D6CD; border-left-color: #85D6CD; font-weight: 700; }
-        .admin-user-info { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto; position: absolute; bottom: 0; width: 100%; }
-        .admin-user-info a { display: block; color: #FE7B7E; text-decoration: none; font-size: 0.9rem; }
-        .admin-main { flex: 1; margin-left: 250px; padding: 30px; }
-        .admin-header h1 { font-size: 1.8rem; color: #2B2B2B; margin-bottom: 20px; }
-        .section { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
-        .coming-soon { text-align: center; padding: 60px 20px; color: #999; }
-        .coming-soon h2 { color: #2B2B2B; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-    <div class="admin-container">
-        <aside class="admin-sidebar">
-            <div class="admin-logo"><img src="../images/logo.png" alt="Logo"><h2>Admin</h2></div>
-            <ul class="admin-menu">
-                <li><a href="../index.php" style="color: #FE7B7E; font-weight: 700;">🏠 Retour à l'accueil</a></li>
-                <li style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;"></li>
-                <li><a href="dashboard.php">📊 Dashboard</a></li>
-                <li><a href="moderer-histoires.php">📖 Belles Histoires</a></li>
-                <li><a href="ateliers.php">🎨 Ateliers</a></li>
-                <li><a href="produits.php">🛍️ Produits</a></li>
-                <li><a href="commandes.php" class="active">📦 Commandes</a></li>
-                <li><a href="utilisateurs.php">👥 Utilisateurs</a></li>
-            </ul>
-            <div class="admin-user-info">
-                <p>Connecté en tant que:</p>
-                <strong><?php echo htmlspecialchars($_SESSION['admin_email'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                <a href="../logout.php">Déconnexion</a>
-            </div>
-        </aside>
-        <main class="admin-main">
-            <div class="admin-header"><h1>📦 Gestion des Commandes</h1></div>
-            <div class="section">
-                <div class="coming-soon">
-                    <h2>⚙️ En développement</h2>
-                    <p>Système de panier et paiement à venir</p>
-                </div>
-            </div>
         </main>
     </div>
 </body>

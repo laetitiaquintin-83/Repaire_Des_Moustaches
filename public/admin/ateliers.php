@@ -12,12 +12,17 @@ if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
 }
 // ============================================================
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
-$csrf_token = generateCSRFToken();
 $message = '';
 $error = '';
+
+// Génération / vérification du token CSRF
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 // Récupérer l'admin courant
 $admin_id = (int)$_SESSION['admin_id'];
@@ -26,8 +31,8 @@ $admin_id = (int)$_SESSION['admin_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         // Valider le token CSRF
-        $csrf_token = $_POST['csrf_token'] ?? '';
-        if (!validateCSRFToken($csrf_token)) {
+        $posted_token = $_POST['csrf_token'] ?? '';
+        if (!hash_equals($_SESSION['csrf_token'], $posted_token)) {
             $error = 'Erreur de sécurité : token CSRF invalide';
         } else {
             $action = $_POST['action'];
@@ -113,15 +118,89 @@ foreach ($ateliers as $atelier) {
     <title>Gestion des Ateliers - Repaire Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
     <style>
+        /* Force la disposition en deux colonnes indépendantes */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif !important;
+            background-color: #f9f9f9;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar sombre de gauche */
+        .admin-sidebar {
+            width: 260px;
+            min-width: 260px;
+            background-color: #2b2b2b !important;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+
+        .admin-sidebar h2 {
+            font-family: 'Pacifico', cursive !important;
+            text-align: center;
+            color: #FE7B7E;
+            margin: 0 0 30px 0;
+            font-size: 28px;
+        }
+
+        .admin-sidebar nav {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-sidebar nav a {
+            display: block;
+            color: #ccc !important;
+            padding: 12px 25px;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .admin-sidebar nav a:hover, 
+        .admin-sidebar nav a.active {
+            color: white !important;
+            background-color: #3e3e3e;
+            border-left: 4px solid #85D6CD;
+        }
+
+        /* Zone de contenu à droite */
+        .admin-main {
+            flex-grow: 1;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .admin-main h1 {
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 700;
+            color: #2B2B2B;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        /* Styles spécifiques des formulaires et cartes */
         .admin-form {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         
         .admin-form h3 {
@@ -147,9 +226,10 @@ foreach ($ateliers as $atelier) {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-family: inherit;
             font-size: 14px;
+            box-sizing: border-box;
         }
         
         .form-group textarea {
@@ -173,7 +253,7 @@ foreach ($ateliers as $atelier) {
         .btn {
             padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -209,8 +289,13 @@ foreach ($ateliers as $atelier) {
         .btn-edit {
             background: #FE7B7E;
             color: white;
-            padding: 6px 12px;
-            font-size: 12px;
+            padding: 8px 15px;
+            font-size: 13px;
+            border-radius: 20px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
         }
         
         .btn-edit:hover {
@@ -219,8 +304,9 @@ foreach ($ateliers as $atelier) {
         
         .alert {
             padding: 12px 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-bottom: 20px;
+            font-weight: 600;
         }
         
         .alert-success {
@@ -243,8 +329,8 @@ foreach ($ateliers as $atelier) {
         .atelier-card {
             background: white;
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border-left: 4px solid #85D6CD;
         }
         
@@ -256,7 +342,7 @@ foreach ($ateliers as $atelier) {
         }
         
         .atelier-title {
-            font-weight: 600;
+            font-weight: 700;
             color: #2B2B2B;
             font-size: 16px;
         }
@@ -295,16 +381,22 @@ foreach ($ateliers as $atelier) {
         }
         
         @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            .admin-sidebar {
+                width: 100%;
+                min-width: 100%;
+            }
             .atelier-info {
                 grid-template-columns: 1fr;
             }
-            
             .atelier-actions {
                 flex-direction: column;
             }
-            
             .btn, .btn-edit {
                 width: 100%;
+                text-align: center;
             }
         }
     </style>
@@ -313,10 +405,10 @@ foreach ($ateliers as $atelier) {
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-menu">
+            <div>
                 <h2>Admin</h2>
                 <nav>
-                    <a href="../index.php" style="color: #FE7B7E; font-weight: 700; display: block; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">🏠 Retour à l'accueil</a>
+                    <a href="../index.php" style="color: #FE7B7E !important;">🏠 Retour à l'accueil</a>
                     <a href="dashboard.php">📊 Dashboard</a>
                     <a href="moderer-histoires.php">📖 Belles Histoires</a>
                     <a href="ateliers.php" class="active">🎨 Ateliers</a>
@@ -325,10 +417,10 @@ foreach ($ateliers as $atelier) {
                     <a href="utilisateurs.php">👥 Utilisateurs</a>
                 </nav>
             </div>
-            <div style="padding: 20px; border-top: 1px solid #444; margin-top: auto;">
-                <p style="margin: 0 0 10px 0; font-size: 12px; color: #aaa;">Connecté:</p>
-                <p style="margin: 0 0 15px 0; font-weight: 600; color: white;"><?php echo htmlspecialchars($_SESSION['admin_email']); ?></p>
-                <a href="../logout.php" style="color: #FE7B7E; text-decoration: none; font-weight: 600;">Déconnexion</a>
+            <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="margin: 0 0 5px 0; font-size: 12px; color: #aaa;">Connecté:</p>
+                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 13px;"><?php echo htmlspecialchars($_SESSION['admin_email'] ?? 'Admin'); ?></p>
+                <a href="../logout.php" style="color: #FE7B7E !important; text-decoration: none; font-weight: 600; font-size: 14px;">🚪 Déconnexion</a>
             </div>
         </aside>
 
@@ -392,7 +484,7 @@ foreach ($ateliers as $atelier) {
             </div>
 
             <!-- Liste des ateliers -->
-            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <h3 style="margin-top: 0; color: #2B2B2B; border-bottom: 3px solid #85D6CD; padding-bottom: 10px;">
                     Ateliers (<?php echo count($ateliers); ?>)
                 </h3>
@@ -436,24 +528,10 @@ foreach ($ateliers as $atelier) {
         </main>
     </div>
 
-    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-                <li><a href="utilisateurs.php">👥 Utilisateurs</a></li>
-            </ul>
-            <div class="admin-user-info">
-                <p>Connecté en tant que:</p>
-                <strong><?php echo htmlspecialchars($_SESSION['admin_email'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                <a href="../logout.php">Déconnexion</a>
-            </div>
-        </aside>
-        <main class="admin-main">
-            <div class="admin-header"><h1>🎨 Gestion des Ateliers</h1></div>
-            <div class="section">
-                <div class="coming-soon">
-                    <h2>⚙️ En développement</h2>
-                    <p><?php echo count($ateliers); ?> atelier(s) à venir</p>
-                </div>
-            </div>
-        </main>
-    </div>
+    <?php 
+    if (file_exists(__DIR__ . '/../../includes/footer.php')) {
+        require_once __DIR__ . '/../../includes/footer.php'; 
+    }
+    ?>
 </body>
 </html>

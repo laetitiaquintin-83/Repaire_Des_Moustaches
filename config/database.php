@@ -6,7 +6,13 @@ declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', '0');  // Ne pas afficher les erreurs en production
 ini_set('log_errors', '1');
-ini_set('error_log', __DIR__ . '/../logs/php-errors.log');
+
+// Création automatique du dossier logs s'il n'existe pas
+$logDir = __DIR__ . '/../logs';
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0777, true);
+}
+ini_set('error_log', $logDir . '/php-errors.log');
 
 // Gestionnaire d'erreurs personnalisé
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {

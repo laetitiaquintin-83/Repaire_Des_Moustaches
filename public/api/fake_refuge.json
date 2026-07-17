@@ -1,0 +1,26 @@
+[
+    {
+        "nom": "Chaussette",
+        "espece": "Chat",
+        "race": "Européen",
+        "age": "2 ans",
+        "refuge_provenance": "SPA de Toulon",
+        "image": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=500"
+    },
+    {
+        "nom": "Rex",
+        "espece": "Chien",
+        "race": "Berger Allemand",
+        "age": "4 ans",
+        "refuge_provenance": "Refuge des Moustaches",
+        "image": "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=500"
+    },
+    {
+        "nom": "Flocon",
+        "espece": "Lapin",
+        "race": "Angora",
+        "age": "1 an",
+        "refuge_provenance": "Association SOS Rongeurs",
+        "image": "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?q=80&w=500"
+    }
+]

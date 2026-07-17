@@ -39,7 +39,8 @@ header('Content-Type: text/html; charset=utf-8');
         </nav>
 
         <div class="action">
+            <!-- Remplace ici si tu as un lien spécifique pour le panier (ex: <a href="panier.php">🛒</a>) -->
             <a href="formulaire.php" class="bouton-reserver">Réserver</a>
-            <a href="../admin/login.php" class="btn-admin-lock" title="Accès administrateur">🔐</a>
+            <a href="login.php" class="btn-admin-lock" title="Accès administrateur">🔐</a>
         </div>
     </header>

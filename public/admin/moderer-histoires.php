@@ -12,7 +12,7 @@ if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
 }
 // ============================================================
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 $message = '';
@@ -61,21 +61,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Récupérer les histoires selon l'onglet
 $tab = (string) ($_GET['tab'] ?? 'attente');
-$statut = '';
 
-if ($tab === 'attente') {
-    $statut = 'en_attente';
-} elseif ($tab === 'publiees') {
-    $statut = 'publiee';
-} elseif ($tab === 'refusees') {
-    $statut = 'refusee';
-} else {
-    $statut = 'en_attente';
+$statut = match ($tab) {
+    'publiees' => 'publiee',
+    'refusees' => 'refusee',
+    default => 'en_attente',
+};
+
+if ($statut === 'en_attente') {
     $tab = 'attente';
 }
 
+// Utilisation de COALESCE pour parer au strict_types=1 et au LEFT JOIN (évite les TypeErrors si NULL)
 $stmt = $pdo->prepare('
-    SELECT bh.id, bh.titre, bh.contenu, bh.statut, bh.date_publication, u.nom, u.prenom
+    SELECT 
+        bh.id, 
+        COALESCE(bh.titre, "") AS titre, 
+        COALESCE(bh.contenu, "") AS contenu, 
+        bh.statut, 
+        bh.date_publication, 
+        COALESCE(u.nom, "") AS nom, 
+        COALESCE(u.prenom, "Anonyme") AS prenom
     FROM belles_histoires bh
     LEFT JOIN utilisateurs u ON bh.utilisateur_id = u.id
     WHERE bh.statut = ?
@@ -84,15 +90,18 @@ $stmt = $pdo->prepare('
 $stmt->execute([$statut]);
 $histoires = $stmt->fetchAll();
 
-// Statistiques pour les onglets
-$stats = [];
-$stmt = $pdo->query("SELECT statut, COUNT(*) FROM belles_histoires GROUP BY statut");
+// Statistiques pour les onglets (Correction : ajout de l'alias AS count)
+$stats = [
+    'en_attente' => 0,
+    'publiee' => 0,
+    'refusee' => 0
+];
+$stmt = $pdo->query("SELECT statut, COUNT(*) AS count FROM belles_histoires GROUP BY statut");
 while ($row = $stmt->fetch()) {
-    $stats[$row['statut']] = (int)$row['count'];
+    if (isset($stats[$row['statut']])) {
+        $stats[$row['statut']] = (int)$row['count'];
+    }
 }
-$stats['en_attente'] = $stats['en_attente'] ?? 0;
-$stats['publiee'] = $stats['publiee'] ?? 0;
-$stats['refusee'] = $stats['refusee'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -403,7 +412,7 @@ $stats['refusee'] = $stats['refusee'] ?? 0;
             
             <div class="admin-user-info">
                 <p>Connecté en tant que:</p>
-                <strong><?php echo htmlspecialchars($_SESSION['admin_email'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                <strong><?php echo htmlspecialchars($_SESSION['admin_email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></strong>
                 <a href="../logout.php">🚪 Déconnexion</a>
             </div>
         </aside>
@@ -455,13 +464,18 @@ $stats['refusee'] = $stats['refusee'] ?? 0;
                                         $statutLabels = [
                                             'en_attente' => '⏳ En attente',
                                             'publiee' => '✓ Publiée',
-                                            'refusee' => '✕ Refusée'
+                                            'refusee' => '✕ Refusées'
                                         ];
                                         echo $statutLabels[$histoire['statut']] ?? $histoire['statut'];
                                     ?>
                                 </span>
-                                Par <?php echo htmlspecialchars($histoire['prenom'] . ' ' . $histoire['nom'], ENT_QUOTES, 'UTF-8'); ?> 
-                                | Soumise le <?php echo date('d/m/Y à H:i', strtotime($histoire['date_publication'])); ?>
+                                Par <?php echo htmlspecialchars(trim(($histoire['prenom'] ?? '') . ' ' . ($histoire['nom'] ?? '')), ENT_QUOTES, 'UTF-8'); ?> 
+                                | <?php 
+                                    // Correction : Sécurité de formatage de date au cas où elle vaut NULL (en_attente)
+                                    echo !empty($histoire['date_publication']) 
+                                        ? 'Traitée le ' . date('d/m/Y à H:i', strtotime($histoire['date_publication'])) 
+                                        : 'En attente de traitement'; 
+                                ?>
                             </div>
                             <div class="histoire-contenu">
                                 <?php echo nl2br(htmlspecialchars($histoire['contenu'], ENT_QUOTES, 'UTF-8')); ?>
@@ -491,4 +505,6 @@ $stats['refusee'] = $stats['refusee'] ?? 0;
         </main>
     </div>
 
-    <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+    <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+</body>
+</html>
