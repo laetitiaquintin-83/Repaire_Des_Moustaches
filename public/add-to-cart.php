@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
+$sitePrefix = '';
 // ============================================================
-// 🔒 BLOCAGE DES REQUÊTES GET (sécurité)
+// 🍔”’ BLOCAGE DES REQUàŠTES GET (sécurité)
 // ============================================================
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -54,7 +55,7 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// Ajouter ou mettre à jour
+// Ajouter ou mettre à  jour
 if (isset($_SESSION['cart'][$produit_id])) {
     $_SESSION['cart'][$produit_id]['quantite'] += $quantite;
 } else {

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+$sitePrefix = '';
 session_start();
 
 require_once __DIR__ . '/../config/database.php';
@@ -43,7 +44,7 @@ if ($commande_id > 0) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -187,11 +188,11 @@ if ($commande_id > 0) {
     <!-- Header -->
     <header style="background: white; border-bottom: 2px solid #85D6CD; position: sticky; top: 0; z-index: 100;">
         <nav style="max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
+            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🍔§” Repaire</a>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <a href="../index.php">Accueil</a>
                 <a href="../public/boutique.php">Boutique</a>
-                <a href="cart.php" style="color: #2B2B2B;">🛒 Panier</a>
+                <a href="cart.php" style="color: #2B2B2B;">🍔›’ Panier</a>
             </div>
         </nav>
     </header>
@@ -199,7 +200,7 @@ if ($commande_id > 0) {
     <div class="confirmation-container">
         <?php if ($commande): ?>
             <div class="confirmation-card">
-                <div class="confirmation-icon">✓</div>
+                <div class="confirmation-icon">œ“</div>
                 <h1 class="confirmation-title">Commande confirmée !</h1>
                 <p class="confirmation-subtitle">Merci pour votre achat</p>
                 
@@ -218,7 +219,7 @@ if ($commande_id > 0) {
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Date:</span>
-                        <span class="detail-value"><?php echo date('d/m/Y à H:i', strtotime($commande['date_commande'])); ?></span>
+                        <span class="detail-value"><?php echo date('d/m/Y à  H:i', strtotime($commande['date_commande'])); ?></span>
                     </div>
                 </div>
                 
@@ -237,20 +238,20 @@ if ($commande_id > 0) {
                 </div>
                 
                 <div class="info-box">
-                    📧 <strong>Confirmation envoyée!</strong> Un email de confirmation a été envoyé à <strong><?php echo htmlspecialchars($commande['email']); ?></strong>
+                    🍔“§ <strong>Confirmation envoyée!</strong> Un email de confirmation a été envoyé à  <strong><?php echo htmlspecialchars($commande['email']); ?></strong>
                 </div>
                 
                 <div class="actions">
                     <a href="boutique.php" class="btn btn-primary">Continuer les achats</a>
-                    <a href="../index.php" class="btn btn-secondary">Retour à l'accueil</a>
+                    <a href="../index.php" class="btn btn-secondary">Retour à  l'accueil</a>
                 </div>
             </div>
         <?php else: ?>
             <div class="confirmation-card">
-                <div style="font-size: 3rem; margin-bottom: 20px;">❌</div>
+                <div style="font-size: 3rem; margin-bottom: 20px;">âŒ</div>
                 <h1 class="confirmation-title">Commande introuvable</h1>
                 <p class="confirmation-subtitle">Nous n'avons pas trouvé cette commande</p>
-                <a href="boutique.php" class="btn btn-primary" style="margin-top: 30px;">Retour à la boutique</a>
+                <a href="boutique.php" class="btn btn-primary" style="margin-top: 30px;">Retour à  la boutique</a>
             </div>
         <?php endif; ?>
     </div>

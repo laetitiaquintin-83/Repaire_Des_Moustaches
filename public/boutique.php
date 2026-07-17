@@ -1,6 +1,10 @@
 <?php
-
 declare(strict_types=1);
+
+// On force le serveur à envoyer la page en UTF-8 pour éliminer les caractères bizarres
+header('Content-Type: text/html; charset=utf-8');
+
+$sitePrefix = '';
 
 session_start();
 
@@ -29,9 +33,9 @@ foreach ($produits as $produit) {
 
 // Labels & émojis pour chaque catégorie
 $config_categories = [
-    'diner' => ['label' => 'Repas & Boissons', 'emoji' => '🍔'],
-    'diner_retro' => ['label' => 'Dîner Rétro', 'emoji' => '🥤'],
-    'cat_lovers' => ['label' => 'Cat Lovers', 'emoji' => '🐾'],
+    'diner' => ['label' => 'Repas & Boissons', 'emoji' => '🍔🍽️'],
+    'diner_retro' => ['label' => 'Dîner Rétro', 'emoji' => '🍔🎷'],
+    'cat_lovers' => ['label' => 'Cat Lovers', 'emoji' => '🐱🐾'],
     'solidaire' => ['label' => 'Solidaire', 'emoji' => '❤️'],
 ];
 
@@ -43,7 +47,7 @@ function formatPrice(float $price): string
 function getCategoryConfig(string $cat): array
 {
     global $config_categories;
-    return $config_categories[$cat] ?? ['label' => ucfirst(str_replace('_', ' ', $cat)), 'emoji' => '📦'];
+    return $config_categories[$cat] ?? ['label' => ucfirst(str_replace('_', ' ', $cat)), 'emoji' => '🍔🛍️'];
 }
 
 function getImagePath(string $productName): string
@@ -80,7 +84,7 @@ if (isset($_SESSION['cart'])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         .panier-link {
             background: #85D6CD;
@@ -130,15 +134,25 @@ if (isset($_SESSION['cart'])) {
 </head>
 <body>
     <header>
-        <a href="../index.php" class="logo"><img src="../images/logo.png" alt="Logo du Repaire des Moustaches"></a>
-        <nav><ul><li><a href="../index.php">Accueil</a></li><li><a href="../concept.php">Le Concept</a></li><li><a href="../equipage.php">L'équipage</a></li><li><a href="../ateliers.php">Les Ateliers</a></li><li><a href="belles-histoires.php">Histoires</a></li><li><a href="boutique.php">Boutique</a></li></ul></nav>
+        <a href="index.php" class="logo"><img src="images/logo.png" alt="Logo du Repaire des Moustaches"></a>
+        <nav>
+            <ul>
+                <li><a href="concept.php">Le Concept</a></li>
+                <li><a href="projet.php">Le Projet</a></li>
+                <li><a href="equipage.php">L'équipage</a></li>
+                <li><a href="ateliers.php">Les Ateliers</a></li>
+                <li><a href="belles-histoires.php">Belles Histoires</a></li>
+                <li><a href="boutique.php">Boutique</a></li>
+            </ul>
+        </nav>
         <div class="action">
             <a href="cart.php" class="panier-link">
                 🛒 Panier 
                 <?php if ($cart_count > 0): ?>
                     <span class="panier-count"><?php echo $cart_count; ?></span>
                 <?php endif; ?>
-            </a><a href="../login.php" class="btn-admin-lock" title="Accès administrateur">🔐</a>
+            </a>
+            <a href="../login.php" class="btn-admin-lock" title="Accès administrateur">🔒</a>
         </div>
     </header>
 
@@ -169,7 +183,7 @@ if (isset($_SESSION['cart'])) {
                             <?php
                             $descriptions = [
                                 'diner' => 'Nos plats et boissons maison pour le dîner',
-                                'diner_retro' => 'L\'esprit Dîner américain années 50 chez toi',
+                                'diner_retro' => "L'esprit Dîner américain années 50 chez toi",
                                 'cat_lovers' => 'Pour les amoureux des chats',
                                 'solidaire' => 'Chaque achat soutient directement le refuge',
                             ];
@@ -182,7 +196,7 @@ if (isset($_SESSION['cart'])) {
                         <?php foreach ($items as $produit): ?>
                             <article class="carte-produit-boutique">
                                 <div class="produit-image-boutique">
-                                    <img src="../<?php echo htmlspecialchars(getImagePath((string) $produit['nom']), ENT_QUOTES, 'UTF-8'); ?>" 
+                                    <img src="<?php echo htmlspecialchars(getImagePath((string) $produit['nom']), ENT_QUOTES, 'UTF-8'); ?>" 
                                          alt="<?php echo htmlspecialchars((string) $produit['nom'], ENT_QUOTES, 'UTF-8'); ?>"
                                          loading="lazy">
                                 </div>
@@ -196,15 +210,12 @@ if (isset($_SESSION['cart'])) {
                                             <?php echo htmlspecialchars(formatPrice((float) $produit['prix']), ENT_QUOTES, 'UTF-8'); ?>
                                         </span>
                                         
-                                        <!-- ✅ FORMULAIRE CORRIGÉ : class ajoutée + bouton type="submit" -->
                                         <form method="POST" action="add-to-cart.php" class="form-add-to-cart" style="width: 100%; margin: 0;">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                                             <input type="hidden" name="produit_id" value="<?php echo (int)$produit['id']; ?>">
                                             <input type="hidden" name="quantite" value="1">
                                             <button type="submit" class="bouton-ajouter-panier">🛒 Ajouter</button>
                                         </form>
-                                        <!-- FIN CORRECTION -->
-                                        
                                     </div>
                                 </div>
                             </article>
@@ -217,9 +228,9 @@ if (isset($_SESSION['cart'])) {
         <section class="boutique-info-finales" style="padding: 60px 50px; background-color: white; margin-top: 40px; text-align: center;">
             <h2 style="font-family: 'Pacifico', cursive; color: #FE7B7E; font-size: 2rem; font-weight: normal; margin-bottom: 20px;">Besoin d'aide ?</h2>
             <div style="max-width: 700px; margin: 0 auto;">
-                <p style="margin-bottom: 15px; line-height: 1.7;">📦 Livraison à domicile ou retrait au Repaire</p>
+                <p style="margin-bottom: 15px; line-height: 1.7;">🚚 Livraison à domicile ou retrait au Repaire</p>
                 <p style="margin-bottom: 15px; line-height: 1.7;">💳 Paiement sécurisé</p>
-                <p style="margin-bottom: 20px; line-height: 1.7;">💬 Questions ? <a href="mailto:contact@repaire-des-moustaches.fr" style="color: #FE7B7E; text-decoration: none;">Contacte-nous !</a></p>
+                <p style="margin-bottom: 20px; line-height: 1.7;">❓ Questions ? <a href="mailto:contact@repaire-des-moustaches.fr" style="color: #FE7B7E; text-decoration: none;">Contacte-nous !</a></p>
             </div>
         </section>
     </main>
@@ -233,7 +244,6 @@ if (isset($_SESSION['cart'])) {
         </div>
     </footer>
 
-    <!-- Gestion dynamique du panier avec fetch() AJAX -->
     <script src="../js/cart.js"></script>
 </body>
 </html>

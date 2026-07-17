@@ -1,7 +1,13 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/config/database.php';
+// Force l'encodage UTF-8 au niveau du serveur pour supprimer les caractères bizarres
+header('Content-Type: text/html; charset=utf-8');
+
+$sitePrefix = '';
+
+// Connexion propre à la base de données (on remonte d'un dossier pour trouver config/)
+require_once __DIR__ . '/../config/database.php';
 
 try {
     $pdo = getPDO();
@@ -16,48 +22,18 @@ try {
     error_log('Erreur BD ateliers: ' . $e->getMessage());
     $ateliers = [];
 }
+
+// 1. ON APPELLE TON HEADER AUTOMATIQUE ICI !
+include_once __DIR__ . '/../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Les Ateliers - Le Repaire des Moustaches</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.min.css">
-    <!-- Preload critical image (logo) -->
-    <link rel="preload" as="image" href="images/logo.webp" type="image/webp">
-    <link rel="preload" as="image" href="images/logo.svg" type="image/svg+xml">
-</head>
-<body>
-    <header>
-        <a href="index.php" class="logo">
-            <picture>
-                <source srcset="images/logo.webp" type="image/webp">
-                <source srcset="images/logo.svg" type="image/svg+xml">
-                <img src="images/logo.png" alt="Logo du Repaire des Moustaches" width="100" height="55">
-            </picture>
-        </a>
-        <nav>
-            <ul>
-                <li><a href="concept.php">Le Concept</a></li>
-                <li><a href="projet.php">Le Projet</a></li>
-                <li><a href="equipage.php">L'équipage</a></li>
-                <li><a href="ateliers.php">Les Ateliers</a></li>
-                <li><a href="public/belles-histoires.php">Belles Histoires</a></li>
-                <li><a href="public/boutique.php">Boutique</a></li>
-            </ul>
-        </nav>
-        <div class="action"><a href="formulaire.php" class="bouton-reserver">Réserver</a><a href="login.php" class="btn-admin-lock" title="Accès administrateur">🔐</a></div>
-    </header>
 
     <main>
         <section class="page-section ateliers">
             <h1 class="page-title">Les Ateliers du Repaire</h1>
             <p class="sous-titre-ateliers">Apprendre, créer, se détendre, s'entraider. Quatre façons de changer la vie (la vôtre et celle de nos moustachus).</p>
-            <p style="text-align: center; margin-bottom: 50px; line-height: 1.7; max-width: 700px; margin-left: auto; margin-right: auto;">Les ateliers sont au cœur de notre mission. Une adhésion annuelle à 5€ vous ouvre les portes. Ensuite, participez comme bon vous semble, au prix que vous décidez (prix libre). Ensemble, nous créons un espace de solidarité où chacun donne ce qu'il peut.</p>
+            <p style="text-align: center; margin-bottom: 50px; line-height: 1.7; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Les ateliers sont au cœur de notre mission. Une adhésion annuelle à 5€ vous ouvre les portes. Ensuite, participez comme bon vous semble, au prix que vous décidez (prix libre). Ensemble, nous créons un espace de solidarité où chacun donne ce qu'il peut.
+            </p>
 
             <div class="grille-atelier-visuels">
                 <?php foreach ($ateliers as $atelier): 
@@ -91,13 +67,8 @@ try {
             </div>
         </section>
     </main>
-    <footer>
-        <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
-        <div class="reseaux-sociaux">
-            <a href="#">Facebook</a> |
-            <a href="#">Instagram</a> |
-            <a href="login.php">Admin</a>
-        </div>
-    </footer>
-</body>
-</html>
+
+<?php 
+// 2. ON APPELLE TON FOOTER AUTOMATIQUE ICI !
+include_once __DIR__ . '/../includes/footer.php'; 
+?>

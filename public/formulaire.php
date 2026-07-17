@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
+
+$sitePrefix = '';
 session_start();
-require 'config/database.php';
+require '../config/database.php';
 
 $error = null;
 $success = false;
@@ -11,7 +14,7 @@ $csrf_token = generateCSRFToken();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrf_check = $_POST['csrf_token'] ?? '';
     if (!validateCSRFToken($csrf_check)) {
-        $error = "⚠️ Erreur de sécurité : token invalide. Veuillez réessayer.";
+        $error = "âš  Erreur de sécurité : token invalide. Veuillez réessayer.";
     } else {
         $nom = trim($_POST['nom'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -20,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = trim($_POST['message'] ?? '');
     
         if (empty($nom)) {
-            $error = "⚠️ Veuillez entrer votre nom et prénom.";
+            $error = "âš  Veuillez entrer votre nom et prénom.";
         } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "⚠️ Veuillez entrer une adresse email valide.";
+            $error = "âš  Veuillez entrer une adresse email valide.";
         } elseif (empty($motif) || !in_array($motif, ['participer', 'animer', 'prive'])) {
-            $error = "⚠️ Veuillez choisir une option valide.";
+            $error = "âš  Veuillez choisir une option valide.";
         } elseif (empty($message)) {
-            $error = "⚠️ Veuillez entrer votre message.";
+            $error = "âš  Veuillez entrer votre message.";
         } else {
             $date_sql = null;
             if (!empty($date)) {
@@ -34,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($date_parsed && $date_parsed->format('Y-m-d') === $date) {
                     $date_sql = $date;
                 } else {
-                    $error = "⚠️ La date n'est pas au bon format.";
+                    $error = "âš  La date n'est pas au bon format.";
                 }
             }
             
@@ -54,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $demand_id = $pdo->lastInsertId();
                     $success = true;
                 } catch (PDOException $e) {
-                    $error = "⚠️ Erreur lors de l'enregistrement. Veuillez réessayer.";
+                    $error = "âš  Erreur lors de l'enregistrement. Veuillez réessayer.";
                     error_log("Erreur formulaire.php: " . $e->getMessage());
                 }
             }
@@ -82,12 +85,12 @@ require_once 'includes/header.php';
             <div class="formulaire-box">
                 <?php if ($success): ?>
                     <div class="message-success">
-                        ✅ Merci ! Votre demande enregistrée.<br>
+                        œ… Merci ! Votre demande enregistrée.<br>
                         <small>Numéro: #<?php echo htmlspecialchars($demand_id); ?></small><br>
-                        Réponse à <?php echo htmlspecialchars($email); ?>
+                        Réponse à  <?php echo htmlspecialchars($email); ?>
                     </div>
                     <a href="formulaire.php" class="btn-return">← Nouveau formulaire</a>
-                    <a href="index.php" class="btn-return" style="background-color: #85D6CD; color: #2B2B2B; margin-left: 10px;">Retour à l'accueil</a>
+                    <a href="index.php" class="btn-return" style="background-color: #85D6CD; color: #2B2B2B; margin-left: 10px;">Retour à  l'accueil</a>
                 <?php else: ?>
                     <?php if ($error): ?>
                         <div class="message-error"><?php echo $error; ?></div>
@@ -107,9 +110,9 @@ require_once 'includes/header.php';
                             <label for="motif">Je souhaite...</label>
                             <select id="motif" name="motif" required>
                                 <option value="">Choisissez une option...</option>
-                                <option value="participer" <?php echo (($_POST['motif'] ?? '') === 'participer') ? 'selected' : ''; ?>>🙋‍♀️ Participer à un atelier</option>
-                                <option value="animer" <?php echo (($_POST['motif'] ?? '') === 'animer') ? 'selected' : ''; ?>>🎨 Animer un atelier</option>
-                                <option value="prive" <?php echo (($_POST['motif'] ?? '') === 'prive') ? 'selected' : ''; ?>>🎉 Privatiser un événement</option>
+                                <option value="participer" <?php echo (($_POST['motif'] ?? '') === 'participer') ? 'selected' : ''; ?>>🍔™‹â™€ Participer à  un atelier</option>
+                                <option value="animer" <?php echo (($_POST['motif'] ?? '') === 'animer') ? 'selected' : ''; ?>>🍔Ž¨ Animer un atelier</option>
+                                <option value="prive" <?php echo (($_POST['motif'] ?? '') === 'prive') ? 'selected' : ''; ?>>🍔Ž‰ Privatiser un événement</option>
                             </select>
                         </div>
                         <div class="form-groupe">
@@ -120,14 +123,14 @@ require_once 'includes/header.php';
                             <label for="message">Votre message</label>
                             <textarea id="message" name="message" rows="5" placeholder="Dites-nous en plus..." required><?php echo htmlspecialchars($_POST['message'] ?? ''); ?></textarea>
                         </div>
-                        <button type="submit" class="btn-envoyer">Envoyer 🐾</button>
+                        <button type="submit" class="btn-envoyer">Envoyer 🍔🐾</button>
                     </form>
                 <?php endif; ?>
             </div>
         </section>
     </main>
 
-<!-- Validation JavaScript côté client pour les formulaires -->
+<!-- Validation JavaScript cà´té client pour les formulaires -->
 <script src="js/form-validation.js"></script>
 
 <?php require_once 'includes/footer.php'; ?>

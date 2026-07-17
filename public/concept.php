@@ -1,4 +1,12 @@
-<?php include_once 'includes/header.php'; ?>
+<?php
+declare(strict_types=1);
+
+// Force l'encodage UTF-8 au niveau du serveur pour supprimer les caractères bizarres
+header('Content-Type: text/html; charset=utf-8');
+
+$sitePrefix = ''; 
+include_once '../includes/header.php'; 
+?>
 
     <main>
         <section class="page-section concept">
@@ -42,4 +50,4 @@
         </section>
     </main>
 
-<?php include_once 'includes/footer.php'; ?>
+    <?php include_once '../includes/footer.php'; ?>

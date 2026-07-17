@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
+$sitePrefix = '';
 session_start();
 
-require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/../config/database.php';
 
 $error = '';
 $success = '';
 
-// Si déjà connecté, rediriger vers le dashboard
+// Si déjà  connecté, rediriger vers le dashboard
 if (isset($_SESSION['admin_id'])) {
     header('Location: admin/dashboard.php');
     exit;

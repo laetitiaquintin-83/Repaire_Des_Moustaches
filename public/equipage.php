@@ -1,7 +1,12 @@
 <?php
 declare(strict_types=1);
 
-$sitePrefix = ''; include_once '../includes/header.php'; ?>
+// Force l'encodage UTF-8 au niveau du serveur pour supprimer les caractères bizarres
+header('Content-Type: text/html; charset=utf-8');
+
+$sitePrefix = ''; 
+include_once __DIR__ . '/../includes/header.php'; 
+?>
 
 <style>
     /* 1. On s'assure que la grille répartit bien ses cartes */
@@ -10,7 +15,7 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
         justify-content: center;
         gap: 40px;
         flex-wrap: wrap; /* Évite que ça déborde sur petit écran */
-        align-items: stretch; /* Force toutes les cartes à  avoir la même hauteur */
+        align-items: stretch; /* Force toutes les cartes à avoir la même hauteur */
     }
 
     /* 2. On configure la carte pour qu'elle pousse les boutons tout en bas */
@@ -31,12 +36,12 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
         flex-direction: column; /* Aligne les boutons l'un sous l'autre */
         gap: 12px; /* Espace de 12px très propre entre les deux boutons */
         width: 100%;
-        margin-top: auto; /* Force le bloc à  se coller au bas de la carte */
+        margin-top: auto; /* Force le bloc à se coller au bas de la carte */
     }
 
     /* 4. On redéfinit le bouton pour qu'il prenne toute la largeur sans casser le style d'origine */
     .bouton-chat {
-        display: block !important; /* Force le bouton à  se comporter en bloc */
+        display: block !important; /* Force le bouton à se comporter en bloc */
         width: 100% !important;
         text-align: center;
         box-sizing: border-box;
@@ -66,8 +71,8 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
             <article class="carte-chat">
                 <div>
                     <picture>
-                    <source srcset="images/chat1.webp" type="image/webp">
-                    <img src="images/chat1.jpg" alt="Velours, chat roux élégant" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
+                        <source srcset="images/chat1.webp" type="image/webp">
+                        <img src="images/chat1.jpg" alt="Velours, chat roux élégant" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
                     </picture>
                     <div class="info-chat">
                         <h3>Velours</h3>
@@ -76,47 +81,48 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
                     </div>
                 </div>
                 <div class="actions-chat">
-                <a href="adoption.php" class="bouton-chat">Tomber sous le charme</a>
-                <a href="adoption.php" class="bouton-chat secondaire">Adopter Velours</a>
+                    <a href="adoption.php" class="bouton-chat">Tomber sous le charme</a>
+                    <a href="adoption.php" class="bouton-chat secondaire">Adopter Velours</a>
                 </div>
             </article>
 
             <article class="carte-chat">
                 <div>
                     <picture>
-                    <source srcset="images/chat2.webp" type="image/webp">
-                    <img src="images/chat2.jpg" alt="Biscuit, petit chat gourmand" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
+                        <source srcset="images/chat2.webp" type="image/webp">
+                        <img src="images/chat2.jpg" alt="Biscuit, petit chat gourmand" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
                     </picture>
                     <div class="info-chat">
                         <h3>Biscuit</h3>
                         <p class="chat-trait">Le petit gourmand turbulent</p>
-                        <p class="chat-histoire">Biscuit a grandi sous les tables du dîner et considère chaque assiette comme une invitation personnelle. Plein de vie, de cà¢lins imprévisibles et d'aventures, il transforme chaque jour en jeu. Un compagnon parfait pour ceux qui adorent l'énergie féline.</p>
+                        <p class="chat-histoire">Biscuit a grandi sous les tables du dîner et considère chaque assiette comme une invitation personnelle. Plein de vie, de câlins imprévisibles et d'aventures, il transforme chaque jour en jeu. Un compagnon parfait pour ceux qui adorent l'énergie féline.</p>
                     </div>
                 </div>
                 <div class="actions-chat">
-                <a href="adoption.php" class="bouton-chat">Jouer avec Biscuit</a>
-                <a href="adoption.php" class="bouton-chat secondaire">L'emmener chez toi</a>
+                    <a href="adoption.php" class="bouton-chat">Jouer avec Biscuit</a>
+                    <a href="adoption.php" class="bouton-chat secondaire">L'emmener chez toi</a>
                 </div>
             </article>
 
             <article class="carte-chat">
                 <div>
                     <picture>
-                    <source srcset="images/chat3.webp" type="image/webp">
-                    <img src="images/chat3.jpg" alt="Moonlight, chat mélancolique et poète" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
+                        <source srcset="images/chat3.webp" type="image/webp">
+                        <img src="images/chat3.jpg" alt="Moonlight, chat mélancolique et poète" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
                     </picture>
                     <div class="info-chat">
                         <h3>Moonlight</h3>
                         <p class="chat-trait">Le poète des toits parisiens</p>
-                        <p class="chat-histoire">Moonlight a connu la liberté sauvage avant d'arriver au Repaire. Ses yeux profonds racontent mille histoires. Doux et pensif, il cherche une à¢me sœur qui comprenne ses silences éloquents et aime les nuits étoilées depuis une fenêtre douillette.</p>
+                        <p class="chat-histoire">Moonlight a connu la liberté sauvage avant d'arriver au Repaire. Ses yeux profonds racontent mille histoires. Doux et pensif, il cherche une âme sœur qui comprenne ses silences éloquents et aime les nuits étoilées depuis une fenêtre douillette.</p>
                     </div>
                 </div>
                 <div class="actions-chat">
-                <a href="adoption.php" class="bouton-chat">Découvrir son histoire</a>
-                <a href="adoption.php" class="bouton-chat secondaire">Lui donner un foyer</a>
+                    <a href="belles-histoires.php" class="bouton-chat">Découvrir son histoire</a>
+                    <a href="adoption.php" class="bouton-chat secondaire">Lui donner un foyer</a>
                 </div>
             </article>
         </div>
     </section>
 </main>
-<?php include_once '../includes/footer.php'; ?>
+
+<?php include_once __DIR__ . '/../includes/footer.php'; ?>

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+$sitePrefix = '';
 session_start();
 
 require_once __DIR__ . '/../config/database.php';
@@ -41,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ville = trim($_POST['ville'] ?? '');
 
         // ============================================================
-        // 🔍 VALIDATIONS MÉTIER RENFORCÉES
+        // 🍔” VALIDATIONS MÉTIER RENFORCÉES
         // ============================================================
 
         // 1. Champs obligatoires
@@ -53,11 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Adresse email invalide.';
         }
         // 3. Prénom (au moins 2 caractères, lettres et accents autorisés)
-        elseif (strlen($prenom) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/', $prenom)) {
+        elseif (strlen($prenom) < 2 || !preg_match('/^[a-zA-ZÀ-à¿\s\-]+$/', $prenom)) {
             $error = 'Le prénom doit comporter au moins 2 caractères et ne contenir que des lettres, des espaces ou des tirets.';
         }
         // 4. Nom (au moins 2 caractères, lettres et accents autorisés)
-        elseif (strlen($nom) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/', $nom)) {
+        elseif (strlen($nom) < 2 || !preg_match('/^[a-zA-ZÀ-à¿\s\-]+$/', $nom)) {
             $error = 'Le nom doit comporter au moins 2 caractères et ne contenir que des lettres, des espaces ou des tirets.';
         }
         // 5. Adresse (au moins 5 caractères, pas de restriction stricte)
@@ -69,17 +70,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Le code postal doit être composé de 5 chiffres (ex: 83000).';
         }
         // 7. Ville (au moins 2 caractères, lettres, espaces, tirets, accents)
-        elseif (strlen($ville) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/', $ville)) {
+        elseif (strlen($ville) < 2 || !preg_match('/^[a-zA-ZÀ-à¿\s\-]+$/', $ville)) {
             $error = 'La ville doit comporter au moins 2 caractères et ne contenir que des lettres, des espaces ou des tirets.';
         }
-        // ✅ Toutes les validations sont passées
+        // œ… Toutes les validations sont passées
         else {
             try {
                 // Déterminer l'utilisateur_id
                 $utilisateur_id = $_SESSION['user_id'] ?? null;
 
                 if (!$utilisateur_id) {
-                    // Vérifier si l'email existe déjà
+                    // Vérifier si l'email existe déjà 
                     $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ?');
                     $stmt->execute([$email]);
                     $existing = $stmt->fetch();
@@ -157,7 +158,7 @@ foreach ($cart as $item) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -376,12 +377,12 @@ foreach ($cart as $item) {
     <!-- Header -->
     <header style="background: white; border-bottom: 2px solid #85D6CD; position: sticky; top: 0; z-index: 100;">
         <nav style="max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🧔 Repaire</a>
+            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🍔§” Repaire</a>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <a href="../index.php">Accueil</a>
                 <a href="boutique.php">Boutique</a>
                 <a href="belles-histoires.php">Histoires</a>
-                <a href="cart.php" style="color: #2B2B2B;">🛒 Panier</a>
+                <a href="cart.php" style="color: #2B2B2B;">🍔›’ Panier</a>
                 <a href="../login.php" style="color: #85D6CD; font-weight: bold;">Admin</a>
             </div>
         </nav>
@@ -389,7 +390,7 @@ foreach ($cart as $item) {
 
     <div class="checkout-container">
         <div class="checkout-header">
-            <h1>📦 Finaliser la commande</h1>
+            <h1>🍔“¦ Finaliser la commande</h1>
         </div>
         
         <?php if ($error): ?>
@@ -443,10 +444,10 @@ foreach ($cart as $item) {
                 </div>
                 
                 <div class="info-box">
-                    💡 <strong>À savoir:</strong> En demo, le paiement ne sera pas débité. Vous recevrez un email de confirmation.
+                    🍔’¡ <strong>À savoir:</strong> En demo, le paiement ne sera pas débité. Vous recevrez un email de confirmation.
                 </div>
                 
-                <button type="submit" class="btn btn-primary">✓ Confirmer la commande</button>
+                <button type="submit" class="btn btn-primary">œ“ Confirmer la commande</button>
                 <a href="cart.php" class="btn btn-secondary">Retour au panier</a>
             </form>
 
@@ -479,7 +480,7 @@ foreach ($cart as $item) {
         </div>
     </footer>
 
-    <!-- Validation JavaScript côté client -->
+    <!-- Validation JavaScript cà´té client -->
     <script src="../js/form-validation.js"></script>
 </body>
 </html>

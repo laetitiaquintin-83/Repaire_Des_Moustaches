@@ -1,4 +1,7 @@
-<?php include_once 'includes/header.php'; ?>
+<?php
+declare(strict_types=1);
+
+$sitePrefix = ''; include_once '../includes/header.php'; ?>
 
 <main class="legal-page">
     <h1>Conditions Générales de Vente</h1>
@@ -30,15 +33,15 @@
 
     <section>
         <h2>6. Droit de rétractation</h2>
-        <p>Conformément à la loi, vous disposez d’un délai de 14 jours pour exercer votre droit de rétractation.</p>
+        <p>Conformément à  la loi, vous disposez d'un délai de 14 jours pour exercer votre droit de rétractation.</p>
     </section>
 
     <section>
         <h2>7. Protection des données</h2>
-        <p>Vos données personnelles sont traitées conformément à notre politique de confidentialité.</p>
+        <p>Vos données personnelles sont traitées conformément à  notre politique de confidentialité.</p>
     </section>
 
-    <p style="margin-top: 40px; font-style: italic; color: #666;">Dernière mise à jour : juillet 2026</p>
+    <p style="margin-top: 40px; font-style: italic; color: #666;">Dernière mise à  jour : juillet 2026</p>
 </main>
 
-<?php include_once 'includes/footer.php'; ?>
+<?php include_once '../includes/footer.php'; ?>

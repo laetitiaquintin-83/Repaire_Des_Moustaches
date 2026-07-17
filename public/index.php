@@ -1,4 +1,11 @@
-<?php include_once 'includes/header.php'; ?>
+<?php
+declare(strict_types=1);
+
+// Force l'encodage UTF-8 au niveau du serveur pour éliminer les caractères bizarres
+header('Content-Type: text/html; charset=utf-8');
+
+$sitePrefix = '';
+include_once '../includes/header.php'; ?>
 
     <main>
         <section class="hero">
@@ -12,7 +19,7 @@
                 <picture>
                     <source srcset="images/diner-jukebox.webp" type="image/webp">
                     <source srcset="images/diner-jukebox.svg" type="image/svg+xml">
-                    <img src="images/diner-jukebox.png" alt="Interieur du Repaire des Moustaches avec jukebox et arbres a chat" width="500" height="350">
+                    <img src="images/diner-jukebox.png" alt="Intérieur du Repaire des Moustaches avec jukebox et arbres à chat" width="500" height="350">
                 </picture>
             </div>
         </section>
@@ -29,7 +36,7 @@
                         </picture>
                     </div>
                     <h3><a href="concept.php">Le Concept</a></h3>
-                    <p>Une version simple du lieu et de ses regles.</p>
+                    <p>Une version simple du lieu et de ses règles.</p>
                 </article>
 
                 <article class="concept-item">
@@ -69,7 +76,7 @@
                 </article>
 
                 <article class="concept-item">
-                    <div class="icon">🍰</div>
+                    <div class="icon">🍔</div>
                     <h3><a href="douceurs.php">Nos douceurs</a></h3>
                     <p>Les visuels gourmands du dîner.</p>
                 </article>
@@ -77,4 +84,4 @@
         </section>
     </main>
 
-<?php include_once 'includes/footer.php'; ?>
+<?php include_once '../includes/footer.php'; ?>

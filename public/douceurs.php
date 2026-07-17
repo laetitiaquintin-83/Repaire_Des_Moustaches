@@ -1,10 +1,13 @@
-<?php include_once 'includes/header.php'; ?>
+<?php
+declare(strict_types=1);
+
+$sitePrefix = ''; include_once '../includes/header.php'; ?>
 
     <main>
         <section class="page-section douceurs">
             <h1 class="page-title">Nos Douceurs</h1>
             <p class="sous-titre">Chaque bouchée raconte une histoire. Chaque achat soutient nos chats.</p>
-            <p style="text-align: center; margin-bottom: 50px; line-height: 1.7; max-width: 700px; margin-left: auto; margin-right: auto;">Notre pâtisserie maison est le moteur économique du Repaire. Fabriquées sur place avec passion, ces créations sucrées sont bien plus que des gourmandises : ce sont des actes de solidarité. En savourant une pâtisserie du Repaire, vous nourrissez aussi nos moustachus.</p>
+            <p style="text-align: center; margin-bottom: 50px; line-height: 1.7; max-width: 700px; margin-left: auto; margin-right: auto;">Notre pà¢tisserie maison est le moteur économique du Repaire. Fabriquées sur place avec passion, ces créations sucrées sont bien plus que des gourmandises : ce sont des actes de solidarité. En savourant une pà¢tisserie du Repaire, vous nourrissez aussi nos moustachus.</p>
             <div class="grille-douceurs">
                 <article class="douceur-card">
                     <picture>
@@ -23,7 +26,7 @@
                     </picture>
                     <div class="douceur-info">
                         <h3>Les Brownies Velours</h3>
-                        <p>Nommés ainsi car ils sont aussi doux que Velours lui-même. Chocolat noir intense, cœur fondant, recette gardée secrète par notre pâtissière adorée.</p>
+                        <p>Nommés ainsi car ils sont aussi doux que Velours lui-même. Chocolat noir intense, cœur fondant, recette gardée secrète par notre pà¢tissière adorée.</p>
                     </div>
                 </article>
                 <article class="douceur-card">
@@ -39,7 +42,7 @@
                 <article class="douceur-card">
                     <picture>
                         <source srcset="images/nouveauté.webp" type="image/webp">
-                        <img src="images/nouveauté.jpg" alt="Pâtisseries variées" width="300" height="200" loading="lazy">
+                        <img src="images/nouveauté.jpg" alt="Pà¢tisseries variées" width="300" height="200" loading="lazy">
                     </picture>
                     <div class="douceur-info">
                         <h3>Les Spécialités du Mois</h3>
@@ -50,4 +53,4 @@
         </section>
     </main>
 
-<?php include_once 'includes/footer.php'; ?>
+<?php include_once '../includes/footer.php'; ?>

@@ -52,7 +52,7 @@
     animation: diner-box-glow 2s ease-in-out infinite;
 }
 
-/* --- RESET DE BASE (Pour effacer les marges par défaut) --- */
+/* --- RESET DE BASE --- */
 * {
     margin: 0;
     padding: 0;
@@ -232,6 +232,16 @@ nav a:hover {
 }
 
 /* ==========================================================================
+   IMAGE ACCUEIL (Bannière)
+   ========================================================================== */
+   .ton-image-accueil-classe {
+    width: 100%;             /* Elle prend toute la largeur de l'écran */
+    height: 450px;           /* Tu fixes une hauteur maximale raisonnable */
+    object-fit: cover;       /* 🌟 C'est cette ligne magique qui empêche l'écrasement ! */
+    object-position: center 20%; /* Ajuste le centrage vertical pour bien voir le jukebox et les chats */
+}
+
+/* ==========================================================================
    SERVICES
    ========================================================================== */
 .services {
@@ -333,8 +343,13 @@ nav a:hover {
     text-align: center;
 }
 
+.bouton-chat.secondaire {
+    background-color: transparent;
+    border: 2px solid #F8BBD0;
+}
+
 /* ==========================================================================
-   NOUVEAU : GRILLE PENSIONNAIRES (version moderne)
+   GRILLE PENSIONNAIRES (version moderne)
    ========================================================================== */
 .grille-pensionnaires {
     display: grid;
@@ -1262,6 +1277,143 @@ footer p {
     color: var(--gris-fonce);
     margin-bottom: 20px;
     text-align: center;
+}
+
+/* ==========================================================================
+   FORMULAIRE D'INSCRIPTION AUX ATELIERS
+   ========================================================================== */
+.ateliers-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.ateliers-image img {
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.ateliers-image img:hover {
+    transform: scale(1.02);
+}
+
+.formulaire-box {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 35px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid #F0F0F0;
+}
+
+.form-groupe {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.form-groupe label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--gris-fonce);
+    margin-bottom: 8px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.form-groupe input[type="text"],
+.form-groupe input[type="email"],
+.form-groupe input[type="date"],
+.form-groupe select,
+.form-groupe textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #EAEAEA;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--gris-fonce);
+    background-color: var(--creme);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-groupe input:focus,
+.form-groupe select:focus,
+.form-groupe textarea:focus {
+    border-color: var(--vert-menthe);
+    background-color: #FFFFFF;
+    outline: none;
+    box-shadow: 0 0 10px rgba(133, 214, 205, 0.3);
+}
+
+.btn-envoyer {
+    background-color: var(--rose-corail);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(254, 123, 126, 0.2);
+}
+
+.btn-envoyer:hover {
+    background-color: #E55C5C;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(254, 123, 126, 0.35);
+}
+
+.btn-envoyer:active {
+    transform: translateY(0);
+}
+
+.message-success {
+    background-color: #E8F7F5;
+    color: #2E7D73;
+    border: 1px solid var(--vert-menthe);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.message-error {
+    background-color: #FDF2F2;
+    color: #C81E1E;
+    border: 1px solid var(--rose-corail);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.btn-return {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-radius: 30px;
+    background-color: var(--vert-menthe);
+    color: var(--gris-fonce);
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-return:hover {
+    background-color: #6FC1B0;
 }
 
 /* ==========================================================================
