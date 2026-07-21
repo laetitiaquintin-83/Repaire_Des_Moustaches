@@ -1,28 +1,30 @@
 <?php
 declare(strict_types=1);
 
-$sitePrefix = ''; include_once '../includes/header.php'; ?>
+$sitePrefix = ''; 
+include_once '../includes/header.php'; 
+?>
 
     <main>
         <section class="page-section concept">
-            <div class="projet-badge">🍔“ Phase d'incubation - Formation & Réalité</div>
+            <div class="projet-badge">💡 Phase d'incubation - Formation & Réalité</div>
             <h1 class="page-title">Demain, un lieu unique...</h1>
             
             <p class="projet-intro">
-                Né d'un projet d'examen, <strong>Le Repaire des Moustaches</strong> devient une vraie aventure. Mon ambition est de créer à  Toulon un espace hybride où le bien-être animal rencontre l'élégance rétro des années 50, porté par une structure associative solidaire.
+                Né d'un projet d'examen, <strong>Le Repaire des Moustaches</strong> devient une vraie aventure. Mon ambition est de créer à Toulon un espace hybride où le bien-être animal rencontre l'élégance rétro des années 50, porté par une structure associative solidaire.
             </p>
 
             <div class="piliers">
                 <article class="pilier-card">
-                    <h3>Les Chats 🍔±</h3>
-                    <p>Un refuge urbain où nos pensionnaires à  moustaches attendent leur famille pour la vie dans une ambiance cosy et bienveillante.</p>
+                    <h3>Les Chats 🐾</h3>
+                    <p>Un refuge urbain où nos pensionnaires à moustaches attendent leur famille pour la vie dans une ambiance cosy et bienveillante.</p>
                 </article>
                 <article class="pilier-card">
-                    <h3>Le Rétro 🍔“¸</h3>
+                    <h3>Le Rétro 🎷</h3>
                     <p>Des ateliers créatifs et des moments de partage célébrant l'univers vintage des années 50 et ses valeurs d'authenticité.</p>
                 </article>
                 <article class="pilier-card">
-                    <h3>Le Social 🍔¤</h3>
+                    <h3>Le Social 🤝</h3>
                     <p>Une structure associative (Loi 1901) pour favoriser le bénévolat, la médiation animale et les liens entre les gens au cœur du Var.</p>
                 </article>
             </div>
@@ -32,8 +34,8 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
                 <ul>
                     <li><strong>Aujourd'hui :</strong> Structuration du projet en association et test communautaire sur Facebook</li>
                     <li><strong>Été 2026 :</strong> Recherche de partenaires et premiers ateliers pilotes</li>
-                    <li><strong>2026-2027 :</strong> Identification d'un lieu à  Toulon et développement du réseau</li>
-                    <li><strong>À terme :</strong> Ouverture du lieu hybride (refuge + dîner + ateliers solidaires)</li>
+                    <li><strong>2026-2027 :</strong> Identification d'un lieu à Toulon et développement du réseau</li>
+                    <li><strong>À terme :</strong> Ouverture du lieu hybride (refuge + diner + ateliers solidaires)</li>
                 </ul>
             </div>
 
@@ -42,7 +44,7 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
                 <p>Nous construisons actuellement notre réseau de partenaires, bénévoles et conseils. Que vous soyez un expert en droit associatif, une photographe passionnée, un restaurateur visionnaire ou simplement un amoureux des chats, votre avis et votre enthousiasme nous intéressent.</p>
                 <p><strong>Nous avons le statut idéal pour préparer le terrain sans pression excessive :</strong> une étudiante en formation qui ose croire en ses idées.</p>
                 <div class="cta-rejoindre">
-                    <a href="formulaire.php">Nous soutenir ou nous conseiller â†’</a>
+                    <a href="formulaire.php">Nous soutenir ou nous conseiller →</a>
                 </div>
             </div>
         </section>

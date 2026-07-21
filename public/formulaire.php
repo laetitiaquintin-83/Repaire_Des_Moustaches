@@ -1,35 +1,52 @@
 <?php
 declare(strict_types=1);
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $sitePrefix = '';
-session_start();
-require '../config/database.php';
+
+// Inclusion sécurisée de la base de données et des fonctions
+require_once __DIR__ . '/../config/database.php';
 
 $error = null;
 $success = false;
 $demand_id = null;
 $email = '';
-$csrf_token = generateCSRFToken();
+
+// Génération sécurisée du token CSRF
+$csrf_token = function_exists('generateCSRFToken') ? generateCSRFToken() : ($_SESSION['csrf_token'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrf_check = $_POST['csrf_token'] ?? '';
-    if (!validateCSRFToken($csrf_check)) {
-        $error = "âš  Erreur de sécurité : token invalide. Veuillez réessayer.";
+    
+    // Validation du token CSRF
+    $isValidCsrf = function_exists('validateCSRFToken') 
+        ? validateCSRFToken($csrf_check) 
+        : hash_equals($_SESSION['csrf_token'] ?? '', $csrf_check);
+
+    if (!$isValidCsrf) {
+        $error = "⚠️ Erreur de sécurité : token CSRF invalide. Veuillez réessayer.";
     } else {
         $nom = trim($_POST['nom'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $motif = trim($_POST['motif'] ?? '');
-        $date = trim($_POST['date'] ?? null);
+        $date = trim($_POST['date'] ?? '');
         $message = trim($_POST['message'] ?? '');
-    
+
         if (empty($nom)) {
-            $error = "âš  Veuillez entrer votre nom et prénom.";
+            $error = "⚠️ Veuillez entrer votre nom et prénom.";
         } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "âš  Veuillez entrer une adresse email valide.";
-        } elseif (empty($motif) || !in_array($motif, ['participer', 'animer', 'prive'])) {
-            $error = "âš  Veuillez choisir une option valide.";
+            $error = "⚠️ Veuillez entrer une adresse email valide.";
+        } elseif (empty($motif) || !in_array($motif, ['participer', 'animer', 'prive'], true)) {
+            $error = "⚠️ Veuillez choisir une option valide.";
         } elseif (empty($message)) {
-            $error = "âš  Veuillez entrer votre message.";
+            $error = "⚠️ Veuillez entrer votre message.";
         } else {
             $date_sql = null;
             if (!empty($date)) {
@@ -37,10 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($date_parsed && $date_parsed->format('Y-m-d') === $date) {
                     $date_sql = $date;
                 } else {
-                    $error = "âš  La date n'est pas au bon format.";
+                    $error = "⚠️ La date n'est pas au bon format.";
                 }
             }
-            
+
             if (!$error) {
                 try {
                     $pdo = getPDO();
@@ -57,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $demand_id = $pdo->lastInsertId();
                     $success = true;
                 } catch (PDOException $e) {
-                    $error = "âš  Erreur lors de l'enregistrement. Veuillez réessayer.";
+                    $error = "⚠️ Erreur lors de l'enregistrement. Veuillez réessayer.";
                     error_log("Erreur formulaire.php: " . $e->getMessage());
                 }
             }
@@ -65,72 +82,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require_once 'includes/header.php';
+// Inclusion du header HTML
+if (file_exists(__DIR__ . '/includes/header.php')) {
+    require_once __DIR__ . '/includes/header.php';
+} else {
+    require_once __DIR__ . '/../includes/header.php';
+}
 ?>
 
 <main>
-        <div style="text-align: center; padding: 40px 20px 0;">
-            <h1 style="font-family: 'Pacifico', cursive; color: #2B2B2B; font-size: 3rem; margin-bottom: 10px;">Ateliers & Événements</h1>
-            <p style="font-size: 1.1rem; color: #555; max-width: 600px; margin: 0 auto;">Que vous souhaitiez participer ou proposer une animation, dites-nous tout !</p>
+    <div style="text-align: center; padding: 40px 20px 0;">
+        <h1 style="font-family: 'Pacifico', cursive; color: #2B2B2B; font-size: 3rem; margin-bottom: 10px;">Ateliers & Événements</h1>
+        <p style="font-size: 1.1rem; color: #555; max-width: 600px; margin: 0 auto;">Que vous souhaitiez participer ou proposer une animation, dites-nous tout !</p>
+    </div>
+
+    <section class="ateliers-container">
+        <div class="ateliers-image">
+            <picture>
+                <source srcset="images/formulaire.webp" type="image/webp">
+                <img src="images/formulaire.jpg" alt="Illustration des ateliers au Repaire des Moustaches" width="400" height="400" loading="lazy">
+            </picture>
         </div>
 
-        <section class="ateliers-container">
-            <div class="ateliers-image">
-                <picture>
-                    <source srcset="images/formulaire.webp" type="image/webp">
-                    <img src="images/formulaire.jpg" alt="Illustration des ateliers au Repaire des Moustaches" width="400" height="400" loading="lazy">
-                </picture>
-            </div>
-
-            <div class="formulaire-box">
-                <?php if ($success): ?>
-                    <div class="message-success">
-                        œ… Merci ! Votre demande enregistrée.<br>
-                        <small>Numéro: #<?php echo htmlspecialchars($demand_id); ?></small><br>
-                        Réponse à  <?php echo htmlspecialchars($email); ?>
-                    </div>
-                    <a href="formulaire.php" class="btn-return">← Nouveau formulaire</a>
-                    <a href="index.php" class="btn-return" style="background-color: #85D6CD; color: #2B2B2B; margin-left: 10px;">Retour à  l'accueil</a>
-                <?php else: ?>
-                    <?php if ($error): ?>
-                        <div class="message-error"><?php echo $error; ?></div>
-                    <?php endif; ?>
-                    
-                    <form method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
-                        <div class="form-groupe">
-                            <label for="nom">Nom & Prénom</label>
-                            <input type="text" id="nom" name="nom" placeholder="Ex: Jane Doe" value="<?php echo htmlspecialchars($_POST['nom'] ?? ''); ?>" required>
-                        </div>
-                        <div class="form-groupe">
-                            <label for="email">Adresse Email</label>
-                            <input type="email" id="email" name="email" placeholder="jane.doe@email.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required>
-                        </div>
-                        <div class="form-groupe">
-                            <label for="motif">Je souhaite...</label>
-                            <select id="motif" name="motif" required>
-                                <option value="">Choisissez une option...</option>
-                                <option value="participer" <?php echo (($_POST['motif'] ?? '') === 'participer') ? 'selected' : ''; ?>>🍔™‹â™€ Participer à  un atelier</option>
-                                <option value="animer" <?php echo (($_POST['motif'] ?? '') === 'animer') ? 'selected' : ''; ?>>🍔Ž¨ Animer un atelier</option>
-                                <option value="prive" <?php echo (($_POST['motif'] ?? '') === 'prive') ? 'selected' : ''; ?>>🍔Ž‰ Privatiser un événement</option>
-                            </select>
-                        </div>
-                        <div class="form-groupe">
-                            <label for="date">Date (optionnel)</label>
-                            <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($_POST['date'] ?? ''); ?>">
-                        </div>
-                        <div class="form-groupe">
-                            <label for="message">Votre message</label>
-                            <textarea id="message" name="message" rows="5" placeholder="Dites-nous en plus..." required><?php echo htmlspecialchars($_POST['message'] ?? ''); ?></textarea>
-                        </div>
-                        <button type="submit" class="btn-envoyer">Envoyer 🍔🐾</button>
-                    </form>
+        <div class="formulaire-box">
+            <?php if ($success): ?>
+                <div class="message-success">
+                    ✅ Merci ! Votre demande a été enregistrée.<br>
+                    <small>Numéro: #<?php echo htmlspecialchars((string)$demand_id, ENT_QUOTES, 'UTF-8'); ?></small><br>
+                    Réponse à : <?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+                <a href="formulaire.php" class="btn-return">← Nouveau formulaire</a>
+                <a href="index.php" class="btn-return" style="background-color: #85D6CD; color: #2B2B2B; margin-left: 10px;">Retour à l'accueil</a>
+            <?php else: ?>
+                <?php if ($error): ?>
+                    <div class="message-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php endif; ?>
-            </div>
-        </section>
-    </main>
 
-<!-- Validation JavaScript cà´té client pour les formulaires -->
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars((string)$csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                    
+                    <div class="form-groupe">
+                        <label for="nom">Nom & Prénom</label>
+                        <input type="text" id="nom" name="nom" placeholder="Ex: Jane Doe" value="<?php echo htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                    </div>
+
+                    <div class="form-groupe">
+                        <label for="email">Adresse Email</label>
+                        <input type="email" id="email" name="email" placeholder="jane.doe@email.com" value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                    </div>
+
+                    <div class="form-groupe">
+                        <label for="motif">Je souhaite...</label>
+                        <select id="motif" name="motif" required>
+                            <option value="">Choisissez une option...</option>
+                            <option value="participer" <?php echo (($_POST['motif'] ?? '') === 'participer') ? 'selected' : ''; ?>>🙋‍♀️ Participer à un atelier</option>
+                            <option value="animer" <?php echo (($_POST['motif'] ?? '') === 'animer') ? 'selected' : ''; ?>>🎨 Animer un atelier</option>
+                            <option value="prive" <?php echo (($_POST['motif'] ?? '') === 'prive') ? 'selected' : ''; ?>>🎉 Privatiser un événement</option>
+                        </select>
+                    </div>
+
+                    <div class="form-groupe">
+                        <label for="date">Date (optionnel)</label>
+                        <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($_POST['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+
+                    <div class="form-groupe">
+                        <label for="message">Votre message</label>
+                        <textarea id="message" name="message" rows="5" placeholder="Dites-nous en plus..." required><?php echo htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-envoyer">Envoyer 🐾</button>
+                </form>
+            <?php endif; ?>
+        </div>
+    </section>
+</main>
+
 <script src="js/form-validation.js"></script>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php 
+if (file_exists(__DIR__ . '/includes/footer.php')) {
+    require_once __DIR__ . '/includes/footer.php';
+} else {
+    require_once __DIR__ . '/../includes/footer.php';
+}
+?>
