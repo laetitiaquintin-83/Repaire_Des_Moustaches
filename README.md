@@ -1,253 +1,140 @@
 # 🐱 Le Repaire des Moustaches
 
-Projet web pour le titre professionnel **DWWM (Développeur Web et Web Mobile)** - Examen Titre Pro 2026.
-
-## 📋 Concept
-
-**Le Repaire des Moustaches** est un tiers-lieu hybride combinant :
-
-- 🍔 **Dîner rétro** (style années 50 américain)
-- 🐈 **Refuge de chats** (adoption solidaire)
-- 🛠️ **Ateliers solidaires** (création, bien-être, administratif, pâtisserie)
-- 🍰 **Restaurant & boutique** (modèle économique coopératif)
-
-Basé à Toulon, c'est un lieu libre d'accès où chacun peut rencontrer les pensionnaires en liberté, se former via les ateliers (adhésion 5€/an), et soutenir le projet par la consommation.
+Projet web dynamique développé pour l'examen du titre professionnel **DWWM (Développeur Web et Web Mobile)** - Session 2026.
 
 ---
 
-## 🎨 Architecture du Projet
+## 📋 Concept du Projet
+
+**Le Repaire des Moustaches** est un tiers-lieu hybride et solidaire basé à Toulon combinant :
+
+- ☕ **Café / Dîner Rétro** : Un espace restauration convivial au style rétro des années 50.
+- 🐈 **Refuge & Adoption Solidaire** : Rencontre avec les pensionnaires félins en liberté pour favoriser l'adoption via des refuges partenaires.
+- 🛠️ **Ateliers & Événements** : Création, bien-être, pâtisserie et animations (Escape Game) accessibles via le Club des Moustaches.
+- 🛒 **Boutique & Adhésion** : Modèle économique coopératif (vente de goodies, consommations et adhésion annuelle à 5€).
+
+---
+
+## 🎨 Stack Technique & Architecture
 
 ### Frontend
+- **HTML5 sémantique / PHP 8.2+** : Séparation vue / logique, templates réutilisables.
+- **CSS3 Responsive** : Architecture mobile-first, variables CSS (`:root`), effets de survol et transitions.
+- **Typographies & Style** : Google Fonts (*Montserrat* pour la lisibilité, *Pacifico* pour la touche rétro).
+- **Palette Visuelle** : 
+  - Crème `#FFF8E7` | Menthe `#85D6CD` | Rose `#FE7B7E` | Dark `#2B2B2B`
 
-- **PHP 8.2+** avec HTML5 sémantique sur les pages principales du site
-- **CSS3** responsive avec variables de couleurs et hover effects
-- **Google Fonts** : Montserrat (body) + Pacifico (titres rétro)
-- **Palette** : Crème #FFF8E7 | Menthe #85D6CD | Rose #FE7B7E | Gris #2B2B2B
+### Backend & Sécurité
+- **PHP 8.2+** (Programmation orientée objet / Procédurale sécurisée)
+- **Base de données MySQL 8.0+** : 13 tables relationnelles normalisées avec clés étrangères (FK) et contraintes `CHECK`.
+- **Connexion BDD** : Design Pattern Singleton PDO (`config/database.php`).
+- **Sécurité intégrée** :
+  - **Injection SQL** : Requêtes préparées systématiques via PDO.
+  - **Attaques XSS** : Échappement des sorties via `htmlspecialchars()`.
+  - **CSRF** : Validation par jetons uniques (`hash_equals()`).
+  - **Mots de passe** : Hachage fort avec `password_hash()` (bcrypt).
 
-### Backend (Infrastructure)
+---
 
-- **PHP 8.2+** avec PDO (sécurité SQL injection)
-- **MySQL 8.0+** (13 tables normalisées, FK, CHECK constraints)
-- **Config** : `config/database.php` (singleton PDO pattern)
-- **Démo** : `schema.sql` + `demo_data.sql` prêts à l'import
+## 📁 Structure du Projet
 
-### Structure des fichiers
-
-```
+```text
 Repaire_Des_Moustaches/
-├── index.php               # Accueil (hero + 5 cartes + 🔐 bouton admin)
-├── concept.php             # 3 piliers du projet
-├── equipage.php            # Galerie 3 chats + adoption
-├── ateliers.php            # Ateliers dynamiques depuis BDD
-├── repaire.php             # Histoire + Engagements
-├── douceurs.php            # Galerie gourmande
-├── projet.php              # Vision & trajectoire
-├── formulaire.php          # Réservation + CSRF protection
-├── login.php               # Authentification admin
-├── logout.php              # Déconnexion
-├── cgv.php                 # Conditions générales de vente
-├── style.css               # Styles (responsive, 🔐 cadenas)
-├── schema.sql              # 13 CREATE TABLE + DEMANDES
-├── demo_data.sql           # Données test
-├── includes/
-│   ├── header.php          # Header + nav (include_once en début)
-│   └── footer.php          # Footer (include_once en fin)
+├── index.php                 # Page d'accueil (Hero, présentation, accès rapide)
+├── concept.php               # Les 3 piliers du lieu
+├── equipage.php              # Présentation de l'équipe et des mascottes
+├── ateliers.php              # Catalogue et réservation d'ateliers
+├── repaire.php               # Histoire du lieu & engagements
+├── projet.php                # Vision et trajectoire du tiers-lieu
+├── formulaire.php            # Formulaire de contact / réservation
+├── login.php                 # Connexion à l'espace administration
+├── logout.php                # Déconnexion sécurisée
+├── cgv.php                   # Conditions Générales de Vente
+├── style.css                 # Feuille de style globale responsive
+├── schema.sql                # Structure BDD (13 tables, contraintes, FK)
+├── demo_data.sql             # Jeu de données de démonstration
+│
+├── includes/                 # Composants réutilisables (DRY)
+│   ├── header.php            # Navigation principale & sessions
+│   └── footer.php            # Pied de page & liens légaux
+│
 ├── config/
-│   └── database.php        # PDO singleton + CSRF tokens
-├── public/
-│   ├── pensionnaires.php   # Galerie chats dynamique
-│   ├── belles-histoires.php# Testimonials adoption
-│   ├── boutique.php        # Catalogue produits
-│   ├── cart.php            # Panier session
-│   ├── checkout.php        # Commande finale + CSRF protection
-│   ├── confirmation.php    # Confirmation commande
-│   └── soumettre-histoire.php # Form testimonial
-├── admin/
-│   ├── dashboard.php       # Tableau de bord admin
-│   ├── ateliers.php        # CRUD ateliers
-│   ├── produits.php        # CRUD produits
-│   ├── commandes.php       # Gestion commandes
-│   ├── utilisateurs.php    # Gestion utilisateurs
-│   └── moderer-histoires.php # Modération belles histoires
-├── images/                 # 30+ assets (logos, photos, icônes)
-├── SECURITE_AUDIT.md       # Documentation sécurité (6 niveaux)
-├── GUIDE_PRESENTATION_JURY.md # Script présentation + Q&A
-├── BOUTON_ADMIN_CADENAS.md # Implémentation 🔐 cadenas
-├── MCD.md                  # Diagramme entité-association
-├── .gitignore              # Ignore OS, IDE, build files
-└── README.md               # Ce fichier
-```
+│   └── database.php          # Singleton PDO & helpers de sécurité (CSRF)
+│
+├── public/                   # Espace public / Modules interactifs
+│   ├── adhésion.php          # Adhésion au Club des Moustaches (5€/an)
+│   ├── belles-histoires.php  # Témoignages et histoires d'adoptions
+│   ├── boutique.php          # Catalogue de la boutique solidaire
+│   ├── cart.php              # Gestion du panier (session PHP)
+│   ├── checkout.php          # Tunnel de commande sécurisé
+│   ├── confirmation.php      # Confirmation de commande
+│   ├── escape-game.php       # Présentation & réservation de l'Escape Game
+│   ├── mentions-legales.php  # Informations légales
+│   ├── partenaires.php       # Refuges & associations partenaires
+│   ├── pensionnaires.php     # Galerie dynamique des chats à l'adoption
+│   ├── reparateur.php        # Service / Atelier de réparation solidaire
+│   └── soumettre-histoire.php# Formulaire d'envoi de témoignages
+│
+├── admin/                    # Espace Administration (Back-Office)
+│   ├── dashboard.php         # Tableau de bord principal (Statistiques & KPI)
+│   ├── ateliers.php          # CRUD Gestion des ateliers
+│   ├── commandes.php         # Suivi et gestion des commandes
+│   ├── moderer-histoires.php # Validation/Modération des témoignages
+│   ├── produits.php          # CRUD Catalogue produits
+│   └── utilisateurs.php      # Gestion des membres et accès
+│
+├── images/                   # Visuels, logos, illustrations & photos
+├── MCD.md                    # Modèle Conceptuel des Données
+├── SECURITE_AUDIT.md         # Audit détaillé des 6 niveaux de sécurité
+├── GUIDE_PRESENTATION_JURY.md# Support et trame pour la soutenance
+└── README.md                 # Documentation du projet
+🗄️ Modèle de Données (MySQL - 13 Tables)
+utilisateurs : Gestion des membres et clients.
 
----
+admin_users : Comptes administrateurs sécurisés.
 
-## 🎯 Points Forts du Projet
+refuges_partenaires : Associations et refuges associés.
 
-✅ **Responsive design** - Mobile-first avec breakpoint 1100px  
-✅ **Accessibilité** - Alt tags, sémantique HTML, lang="fr"  
-✅ **Cohérence visuelle** - Variables CSS, composants réutilisables, footer récurrent  
-✅ **Accents français** - Toutes les pages avec accents corrects (é, è, ê, à)  
-✅ **SEO-friendly** - Titres hiérarchisés (H1), descriptions claires, meta viewport  
-✅ **Navigation fluide** - Menu principal identique partout + footer avec liens  
-✅ **Sécurité renforcée** - PDO + CSRF tokens (hash_equals) + htmlspecialchars() sur tous les outputs  
-✅ **Formulaire de réservation** - formulaire.php avec validation server-side et insertion BDD  
-✅ **Délivrables examen** - MCD, SQL complet, PHP backend fonctionnel, HTML/CSS prêt pour la démonstration
-✅ **Hover effects** - Boutons avec transition + shadow, liens sociaux colorés  
-✅ **Stabilité** - HTML/CSS vérifiés et absence d'erreurs bloquantes connues
+pensionnaires : Chats hébergés (statuts : disponible, réservé, adopté).
 
----
+adhesions : Suivi des cotisations (5€/an avec contrainte CHECK).
 
-## 🚀 Utilisation Locale (Laragon)
+ateliers & reservations_ateliers : Inscriptions et gestion du prix libre/animation.
 
-1. **Placer le dossier** dans `C:\laragon\www\Repaire_Des_Moustaches\`
-2. **Ouvrir navigateur** : `http://localhost/Repaire_Des_Moustaches/`
-3. **Base de données** :
-   - Ouvrir phpMyAdmin (http://localhost/phpmyadmin)
-   - Créer une nouvelle BDD `repaire_des_moustaches`
-   - Importer `schema.sql` (structure)
-   - Importer `demo_data.sql` (test data)
-4. **Config BD** : Éditer `config/database.php` si besoin d'autres credentials
+belles_histoires : Témoignages soumis à modération (en attente, approuvée, refusée).
 
----
+categories_produits, produits, commandes, lignes_commandes : Module e-commerce complet.
 
-## 📱 Pages Principales
+demandes : Formulaire de contact, privatisations et propositions d'ateliers.
 
-| Page              | Contenu                                                                                               |
-| ----------------- | ----------------------------------------------------------------------------------------------------- |
-| **index.php**     | Landing page - Hero section + 5 cartes de navigation (Concept, Équipage, Ateliers, Repaire, Douceurs) |
-| **concept.php**   | Explique 3 piliers (Dîner & Goodies, Ateliers Solidaires, Coup de Foudre adoption)                    |
-| **equipage.php**  | Galerie 3 chats + "Son histoire" + "Le rencontrer" buttons                                            |
-| **ateliers.php**  | 4 ateliers (images + titles + descriptions + CTAs variés)                                             |
-| **repaire.php**   | Histoire + Engagements + Image ambiance                                                               |
-| **douceurs.php**  | Galerie gourmande (4 visuels produits/pâtisseries)                                                    |
+🚀 Installation & Test en Local (Laragon / XAMPP)
+Cloner / Placer le projet dans votre dossier web local (ex: C:\laragon\www\Repaire_Des_Moustaches\).
 
----
+Lancer le serveur MySQL & Apache.
 
-## 🗄️ Base de Données (13 Tables)
+Configurer la base de données :
 
-Schéma normalisé avec foreign keys et constraints :
+Accéder à phpMyAdmin (http://localhost/phpmyadmin).
 
-- **utilisateurs** - Comptes membres/visiteurs (email, password bcrypt)
-- **admin_users** - Admin dashboard (login, password bcrypt)
-- **refuges_partenaires** - Refuges d'adoption partenaires
-- **pensionnaires** - Chats en refuge (status: libre/reserve/adopte)
-- **adhesions** - Membership annuelle (5€ CHECK constraint)
-- **ateliers** - Ateliers proposés
-- **reservations_ateliers** - Inscriptions (rôles: participant/animator, prix-libre)
-- **belles_histoires** - Testimonials adoption (modération: attente/approuvee/refusee)
-- **categories_produits** - Menu + boutique categories
-- **produits** - Items vente (plats, goodies)
-- **commandes** - Order headers
-- **lignes_commandes** - Order line items
-- **demandes** - Réservations/animations/privatisations (motif: participer/animer/prive, statut: nouvelle/traitee/refusee)
+Créer une base de données nommée repaire_des_moustaches.
 
----
+Importer schema.sql (structure des tables).
 
-## 🎨 Customization CSS
+Importer demo_data.sql (données de test).
 
-Toutes les couleurs sont des **variables CSS** :
+Accéder à l'application : http://localhost/Repaire_Des_Moustaches/.
 
-```css
-:root {
-  --creme: #fff8e7;
-  --vert-menthe: #85d6cd;
-  --rose-corail: #fe7b7e;
-  --gris-fonce: #2b2b2b;
-}
-```
+💡 Conformité Titre Pro DWWM
+✅ Architecture DRY : Aucun code dupliqué grâce aux includes/ (Header, Nav, Footer).
 
-Pour changer le thème : modifier les 4 values en `:root`.
+✅ Code Sémantique & Accessibilité : Balises HTML5, attributs alt renseignés, contraste validé.
 
----
+✅ Sécurité conforme OWASP : Shield contre les failles SQLi, XSS, CSRF, et gestion propre des sessions HTTP.
 
-## 📝 Notes pour l'Examen DWWM
+✅ Responsive Design : Testé et optimisé pour écrans mobiles, tablettes et ordinateurs.
 
-### ✅ Délivrables Présents
+✅ Soutenance prête : Livrables MCD, SQL, Wireframes UX/UI et code source documenté.
 
-- ✅ **Hiérarchie sémantique** - H1, H2, semantic tags (header, nav, main, footer)
-- ✅ **Accents français** - Corrects partout (é, è, ê, à, ç)
-- ✅ **Footer** - Présent sur toutes les pages
-- ✅ **Responsive** - Mobile-first avec breakpoint 1100px
-- ✅ **MCD** - Diagramme inclus (MCD.md)
-- ✅ **SQL** - 13 tables, normalisées, FK + CHECK constraints
-- ✅ **PDO** - Prepared statements (? ou :param) - Injection SQL impossible
-- ✅ **Sécurité CSRF** - Tokens uniques par session (hash_equals validation)
-- ✅ **Sécurité XSS** - htmlspecialchars() sur tous les outputs
-- ✅ **Sécurité Auth** - bcrypt password_hash (PASSWORD_DEFAULT)
-- ✅ **Validation server-side** - Email, enum, date, type checking
-- ✅ **Formulaires** - formulaire.php avec INSERT INTO demandes
-- ✅ **CRUD Admin** - Ateliers, produits, utilisateurs, histoires, commandes
-- ✅ **Images** - Alt tags, bien organisées, responsive
-- ✅ **Documentation** - SECURITE_AUDIT.md, GUIDE_PRESENTATION_JURY.md, BOUTON_ADMIN_CADENAS.md
-- ✅ **UI Polish** - 🔐 Bouton admin cadenas sur accueil
+Auteur : Projet réalisé dans le cadre du Titre Professionnel DWWM 2026.
 
----
-
-## 🔄 Workflow Git
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: DWWM project structure"
-git remote add origin <your-repo>
-git push -u origin main
-```
-
----
-
-## 👨‍💻 Auteur & Contexte
-
-**Projet d'examen** pour le titre **DWWM 2026**.  
-Concept inspiré du "Repaire des Moustaches" réel (tiers-lieu Toulon).
-
-Livrable pour démonstration à l'examen :
-
-- Site web prêt pour la démonstration (Frontend ✅)
-- Architecture base de données (SQL ✅)
-- Fondation backend PHP (Scaffold ✅)
-- Délivrables d'examen (MCD, SQL, HTML/CSS/JS)
-
----
-
-## 📞 Support
-
-Questions sur le projet ? Vérifier :
-
-1. Accents français sur les pages principales
-2. Footer sur toutes les pages
-3. Responsive design (resize browser)
-4. Images présentes dans `images/` folder
-5. Database importée correctement
-
----
-
----
-
-## 📚 Documentation Complète
-
-| Fichier | Contenu |
-| --- | --- |
-| **SECURITE_AUDIT.md** | Audit complet 6 niveaux (SQL injection, XSS, CSRF, Auth, Password, Input validation) |
-| **GUIDE_PRESENTATION_JURY.md** | Script présentation + demo 10 min + 8 questions jury + conseils |
-| **POINTS_FRICTION_JURY.md** | 4 points critiques du jury + solutions + pépites à valoriser |
-| **BOUTON_ADMIN_CADENAS.md** | Implémentation 🔐 cadenas + variantes CSS |
-| **MCD.md** | Diagramme entité-association (13 tables) |
-| **schema.sql** | Structure BDD complète avec constraints |
-| **demo_data.sql** | Données test pour démonstration |
-
----
-
-## ✅ Architecture FINALISÉE pour l'Examen
-
-**Points de jury traités:**
-
-1. ✅ **Zéro mélange .html/.php** - Tous les fichiers principaux en .php uniquement
-2. ✅ **Pas de duplication** - Header/footer mutua lisés via includes/
-3. ✅ **Structure cohérente** - Modules clairement séparés (/admin, /public, racine)
-4. ✅ **Versions à jour** - PHP 8.2+, MySQL 8.0+
-5. ✅ **Pas de redirection mystère** - navigation clarifiée et page CGV à la racine
-6. ✅ **Sessions partout** - Même pages d'accueil en .php avec session_start
-
----
-
-**Version** : 1.2 (2026-05-26)  
-**Status** : ✅ **Version de démonstration prête** - Frontend ✅ | Backend ✅ | Database ✅ | Sécurité ✅ | Architecture ✅ | Documentation ✅
+Statut : ✅ Prêt pour soutenance (Frontend ✅ | Backend ✅ | BDD ✅ | Sécurité ✅)
