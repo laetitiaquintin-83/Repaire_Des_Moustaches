@@ -13,12 +13,67 @@ $pdo = getPDO();
 $message = '';
 $error = '';
 
+// Initialisation du panier en session si non existant
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
 // Génération du token CSRF pour les formulaires
 $csrf_token = generateCSRFToken();
 
-// Traiter les actions
+// ---------------------------------------------------------------------
+// 1. GESTION DE L'AJOUT AU PANIER VIA URL (GET) Ex: ?action=add&type=adhesion
+// ---------------------------------------------------------------------
+if (isset($_GET['action']) && $_GET['action'] === 'add') {
+    $type = $_GET['type'] ?? 'produit';
+
+    if ($type === 'adhesion') {
+        // Clé unique pour l'adhésion dans la session
+        $cartKey = 'adhesion_club_moustaches';
+
+        // Si l'adhésion n'est pas encore dans le panier
+        if (!isset($_SESSION['cart'][$cartKey])) {
+            $_SESSION['cart'][$cartKey] = [
+                'id'       => 'adhesion',
+                'nom'      => 'Adhésion - Club des Moustaches',
+                'prix'     => 5.00,
+                'quantite' => 1,
+                'type'     => 'adhesion'
+            ];
+            $message = 'Carte d\'adhésion ajoutée à votre panier ! 🐾';
+        } else {
+            $message = 'La carte d\'adhésion est déjà dans votre panier.';
+        }
+    } elseif (isset($_GET['id'])) {
+        // Traitement classique pour un produit physique par son ID BDD
+        $produit_id = (int)$_GET['id'];
+        $stmt = $pdo->prepare("SELECT * FROM produits WHERE id = ?");
+        $stmt->execute([$produit_id]);
+        $produit = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($produit) {
+            $cartKey = 'prod_' . $produit_id;
+            if (isset($_SESSION['cart'][$cartKey])) {
+                $_SESSION['cart'][$cartKey]['quantite']++;
+            } else {
+                $_SESSION['cart'][$cartKey] = [
+                    'id'       => $produit['id'],
+                    'nom'      => $produit['nom'],
+                    'prix'     => (float)$produit['prix'],
+                    'quantite' => 1,
+                    'type'     => 'produit'
+                ];
+            }
+            $message = 'Produit ajouté au panier !';
+        }
+    }
+}
+
+// ---------------------------------------------------------------------
+// 2. TRAITER LES ACTIONS DU PANIER (POST)
+// ---------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Vérification CSRF pour toutes les actions POST
+    // Vérification CSRF
     $csrf_check = $_POST['csrf_token'] ?? '';
     if (!validateCSRFToken($csrf_check)) {
         die('Erreur de sécurité : token CSRF invalide');
@@ -28,13 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'];
         
         if ($action === 'remove') {
-            $produit_id = (int)($_POST['produit_id'] ?? 0);
+            $produit_id = $_POST['produit_id'] ?? '';
             if (isset($_SESSION['cart'][$produit_id])) {
                 unset($_SESSION['cart'][$produit_id]);
                 $message = 'Article retiré du panier';
             }
         } elseif ($action === 'update_quantity') {
-            $produit_id = (int)($_POST['produit_id'] ?? 0);
+            $produit_id = $_POST['produit_id'] ?? '';
             $nouvelle_quantite = (int)($_POST['quantite'] ?? 0);
             
             if (isset($_SESSION['cart'][$produit_id])) {
@@ -53,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Calculer les totaux (corrigé : array_sum pour les quantités)
+// Calculer les totaux
 $cart = $_SESSION['cart'] ?? [];
 $total_items = array_sum(array_column($cart, 'quantite'));
 $total_price = 0;
@@ -66,16 +121,17 @@ foreach ($cart as $item) {
 function getImagePath(string $productName): string
 {
     $imageMap = [
-        'Milkshake Fraise' => 'images/produits/milkshake-fraise.jpg',
-        'Burger Veggie Moustache' => 'images/produits/burger-veggie.jpg',
-        'Mug Diner' => 'images/produits/mug-diner.jpg',
-        'Tablier Vintage' => 'images/produits/tablier-vintage.jpg',
-        'Pins Emailles' => 'images/produits/pins-emailles.jpg',
-        'Tote Bag Solidaire' => 'images/produits/tote-bag.jpg',
-        'Jouets Catnip Deluxe' => 'images/produits/jouets-catnip.jpg',
-        'Planches de Stickers Retro' => 'images/produits/stickers-retro.jpg',
-        'Cartes Postales Polaroid' => 'images/produits/cartes-postales.jpg',
-        'Badge Solidaire' => 'images/produits/badge-solidaire.jpg',
+        'Adhésion - Club des Moustaches' => 'images/club-moustaches.png',
+        'Milkshake Fraise'              => 'images/produits/milkshake-fraise.jpg',
+        'Burger Veggie Moustache'       => 'images/produits/burger-veggie.jpg',
+        'Mug Diner'                     => 'images/produits/mug-diner.jpg',
+        'Tablier Vintage'               => 'images/produits/tablier-vintage.jpg',
+        'Pins Emailles'                 => 'images/produits/pins-emailles.jpg',
+        'Tote Bag Solidaire'            => 'images/produits/tote-bag.jpg',
+        'Jouets Catnip Deluxe'          => 'images/produits/jouets-catnip.jpg',
+        'Planches de Stickers Retro'    => 'images/produits/stickers-retro.jpg',
+        'Cartes Postales Polaroid'      => 'images/produits/cartes-postales.jpg',
+        'Badge Solidaire'               => 'images/produits/badge-solidaire.jpg',
     ];
     
     return $imageMap[$productName] ?? 'images/placeholder.jpg';
@@ -100,7 +156,6 @@ function getImagePath(string $productName): string
             --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
 
-        /* Notification de message */
         .notif-message {
             background-color: var(--menthe);
             color: var(--gris-texte);
@@ -111,7 +166,6 @@ function getImagePath(string $productName): string
             box-shadow: var(--shadow-soft);
         }
 
-        /* Layout du Panier */
         .panier-container {
             max-width: 1200px;
             margin: 40px auto;
@@ -141,7 +195,6 @@ function getImagePath(string $productName): string
             }
         }
 
-        /* Liste des articles */
         .panier-items {
             display: flex;
             flex-direction: column;
@@ -197,7 +250,6 @@ function getImagePath(string $productName): string
             font-size: 1.1rem;
         }
 
-        /* Formulaire quantité discret et ergonomique */
         .panier-quantite-moderne {
             display: flex;
             align-items: center;
@@ -256,7 +308,6 @@ function getImagePath(string $productName): string
             transform: scale(1.1);
         }
 
-        /* Colonne Résumé de Commande */
         .summary-card {
             background: white;
             border-radius: 18px;
@@ -294,7 +345,6 @@ function getImagePath(string $productName): string
             color: var(--coral);
         }
 
-        /* Boutons CTA d'achat */
         .btn-checkout {
             display: block;
             width: 100%;
@@ -414,7 +464,7 @@ function getImagePath(string $productName): string
             <div class="panier-grid">
                 
                 <section class="panier-items">
-                    <?php foreach ($cart as $produit_id => $item): ?>
+                    <?php foreach ($cart as $key => $item): ?>
                         <div class="carte-panier-moderne">
                             <div class="panier-img-container-moderne">
                                 <img src="<?php echo htmlspecialchars(getImagePath((string) $item['nom']), ENT_QUOTES, 'UTF-8'); ?>" 
@@ -429,7 +479,7 @@ function getImagePath(string $productName): string
                             
                             <form method="POST" class="panier-quantite-moderne">
                                 <input type="hidden" name="action" value="update_quantity">
-                                <input type="hidden" name="produit_id" value="<?php echo $produit_id; ?>">
+                                <input type="hidden" name="produit_id" value="<?php echo htmlspecialchars((string)$key, ENT_QUOTES, 'UTF-8'); ?>">
                                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                                 <input type="number" name="quantite" class="input-quantite-moderne" value="<?php echo $item['quantite']; ?>" min="1" max="100">
                                 <button type="submit" class="btn-quantite-moderne" title="Mettre à jour">🔄</button>
@@ -441,7 +491,7 @@ function getImagePath(string $productName): string
                             
                             <form method="POST" style="margin: 0;">
                                 <input type="hidden" name="action" value="remove">
-                                <input type="hidden" name="produit_id" value="<?php echo $produit_id; ?>">
+                                <input type="hidden" name="produit_id" value="<?php echo htmlspecialchars((string)$key, ENT_QUOTES, 'UTF-8'); ?>">
                                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                                 <button type="submit" class="btn-supprimer-moderne" title="Retirer l'article">🗑️</button>
                             </form>
