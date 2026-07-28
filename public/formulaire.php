@@ -11,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $sitePrefix = '';
 
-// Inclusion sécurisée de la base de données et des fonctions
+// Inclusion sécurisée de la base de données
 require_once __DIR__ . '/../config/database.php';
 
 $error = null;
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Inclusion du header HTML
+// Inclusion du header
 if (file_exists(__DIR__ . '/includes/header.php')) {
     require_once __DIR__ . '/includes/header.php';
 } else {
@@ -90,13 +90,219 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
 }
 ?>
 
-<main>
-    <div style="text-align: center; padding: 40px 20px 0;">
-        <h1 style="font-family: 'Pacifico', cursive; color: #2B2B2B; font-size: 3rem; margin-bottom: 10px;">Ateliers & Événements</h1>
-        <p style="font-size: 1.1rem; color: #555; max-width: 600px; margin: 0 auto;">Que vous souhaitiez participer ou proposer une animation, dites-nous tout !</p>
+<style>
+/* --- STYLES FORMULAIRE ATELIERS RÉTRO --- */
+.page-form-container {
+    max-width: 1050px;
+    margin: 40px auto 70px auto;
+    padding: 0 20px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.form-header h1 {
+    font-family: 'Pacifico', cursive;
+    color: #FF7B7B;
+    font-size: 3rem;
+    font-weight: normal;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0, 0, 0, 0.04);
+}
+
+.form-header p {
+    font-family: 'Montserrat', sans-serif;
+    color: #4A5568;
+    font-size: 1.1rem;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* Grille 2 Colonnes (Image + Formulaire) */
+.ateliers-grid {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.ateliers-image {
+    flex: 1;
+    min-width: 300px;
+    max-width: 420px;
+    text-align: center;
+}
+
+.ateliers-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    border: 4px solid #82CECA;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    object-fit: cover;
+}
+
+/* Carte Formulaire */
+.formulaire-box {
+    flex: 1.2;
+    min-width: 320px;
+    background: #FFFFFF;
+    border: 3px solid #82CECA;
+    border-radius: 24px;
+    padding: 35px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* Groupes de champs */
+.form-groupe {
+    margin-bottom: 22px;
+}
+
+.form-groupe label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #802C38;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.form-groupe input[type="text"],
+.form-groupe input[type="email"],
+.form-groupe input[type="date"],
+.form-groupe select,
+.form-groupe textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    color: #2D3748;
+    background-color: #FFFDF8;
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    box-sizing: border-box;
+    transition: all 0.25s ease;
+}
+
+.form-groupe input:focus,
+.form-groupe select:focus,
+.form-groupe textarea:focus {
+    outline: none;
+    border-color: #82CECA;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(130, 206, 202, 0.2);
+}
+
+.form-groupe textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Bouton d'envoi */
+.btn-envoyer {
+    width: 100%;
+    background-color: #FF7B7B;
+    color: #FFFFFF;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255, 123, 123, 0.35);
+    transition: all 0.25s ease;
+    margin-top: 10px;
+}
+
+.btn-envoyer:hover {
+    background-color: #802C38;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(128, 44, 56, 0.35);
+}
+
+/* Messages d'Alerte */
+.message-error {
+    background-color: #FFF5F5;
+    border-left: 5px solid #E53E3E;
+    color: #C53030;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.message-success {
+    background-color: #F0FFF4;
+    border: 2px dashed #38A169;
+    color: #276749;
+    padding: 25px;
+    border-radius: 16px;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.message-success small {
+    display: inline-block;
+    margin-top: 8px;
+    color: #4A5568;
+    font-weight: normal;
+}
+
+/* Boutons Retour */
+.btn-return-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-return {
+    display: inline-block;
+    padding: 10px 22px;
+    background-color: #E2E8F0;
+    color: #4A5568;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-return:hover {
+    background-color: #CBD5E0;
+    transform: translateY(-2px);
+}
+
+.btn-return-primary {
+    background-color: #82CECA;
+    color: #2D3748;
+}
+
+.btn-return-primary:hover {
+    background-color: #62B8B3;
+    color: #FFFFFF;
+}
+</style>
+
+<main class="page-form-container">
+    <div class="form-header">
+        <h1>Ateliers & Événements 🎨</h1>
+        <p>Que vous souhaitiez participer à une animation ou privatiser un moment d'exception, dites-nous tout !</p>
     </div>
 
-    <section class="ateliers-container">
+    <section class="ateliers-grid">
+        <!-- Visual Illustration -->
         <div class="ateliers-image">
             <picture>
                 <source srcset="images/formulaire.webp" type="image/webp">
@@ -104,15 +310,19 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
             </picture>
         </div>
 
+        <!-- Form Card -->
         <div class="formulaire-box">
             <?php if ($success): ?>
                 <div class="message-success">
-                    ✅ Merci ! Votre demande a été enregistrée.<br>
-                    <small>Numéro: #<?php echo htmlspecialchars((string)$demand_id, ENT_QUOTES, 'UTF-8'); ?></small><br>
-                    Réponse à : <?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>
+                    🐾 Merci ! Votre demande a bien été envoyée au Repaire.<br>
+                    <small>Numéro de dossier : <strong>#<?php echo htmlspecialchars((string)$demand_id, ENT_QUOTES, 'UTF-8'); ?></strong></small><br>
+                    <small>Une confirmation sera envoyée à : <strong><?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?></strong></small>
                 </div>
-                <a href="formulaire.php" class="btn-return">← Nouveau formulaire</a>
-                <a href="index.php" class="btn-return" style="background-color: #85D6CD; color: #2B2B2B; margin-left: 10px;">Retour à l'accueil</a>
+                
+                <div class="btn-return-group">
+                    <a href="formulaire.php" class="btn-return">← Autre demande</a>
+                    <a href="index.php" class="btn-return btn-return-primary">🏠 Retour à l'accueil</a>
+                </div>
             <?php else: ?>
                 <?php if ($error): ?>
                     <div class="message-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
@@ -142,16 +352,16 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
                     </div>
 
                     <div class="form-groupe">
-                        <label for="date">Date (optionnel)</label>
+                        <label for="date">Date souhaitée (optionnel)</label>
                         <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($_POST['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
 
                     <div class="form-groupe">
                         <label for="message">Votre message</label>
-                        <textarea id="message" name="message" rows="5" placeholder="Dites-nous en plus..." required><?php echo htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                        <textarea id="message" name="message" rows="5" placeholder="Décrivez votre projet ou posez vos questions..." required><?php echo htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                     </div>
 
-                    <button type="submit" class="btn-envoyer">Envoyer 🐾</button>
+                    <button type="submit" class="btn-envoyer">Envoyer ma demande 🐾</button>
                 </form>
             <?php endif; ?>
         </div>
