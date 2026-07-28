@@ -18,10 +18,10 @@ if (!isset($sitePrefix)) {
         <a href="<?php echo $sitePrefix; ?>public/escape-game.php">Escape Game</a>
     </p>
     <div class="reseaux-sociaux">
-        <a href="#">Facebook</a> |
-        <a href="#">Instagram</a> |
-        <a href="<?php echo $sitePrefix; ?>login.php">Admin</a>
-    </div>
+    <a href="<?php echo $sitePrefix; ?>facebook-preview.php">Facebook</a> |
+<a href="<?php echo $sitePrefix; ?>instagram-preview.php">Instagram</a> |
+    <a href="<?php echo $sitePrefix; ?>login.php">Admin</a>
+</div>
 </footer>
 </body>
 </html>

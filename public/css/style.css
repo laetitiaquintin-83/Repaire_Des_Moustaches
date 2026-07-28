@@ -234,11 +234,11 @@ nav a:hover {
 /* ==========================================================================
    IMAGE ACCUEIL (Bannière)
    ========================================================================== */
-   .ton-image-accueil-classe {
-    width: 100%;             /* Elle prend toute la largeur de l'écran */
-    height: 450px;           /* Tu fixes une hauteur maximale raisonnable */
-    object-fit: cover;       /* 🌟 C'est cette ligne magique qui empêche l'écrasement ! */
-    object-position: center 20%; /* Ajuste le centrage vertical pour bien voir le jukebox et les chats */
+.ton-image-accueil-classe {
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    object-position: center 20%;
 }
 
 /* ==========================================================================
@@ -1524,4 +1524,69 @@ footer p {
     .pensionnaire-photo {
         height: 180px;
     }
+}
+
+/* ==========================================================================
+   🎨 UNIFICATION DU STYLE (AJOUTS LAETITIA)
+   ========================================================================== */
+
+/* 1. Unifier le fond général de TOUTES les pages en crème chaleureux */
+html,
+body,
+main,
+.page-section,
+.belles-histoires-section,
+.boutique-principale,
+.ateliers,
+.douceurs,
+.attente,
+.le-repaire,
+.panier-section,
+.boutique-hero-catalog,
+.boutique-section,
+.liste-header,
+.moustachus,
+.concept,
+.repaire-galerie {
+    background-color: var(--creme) !important;
+}
+
+/* 2. Unifier les cartes de contenu (fond blanc sur fond crème) */
+.concept-item,
+.equipage-card,
+.projet-card,
+.atelier-card,
+.carte-histoire,
+.carte-produit-boutique,
+.carte-pensionnaire,
+.douceur-card,
+.visuel-card,
+.carte-panier,
+.categorie-preview,
+.formulaire-box,
+.panier-resume,
+.carte-chat,
+.grille-pensionnaires .carte-pensionnaire,
+.visuel-card .contenu-atelier {
+    background-color: #ffffff !important;
+    border: 2px solid var(--vert-menthe) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Effet au survol (optionnel) */
+.concept-item:hover,
+.equipage-card:hover,
+.projet-card:hover,
+.atelier-card:hover,
+.carte-histoire:hover,
+.carte-produit-boutique:hover,
+.carte-pensionnaire:hover,
+.douceur-card:hover,
+.categorie-preview:hover,
+.carte-panier:hover,
+.carte-chat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
 }

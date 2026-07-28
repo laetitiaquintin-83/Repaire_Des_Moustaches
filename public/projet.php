@@ -30,14 +30,14 @@ include_once '../includes/header.php';
             </div>
 
             <div class="feuille-route">
-                <h3>Notre Trajectoire</h3>
-                <ul>
-                    <li><strong>Aujourd'hui :</strong> Structuration du projet en association et test communautaire sur Facebook</li>
-                    <li><strong>Été 2026 :</strong> Recherche de partenaires et premiers ateliers pilotes</li>
-                    <li><strong>2026-2027 :</strong> Identification d'un lieu à Toulon et développement du réseau</li>
-                    <li><strong>À terme :</strong> Ouverture du lieu hybride (refuge + diner + ateliers solidaires)</li>
-                </ul>
-            </div>
+    <h3>Notre Trajectoire</h3>
+    <ul>
+        <li><strong>Aujourd'hui :</strong> Développement technique de la plateforme web et préparation de la soutenance d'examen</li>
+        <li><strong>Automne 2026 :</strong> Lancement officiel de la communauté sur les réseaux et structuration de l'association</li>
+        <li><strong>Début 2027 :</strong> Recherche de partenaires locaux et organisation des premiers ateliers pilotes</li>
+        <li><strong>À terme :</strong> Recherche d'un local à Toulon et ouverture du lieu hybride (refuge + diner + ateliers solidaires)</li>
+    </ul>
+</div>
 
             <div class="section-texte">
                 <h2>L'aventure vous tente ?</h2>

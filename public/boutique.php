@@ -6,7 +6,9 @@ header('Content-Type: text/html; charset=utf-8');
 
 $sitePrefix = '';
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . '/../config/database.php';
 
@@ -83,14 +85,168 @@ if (isset($_SESSION['cart'])) {
     <title>Boutique - Le Repaire des Moustaches</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .panier-link {
-            background: #85D6CD;
+        /* Styles de la boutique ajustés */
+        .boutique-principale {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .boutique-hero-catalog {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .boutique-hero-catalog h1 {
+            color: #ff7b7b;
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+        }
+
+        .boutique-hero-catalog .sous-titre {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .boutique-section {
+            margin-bottom: 50px;
+        }
+
+        .boutique-section-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .boutique-section-header h2 {
+            color: #ff7b7b;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-family: 'Pacifico', cursive;
+        }
+
+        .boutique-section-description {
+            color: #666;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        /* Grille des produits */
+        .grille-produits-boutique {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Carte Produit */
+        .carte-produit-boutique {
+            background: #ffffff;
+            border: 2px solid #82ceca;
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .carte-produit-boutique:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(130, 206, 202, 0.25);
+        }
+
+        /* Image Produit - Hauteur et cadrage corrigés */
+        .produit-image-boutique {
+            width: 100%;
+            height: 230px;
+            overflow: hidden;
+            background-color: #fcf8f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .produit-image-boutique img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.4s ease;
+        }
+
+        .carte-produit-boutique:hover .produit-image-boutique img {
+            transform: scale(1.05);
+        }
+
+        /* Infos Produit */
+        .produit-info-boutique {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .produit-info-boutique h3 {
+            color: #ff7b7b;
+            font-size: 1.2rem;
+            margin: 0 0 8px 0;
+        }
+
+        .produit-description-boutique {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0 0 15px 0;
+            flex-grow: 1;
+        }
+
+        .produit-footer-boutique {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px dashed #eef2f5;
+        }
+
+        .produit-prix-boutique {
+            color: #2c3e50;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .bouton-ajouter-panier {
+            background: #82ceca;
             color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .bouton-ajouter-panier:hover {
+            background: #6bc3b8;
+            transform: translateY(-1px);
+        }
+
+        /* Header action bar */
+        .panier-link {
+            background: #82ceca;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
@@ -104,31 +260,12 @@ if (isset($_SESSION['cart'])) {
         }
         
         .panier-count {
-            background: #FE7B7E;
+            background: #ff7b7b;
             color: white;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 700;
-            min-width: 20px;
-            text-align: center;
-        }
-        
-        .bouton-ajouter-panier {
-            background: #85D6CD;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            width: 100%;
-        }
-        
-        .bouton-ajouter-panier:hover {
-            background: #6bc3b8;
         }
     </style>
 </head>
@@ -160,7 +297,7 @@ if (isset($_SESSION['cart'])) {
         <section class="boutique-hero-catalog">
             <h1 class="page-title">Notre Boutique</h1>
             <p class="sous-titre">Goodies rétro & solidaires pour soutenir le Repaire</p>
-            <p style="text-align: center; margin-bottom: 40px; line-height: 1.7; max-width: 700px; margin-left: auto; margin-right: auto; font-size: 0.95rem;">
+            <p style="text-align: center; margin-bottom: 40px; line-height: 1.7; max-width: 700px; margin-left: auto; margin-right: auto; font-size: 0.95rem; color: #555;">
                 Chaque achat finance les soins de nos moustachus et le fonctionnement du tiers-lieu. 
                 <strong>Ramène chez toi un petit morceau du Repaire !</strong>
             </p>
@@ -214,7 +351,7 @@ if (isset($_SESSION['cart'])) {
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                                             <input type="hidden" name="produit_id" value="<?php echo (int)$produit['id']; ?>">
                                             <input type="hidden" name="quantite" value="1">
-                                            <button type="submit" class="bouton-ajouter-panier">🛒 Ajouter</button>
+                                            <button type="submit" class="bouton-ajouter-panier">🛒 Ajouter au panier</button>
                                         </form>
                                     </div>
                                 </div>
@@ -225,12 +362,12 @@ if (isset($_SESSION['cart'])) {
             <?php endforeach; ?>
         <?php endif; ?>
 
-        <section class="boutique-info-finales" style="padding: 60px 50px; background-color: white; margin-top: 40px; text-align: center;">
-            <h2 style="font-family: 'Pacifico', cursive; color: #FE7B7E; font-size: 2rem; font-weight: normal; margin-bottom: 20px;">Besoin d'aide ?</h2>
-            <div style="max-width: 700px; margin: 0 auto;">
-                <p style="margin-bottom: 15px; line-height: 1.7;">🚚 Livraison à domicile ou retrait au Repaire</p>
-                <p style="margin-bottom: 15px; line-height: 1.7;">💳 Paiement sécurisé</p>
-                <p style="margin-bottom: 20px; line-height: 1.7;">❓ Questions ? <a href="mailto:contact@repaire-des-moustaches.fr" style="color: #FE7B7E; text-decoration: none;">Contacte-nous !</a></p>
+        <section class="boutique-info-finales" style="padding: 40px 30px; background-color: white; border: 2px solid #82ceca; border-radius: 18px; margin-top: 40px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <h2 style="font-family: 'Pacifico', cursive; color: #ff7b7b; font-size: 2rem; font-weight: normal; margin-bottom: 20px;">Besoin d'aide ?</h2>
+            <div style="max-width: 700px; margin: 0 auto; color: #555;">
+                <p style="margin-bottom: 12px; line-height: 1.6;">🚚 Livraison à domicile ou retrait gratuit au Repaire</p>
+                <p style="margin-bottom: 12px; line-height: 1.6;">💳 Paiement 100% sécurisé</p>
+                <p style="margin-bottom: 0; line-height: 1.6;">❓ Une question ? <a href="mailto:contact@repaire-des-moustaches.fr" style="color: #ff7b7b; font-weight: bold; text-decoration: none;">Contacte-nous !</a></p>
             </div>
         </section>
     </main>
