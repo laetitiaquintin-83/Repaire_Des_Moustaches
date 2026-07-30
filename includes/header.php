@@ -258,9 +258,9 @@ if (!isset($sitePrefix)) {
                     </a>
                 </li>
 
-                <!-- Menu 4 : Les Ateliers & Événements -->
+                <!-- Menu 4 : Les Ateliers & Événements (MODIFIÉ ICI) -->
                 <li class="has-dropdown">
-                    <a href="<?php echo $sitePrefix; ?>formulaire.php">Ateliers </a>
+                    <a href="<?php echo $sitePrefix; ?>ateliers.php">Ateliers</a>
                     <ul class="dropdown-menu">
                         <li><a href="<?php echo $sitePrefix; ?>formulaire.php">🙋‍♀️ Proposer / Participer</a></li>
                         <li><a href="<?php echo $sitePrefix; ?>escape-game.php">🕵️‍♂️ Escape Game Le Jukebox</a></li>

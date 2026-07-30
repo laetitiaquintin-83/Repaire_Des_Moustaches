@@ -1590,3 +1590,35 @@ main,
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
 }
+/* ==========================================================================
+   FIX DÉFINITIF : CARTES ATELIERS & VISUELS (Règle la double carte)
+   ========================================================================== */
+.grille-atelier-visuels {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 30px !important;
+    align-items: stretch !important;
+}
+
+/* On réinitialise la carte principale pour qu'elle s'adapte à 100% au contenu */
+.visuel-card {
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important; /* Coupe l'élément parasite qui dépasse en bas */
+    box-sizing: border-box !important;
+}
+
+/* On s'assure que le contenu interne s'étire correctement */
+.visuel-card .contenu-atelier {
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background: transparent !important; /* Pas de double fond blanc */
+    border: none !important; /* Pas de double bordure turquoise */
+    box-shadow: none !important;
+}
