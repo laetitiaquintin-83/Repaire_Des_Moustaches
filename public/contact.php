@@ -1,4 +1,14 @@
 <?php
+declare(strict_types=1);
+
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // On cible directement le bon dossier includes/
 require_once __DIR__ . '/../includes/header.php';
 
@@ -7,16 +17,47 @@ $page_description = "Contactez l'équipe du Repaire des Moustaches à Toulon. Un
 $succes = false;
 $erreur = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = trim($_POST['nom'] ?? '');
-    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-    $sujet = trim($_POST['sujet'] ?? '');
-    $message = trim($_POST['message'] ?? '');
+// Génération sécurisée du token CSRF
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
-    if ($nom && $email && $sujet && $message) {
-        $succes = "Votre message a bien été envoyé ! L'équipe vous répondra très vite entre deux ronrons. 🐾";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf_check = $_POST['csrf_token'] ?? '';
+
+    // Validation du token CSRF
+    if (!hash_equals($_SESSION['csrf_token'], $csrf_check)) {
+        $erreur = "⚠️ Erreur de sécurité : token CSRF invalide. Veuillez réessayer.";
     } else {
-        $erreur = "Veuillez remplir tous les champs correctement.";
+        $nom = trim($_POST['nom'] ?? '');
+        $email_input = trim($_POST['email'] ?? '');
+        $email = filter_var($email_input, FILTER_VALIDATE_EMAIL);
+        $sujet = trim($_POST['sujet'] ?? '');
+        $message = trim($_POST['message'] ?? '');
+
+        // Liste des sujets autorisés
+        $sujets_valides = [
+            'Projet & Ouverture',
+            'Adoptions',
+            'Ateliers',
+            'Partenariat',
+            'Autre'
+        ];
+
+        // Validation backend renforcée
+        if (empty($nom) || mb_strlen($nom) < 2 || mb_strlen($nom) > 50) {
+            $erreur = "⚠️ Le nom doit contenir entre 2 et 50 caractères.";
+        } elseif (!$email) {
+            $erreur = "⚠️ Veuillez entrer une adresse e-mail valide.";
+        } elseif (empty($sujet) || !in_array($sujet, $sujets_valides, true)) {
+            $erreur = "⚠️ Veuillez sélectionner un sujet valide dans la liste.";
+        } elseif (empty($message) || mb_strlen($message) < 10 || mb_strlen($message) > 1000) {
+            $erreur = "⚠️ Votre message doit contenir entre 10 et 1000 caractères.";
+        } else {
+            // Traitement (Envoi de mail, sauvegarde BDD...)
+            $succes = "Votre message a bien été envoyé ! L'équipe vous répondra très vite entre deux ronrons. 🐾";
+        }
     }
 }
 ?>
@@ -153,6 +194,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     box-shadow: 0 0 8px rgba(255, 123, 123, 0.2);
 }
 
+/* Styles UX & Indications */
+.field-help {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 5px;
+}
+
+.required-star {
+    color: #E53E3E;
+    font-weight: bold;
+}
+
+.field-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.char-counter {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #A0AEC0;
+}
+
 .btn-envoyer {
     width: 100%;
     background-color: #ff7b7b;
@@ -165,6 +232,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-top: 10px;
 }
 
 .btn-envoyer:hover {
@@ -173,12 +241,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 .alert {
-    padding: 12px 18px;
+    padding: 14px 18px;
     border-radius: 12px;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     text-align: center;
+    font-weight: 600;
 }
 .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -197,11 +266,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <?php if ($succes): ?>
-        <div class="alert alert-success"><?php echo $succes; ?></div>
+        <div class="alert alert-success"><?php echo htmlspecialchars($succes, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
     <?php if ($erreur): ?>
-        <div class="alert alert-error"><?php echo $erreur; ?></div>
+        <div class="alert alert-error"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
     <div class="contact-grid">
@@ -226,31 +295,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- COLONNE DROITE -->
         <div class="form-card">
             <form action="" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars((string)$csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+
+                <!-- NOM & PRÉNOM -->
                 <div class="form-group">
-                    <label for="nom">Votre nom & prénom</label>
-                    <input type="text" id="nom" name="nom" placeholder="Ex: Marie Dupont" required>
+                    <label for="nom">Votre nom & prénom <span class="required-star">*</span></label>
+                    <input type="text" id="nom" name="nom" placeholder="Ex: Marie Dupont" 
+                           minlength="2" maxlength="50" pattern="[A-Za-zÀ-ÿ\s'-]+"
+                           value="<?php echo htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                    <small class="field-help">2 à 50 caractères (Lettres, espaces et tirets).</small>
                 </div>
 
+                <!-- EMAIL -->
                 <div class="form-group">
-                    <label for="email">Votre adresse e-mail</label>
-                    <input type="email" id="email" name="email" placeholder="marie@exemple.fr" required>
+                    <label for="email">Votre adresse e-mail <span class="required-star">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="marie@exemple.fr" 
+                           value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                    <small class="field-help">Format attendu : nom@domaine.com</small>
                 </div>
 
+                <!-- SUJET -->
                 <div class="form-group">
-                    <label for="sujet">Sujet de votre message</label>
+                    <label for="sujet">Sujet de votre message <span class="required-star">*</span></label>
                     <select id="sujet" name="sujet" required>
-                        <option value="" disabled selected>Choisissez une option...</option>
-                        <option value="Projet & Ouverture">🚀 Question sur le projet / L'ouverture</option>
-                        <option value="Adoptions">🐱 Question sur les chats & adoptions</option>
-                        <option value="Ateliers">🎨 Proposer un atelier</option>
-                        <option value="Partenariat">🤝 Partenariat / Presse</option>
-                        <option value="Autre">🐾 Autre demande</option>
+                        <option value="" disabled <?php echo empty($_POST['sujet']) ? 'selected' : ''; ?>>Choisissez une option...</option>
+                        <option value="Projet & Ouverture" <?php echo (($_POST['sujet'] ?? '') === 'Projet & Ouverture') ? 'selected' : ''; ?>>🚀 Question sur le projet / L'ouverture</option>
+                        <option value="Adoptions" <?php echo (($_POST['sujet'] ?? '') === 'Adoptions') ? 'selected' : ''; ?>>🐱 Question sur les chats & adoptions</option>
+                        <option value="Ateliers" <?php echo (($_POST['sujet'] ?? '') === 'Ateliers') ? 'selected' : ''; ?>>🎨 Proposer un atelier</option>
+                        <option value="Partenariat" <?php echo (($_POST['sujet'] ?? '') === 'Partenariat') ? 'selected' : ''; ?>>🤝 Partenariat / Presse</option>
+                        <option value="Autre" <?php echo (($_POST['sujet'] ?? '') === 'Autre') ? 'selected' : ''; ?>>🐾 Autre demande</option>
                     </select>
+                    <small class="field-help">Sélectionnez le sujet principal de votre prise de contact.</small>
                 </div>
 
+                <!-- MESSAGE -->
                 <div class="form-group">
-                    <label for="message">Votre message</label>
-                    <textarea id="message" name="message" rows="4" placeholder="Écrivez-nous votre petit mot ici..." required></textarea>
+                    <label for="message">Votre message <span class="required-star">*</span></label>
+                    <textarea id="message" name="message" rows="4" minlength="10" maxlength="1000"
+                              placeholder="Écrivez-nous votre petit mot ici..." required><?php echo htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    <div class="field-info-row">
+                        <small class="field-help">Entre 10 et 1000 caractères.</small>
+                        <small id="char-count" class="char-counter">0 / 1000</small>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-envoyer">Envoyer le message 🐾</button>
@@ -258,6 +344,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const messageInput = document.getElementById('message');
+    const charCounter = document.getElementById('char-count');
+
+    if (messageInput && charCounter) {
+        const updateCounter = () => {
+            const length = messageInput.value.length;
+            charCounter.textContent = `${length} / 1000`;
+            
+            if (length < 10 && length > 0) {
+                charCounter.style.color = '#E53E3E';
+            } else {
+                charCounter.style.color = '#A0AEC0';
+            }
+        };
+
+        messageInput.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+});
+</script>
 
 <?php 
 if (file_exists(__DIR__ . '/../includes/footer.php')) {

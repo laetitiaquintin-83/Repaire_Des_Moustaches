@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+    session_start();
+}
+
 // Configuration de la gestion des erreurs
 error_reporting(E_ALL);
-ini_set('display_errors', '0');  // Ne pas afficher les erreurs en production
+ini_set('display_errors', '0'); // Desactiver en production
 ini_set('log_errors', '1');
 
 // Création automatique du dossier logs s'il n'existe pas
@@ -18,7 +22,6 @@ ini_set('error_log', $logDir . '/php-errors.log');
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
     error_log("[$errno] $errstr in $errfile:$errline");
     
-    // Ne pas afficher les erreurs à l'utilisateur
     if ($errno === E_USER_ERROR || $errno === E_PARSE) {
         http_response_code(500);
         die('Une erreur technique est survenue. Notre équipe a été notifiée.');
@@ -42,14 +45,19 @@ function getPDO(): PDO
     $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $host, $dbname, $charset);
 
     $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_EMULATE_PREPARES   => false,
     ];
 
-    $pdo = new PDO($dsn, $username, $password, $options);
-
-    return $pdo;
+    try {
+        $pdo = new PDO($dsn, $username, $password, $options);
+        return $pdo;
+    } catch (PDOException $e) {
+        error_log("Erreur de connexion BDD : " . $e->getMessage());
+        http_response_code(500);
+        die("Impossible de se connecter à la base de données.");
+    }
 }
 
 /**
@@ -57,7 +65,7 @@ function getPDO(): PDO
  */
 function generateCSRFToken(): string
 {
-    if (!isset($_SESSION['csrf_token'])) {
+    if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
     return $_SESSION['csrf_token'];
@@ -68,7 +76,7 @@ function generateCSRFToken(): string
  */
 function validateCSRFToken(string $token): bool
 {
-    if (!isset($_SESSION['csrf_token'])) {
+    if (empty($_SESSION['csrf_token'])) {
         return false;
     }
     return hash_equals($_SESSION['csrf_token'], $token);

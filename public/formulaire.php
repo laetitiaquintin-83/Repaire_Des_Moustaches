@@ -39,14 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $date = trim($_POST['date'] ?? '');
         $message = trim($_POST['message'] ?? '');
 
-        if (empty($nom)) {
-            $error = "⚠️ Veuillez entrer votre nom et prénom.";
+        // Validation backend renforcée (longueur et formats)
+        if (empty($nom) || mb_strlen($nom) < 2 || mb_strlen($nom) > 50) {
+            $error = "⚠️ Le nom doit contenir entre 2 et 50 caractères.";
         } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = "⚠️ Veuillez entrer une adresse email valide.";
         } elseif (empty($motif) || !in_array($motif, ['participer', 'animer', 'prive'], true)) {
             $error = "⚠️ Veuillez choisir une option valide.";
-        } elseif (empty($message)) {
-            $error = "⚠️ Veuillez entrer votre message.";
+        } elseif (empty($message) || mb_strlen($message) < 10 || mb_strlen($message) > 1000) {
+            $error = "⚠️ Votre message doit contenir entre 10 et 1000 caractères.";
         } else {
             $date_sql = null;
             if (!empty($date)) {
@@ -167,7 +168,7 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
     font-weight: 700;
     color: #802C38;
     font-size: 0.95rem;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .form-groupe input[type="text"],
@@ -199,6 +200,32 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
 .form-groupe textarea {
     resize: vertical;
     min-height: 120px;
+}
+
+/* Indicatifs UX et consignes sous les champs */
+.field-help {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 5px;
+}
+
+.required-star {
+    color: #E53E3E;
+    font-weight: bold;
+}
+
+.field-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.char-counter {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #A0AEC0;
 }
 
 /* Bouton d'envoi */
@@ -332,33 +359,47 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars((string)$csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                     
                     <div class="form-groupe">
-                        <label for="nom">Nom & Prénom</label>
-                        <input type="text" id="nom" name="nom" placeholder="Ex: Jane Doe" value="<?php echo htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                        <label for="nom">Nom & Prénom <span class="required-star">*</span></label>
+                        <input type="text" id="nom" name="nom" placeholder="Ex: Jane Doe" 
+                               minlength="2" maxlength="50" pattern="[A-Za-zÀ-ÿ\s'-]+"
+                               value="<?php echo htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                        <small class="field-help">2 à 50 caractères (Lettres, espaces et tirets uniquement).</small>
                     </div>
 
                     <div class="form-groupe">
-                        <label for="email">Adresse Email</label>
-                        <input type="email" id="email" name="email" placeholder="jane.doe@email.com" value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                        <label for="email">Adresse Email <span class="required-star">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="jane.doe@email.com" 
+                               value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                        <small class="field-help">Format attendu : nom@domaine.com</small>
                     </div>
 
                     <div class="form-groupe">
-                        <label for="motif">Je souhaite...</label>
+                        <label for="motif">Je souhaite... <span class="required-star">*</span></label>
                         <select id="motif" name="motif" required>
                             <option value="">Choisissez une option...</option>
                             <option value="participer" <?php echo (($_POST['motif'] ?? '') === 'participer') ? 'selected' : ''; ?>>🙋‍♀️ Participer à un atelier</option>
                             <option value="animer" <?php echo (($_POST['motif'] ?? '') === 'animer') ? 'selected' : ''; ?>>🎨 Animer un atelier</option>
                             <option value="prive" <?php echo (($_POST['motif'] ?? '') === 'prive') ? 'selected' : ''; ?>>🎉 Privatiser un événement</option>
                         </select>
+                        <small class="field-help">Sélectionnez le motif principal de votre demande.</small>
                     </div>
 
                     <div class="form-groupe">
                         <label for="date">Date souhaitée (optionnel)</label>
-                        <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($_POST['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="date" id="date" name="date" 
+                               min="<?php echo date('Y-m-d'); ?>" 
+                               value="<?php echo htmlspecialchars($_POST['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                        <small class="field-help">Indiquez une date à partir d'aujourd'hui.</small>
                     </div>
 
                     <div class="form-groupe">
-                        <label for="message">Votre message</label>
-                        <textarea id="message" name="message" rows="5" placeholder="Décrivez votre projet ou posez vos questions..." required><?php echo htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                        <label for="message">Votre message <span class="required-star">*</span></label>
+                        <textarea id="message" name="message" rows="5" minlength="10" maxlength="1000" 
+                                  placeholder="Décrivez votre projet ou posez vos questions..." required><?php echo htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                        <div class="field-info-row">
+                            <small class="field-help">Entre 10 et 1000 caractères.</small>
+                            <small id="char-count" class="char-counter">0 / 1000</small>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn-envoyer">Envoyer ma demande 🐾</button>
@@ -368,7 +409,28 @@ if (file_exists(__DIR__ . '/includes/header.php')) {
     </section>
 </main>
 
-<script src="js/form-validation.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const messageInput = document.getElementById('message');
+    const charCounter = document.getElementById('char-count');
+
+    if (messageInput && charCounter) {
+        const updateCounter = () => {
+            const length = messageInput.value.length;
+            charCounter.textContent = `${length} / 1000`;
+            
+            if (length < 10 && length > 0) {
+                charCounter.style.color = '#E53E3E';
+            } else {
+                charCounter.style.color = '#A0AEC0';
+            }
+        };
+
+        messageInput.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+});
+</script>
 
 <?php 
 if (file_exists(__DIR__ . '/includes/footer.php')) {

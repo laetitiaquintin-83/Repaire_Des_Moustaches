@@ -6,7 +6,7 @@ session_start();
 // ============================================================
 // 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
 // ============================================================
-if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
+if (!isset($_SESSION['admin_id']) && !isset($_SESSION['admin_logged_in'])) {
     header('Location: ../login.php');
     exit;
 }
@@ -16,10 +16,14 @@ require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 
-// Récupérer quelques stats pour le dashboard
+// Récupérer les statistiques pour le dashboard
 $stats = [];
 
 try {
+    // Nombre de pensionnaires (chats)
+    $stmt = $pdo->query('SELECT COUNT(*) FROM pensionnaires');
+    $stats['pensionnaires'] = (int)$stmt->fetchColumn();
+
     // Nombre de commandes
     $stmt = $pdo->query('SELECT COUNT(*) FROM commandes');
     $stats['commandes'] = (int)$stmt->fetchColumn();
@@ -49,7 +53,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Admin</title>
+    <title>Dashboard - Admin | Le Repaire des Moustaches</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
@@ -94,7 +98,7 @@ try {
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -166,12 +170,16 @@ try {
 <body>
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h1>🐱 Dashboard</h1>
+            <h1>🐱 Dashboard Admin</h1>
             <a href="../logout.php" class="logout-btn">🚪 Déconnexion</a>
         </div>
         
         <!-- Statistiques -->
         <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number"><?php echo htmlspecialchars((string)$stats['pensionnaires'], ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="label">Pensionnaires</div>
+            </div>
             <div class="stat-card">
                 <div class="number"><?php echo htmlspecialchars((string)$stats['commandes'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <div class="label">Commandes</div>
@@ -182,7 +190,7 @@ try {
             </div>
             <div class="stat-card">
                 <div class="number"><?php echo htmlspecialchars((string)$stats['reservations'], ENT_QUOTES, 'UTF-8'); ?></div>
-                <div class="label">Réservations ateliers</div>
+                <div class="label">Réservations</div>
             </div>
             <div class="stat-card">
                 <div class="number"><?php echo htmlspecialchars((string)$stats['utilisateurs'], ENT_QUOTES, 'UTF-8'); ?></div>
@@ -196,6 +204,11 @@ try {
         
         <!-- Menu admin -->
         <div class="admin-menu">
+            <a href="pensionnaires.php" class="menu-item">
+                <span class="icon">🐱</span>
+                <span class="title">Gestion des pensionnaires</span>
+                <span class="desc">Ajouter, modifier le statut des chats</span>
+            </a>
             <a href="produits.php" class="menu-item">
                 <span class="icon">📦</span>
                 <span class="title">Gestion des produits</span>
@@ -206,7 +219,6 @@ try {
                 <span class="title">Gestion des ateliers</span>
                 <span class="desc">Programmer, gérer les places</span>
             </a>
-            <!-- MODIFICATION ICI : Le bouton pointe vers la page de supervision de l'API externe -->
             <a href="../partenaires.php" class="menu-item">
                 <span class="icon">🔗</span>
                 <span class="title">Supervision API</span>

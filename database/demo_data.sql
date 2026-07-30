@@ -29,11 +29,11 @@ VALUES ('solidaire')
 ON DUPLICATE KEY UPDATE nom = VALUES(nom);
 
 -- -----------------------------------------------------
--- 2) Admin (email unique)
+-- 2) Admin (email unique - Mot de passe : admin123)
 -- -----------------------------------------------------
 INSERT INTO admin_users (email, mot_de_passe, role)
-VALUES ('admin@repaire.local', '$2y$10$demo_hash_a_remplacer', 'admin')
-ON DUPLICATE KEY UPDATE role = VALUES(role);
+VALUES ('admin@repaire.local', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHe1V.g540oU7w7A7uD1nU0gX1G6m9V12O', 'admin')
+ON DUPLICATE KEY UPDATE mot_de_passe = VALUES(mot_de_passe), role = VALUES(role);
 
 SET @admin_id = (
   SELECT id FROM admin_users WHERE email = 'admin@repaire.local' LIMIT 1
@@ -72,33 +72,36 @@ SET @refuge_id = (
 );
 
 -- -----------------------------------------------------
--- 5) Pensionnaires
+-- 5) Pensionnaires (Velours, Biscuit, Moonlight)
 -- -----------------------------------------------------
-INSERT INTO pensionnaires (nom, age, description, photo_url, statut, refuge_id, admin_id)
-SELECT 'Capitaine Crochet', 3,
-       'Male joueur et tres sociable. Adore les siestes en hauteur.',
-       'images/chats/capitaine-crochet.jpg',
+INSERT INTO pensionnaires (nom, age, description, caractere, photo_url, statut, refuge_id, admin_id)
+SELECT 'Velours', 3,
+       'Né sur les quais du Mourillon, Velours a passé ses premières années à chercher un toit chaleureux.',
+       'Noble, calme, un peu snob mais irrésistiblement câlin.',
+       'images/chats/chat1.jpg',
        'a_l_adoption', @refuge_id, @admin_id
 WHERE NOT EXISTS (
-  SELECT 1 FROM pensionnaires WHERE nom = 'Capitaine Crochet'
+  SELECT 1 FROM pensionnaires WHERE nom = 'Velours'
 );
 
-INSERT INTO pensionnaires (nom, age, description, photo_url, statut, refuge_id, admin_id)
-SELECT 'Moka', 2,
-       'Femelle douce, un peu timide au debut puis tres caline.',
-       'images/chats/moka.jpg',
-       'famille_accueil', @refuge_id, @admin_id
+INSERT INTO pensionnaires (nom, age, description, caractere, photo_url, statut, refuge_id, admin_id)
+SELECT 'Biscuit', 2,
+       'Biscuit a grandi sous les tables du marché du Cours Lafayette.',
+       'Glouton, affectueux, collant comme une bonne pissaladière.',
+       'images/chats/chat2.jpg',
+       'a_l_adoption', @refuge_id, @admin_id
 WHERE NOT EXISTS (
-  SELECT 1 FROM pensionnaires WHERE nom = 'Moka'
+  SELECT 1 FROM pensionnaires WHERE nom = 'Biscuit'
 );
 
-INSERT INTO pensionnaires (nom, age, description, photo_url, statut, refuge_id, admin_id)
-SELECT 'Pixel', 5,
-       'Calme et gourmand, parfait pour une famille avec enfants.',
-       'images/chats/pixel.jpg',
-       'adopte', @refuge_id, @admin_id
+INSERT INTO pensionnaires (nom, age, description, caractere, photo_url, statut, refuge_id, admin_id)
+SELECT 'Moonlight', 4,
+       'Moonlight a vécu dans les ruelles sombres du Vieux Toulon.',
+       'Mystérieux, doux, introspectif, avec une once de malice.',
+       'images/chats/chat3.jpg',
+       'a_l_adoption', @refuge_id, @admin_id
 WHERE NOT EXISTS (
-  SELECT 1 FROM pensionnaires WHERE nom = 'Pixel'
+  SELECT 1 FROM pensionnaires WHERE nom = 'Moonlight'
 );
 
 -- -----------------------------------------------------
@@ -194,12 +197,12 @@ WHERE NOT EXISTS (
 -- -----------------------------------------------------
 INSERT INTO belles_histoires (utilisateur_id, titre, contenu, statut, admin_id)
 SELECT @u1,
-       'Des nouvelles de Pixel',
-       'Pixel est arrive a la maison depuis 2 mois. Il joue et ronronne tous les soirs.',
+       'Des nouvelles de Velours',
+       'Velours s adapte super bien. Il adore faire ses siestes au soleil.',
        'publiee',
        @admin_id
 WHERE NOT EXISTS (
-  SELECT 1 FROM belles_histoires WHERE titre = 'Des nouvelles de Pixel'
+  SELECT 1 FROM belles_histoires WHERE titre = 'Des nouvelles de Velours'
 );
 
 INSERT INTO belles_histoires (utilisateur_id, titre, contenu, statut, admin_id)

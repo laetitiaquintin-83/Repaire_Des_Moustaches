@@ -10,15 +10,15 @@ require_once __DIR__ . '/../config/database.php';
 $error = '';
 $success = '';
 
-// Si déjà connecté, rediriger vers le dashboard (dans le sous-dossier admin)
+// Si déjà connecté, rediriger vers le dashboard
 if (isset($_SESSION['admin_id'])) {
     header('Location: admin/dashboard.php');
     exit;
 }
 
-// Traitement du formulaire de connexion
+// --- TRAITEMENT DU FORMULAIRE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = (string) ($_POST['email'] ?? '');
+    $email = trim((string) ($_POST['email'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
 
     if (empty($email) || empty($password)) {
@@ -26,30 +26,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = getPDO();
-            
+
+            // Recherche de l'utilisateur
             $stmt = $pdo->prepare('SELECT id, email, mot_de_passe, role FROM admin_users WHERE email = ?');
             $stmt->execute([$email]);
             $admin = $stmt->fetch();
 
+            // Vérification des identifiants et du hash
             if ($admin && password_verify($password, $admin['mot_de_passe'])) {
-                // Régénérer la session pour éviter la fixation
+                // Régénération de session et enregistrement des données
                 session_regenerate_id(true);
-                
-                // Connexion réussie
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_email'] = $admin['email'];
                 $_SESSION['admin_role'] = $admin['role'];
                 $_SESSION['admin_login_time'] = time();
 
-                // Redirection de public/ vers public/admin/dashboard.php
                 header('Location: admin/dashboard.php');
                 exit;
             } else {
                 $error = 'Email ou mot de passe incorrect.';
             }
+
         } catch (Exception $e) {
             error_log('Erreur SQL Connexion Admin : ' . $e->getMessage());
-            $error = 'Une erreur technique est survenue. Veuillez réessayer ultérieurement.';
+            $error = 'Une erreur technique est survenue. Veuillez réessayer.';
         }
     }
 }
@@ -218,7 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="main-content">
         <div class="login-container">
             <div class="login-header">
-                <!-- Depuis public/ vers public/images/logo.png -->
                 <img src="images/logo.png" alt="Le Repaire des Moustaches Logo">
                 <h1>Admin</h1>
                 <p>Gestion du Repaire</p>
@@ -253,13 +252,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="back-link">
-                <!-- Depuis public/login.php vers public/index.php -->
                 <a href="index.php">← Retour au site</a>
             </div>
         </div>
     </div>
 
-    <!-- Depuis public/ vers public/includes/footer.php -->
     <?php require_once __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>

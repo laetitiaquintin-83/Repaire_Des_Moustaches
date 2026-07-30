@@ -25,31 +25,45 @@ if (!isset($sitePrefix)) {
 
     <!-- Styles CSS du Header & Effets de survol uniformes -->
     <style>
+        /* Alignment global de l'en-tête pour éviter tout débordement */
+        header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
         /* Agrandissement et mise en valeur du logo */
         header .logo img {
             width: auto;
-            height: 75px; /* Augmenté pour être bien visible et cliquable */
+            height: 70px;
             transition: transform 0.2s ease;
             display: block;
         }
 
         header .logo:hover img {
-            transform: scale(1.05); /* Effet zoom doux pour indiquer qu'il est cliquable */
+            transform: scale(1.05);
         }
 
+        /* Navigation resserrée */
         nav ul {
             list-style: none;
             margin: 0;
             padding: 0;
             display: flex;
             align-items: center;
-            gap: 18px; /* Ajusté légèrement pour laisser de la place au nouvel onglet Accueil */
+            gap: 10px; /* Réduit pour éviter de pousser le bouton hors de l'écran */
         }
 
         /* Styles de base pour TOUS les liens du menu principal */
         nav ul > li > a {
             transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease !important;
             display: inline-block;
+            font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         /* Effet au survol UNIFORME pour tous les onglets principaux */
@@ -134,8 +148,21 @@ if (!isset($sitePrefix)) {
         /* Typographie Pacifico pour La Patte Suspendue */
         .nav-patte-suspendue {
             font-family: 'Pacifico', cursive !important;
-            font-size: 1.05rem;
+            font-size: 0.95rem; /* Ajusté légèrement */
             font-weight: 400 !important;
+        }
+
+        /* Zone d'action (Bouton Réserver + Admin) */
+        .action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0; /* Empêche le bloc bouton de se réduire ou de sortir */
+        }
+
+        .bouton-reserver {
+            padding: 8px 16px;
+            white-space: nowrap;
         }
 
         /* STYLES DU MACARON FLOTTANT */
@@ -197,7 +224,7 @@ if (!isset($sitePrefix)) {
 
         <nav>
             <ul>
-                <!-- Menu 0 : Accueil (Nouveau !) -->
+                <!-- Menu 0 : Accueil -->
                 <li>
                     <a href="<?php echo $sitePrefix; ?>index.php">Accueil</a>
                 </li>
@@ -224,7 +251,7 @@ if (!isset($sitePrefix)) {
                     </ul>
                 </li>
 
-                <!-- Menu 3 : La Patte Suspendue (Mise en avant solidaire) -->
+                <!-- Menu 3 : La Patte Suspendue -->
                 <li>
                     <a href="<?php echo $sitePrefix; ?>solidaire.php" class="nav-patte-suspendue">
                         🐾 La Patte Suspendue
@@ -233,7 +260,7 @@ if (!isset($sitePrefix)) {
 
                 <!-- Menu 4 : Les Ateliers & Événements -->
                 <li class="has-dropdown">
-                    <a href="<?php echo $sitePrefix; ?>formulaire.php">Ateliers & Loisirs</a>
+                    <a href="<?php echo $sitePrefix; ?>formulaire.php">Ateliers </a>
                     <ul class="dropdown-menu">
                         <li><a href="<?php echo $sitePrefix; ?>formulaire.php">🙋‍♀️ Proposer / Participer</a></li>
                         <li><a href="<?php echo $sitePrefix; ?>escape-game.php">🕵️‍♂️ Escape Game Le Jukebox</a></li>
