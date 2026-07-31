@@ -4,22 +4,23 @@ declare(strict_types=1);
 session_start();
 
 // ============================================================
-// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
+// 🔒 VÉRIFICATION D'ACCÈS ADMIN
 // ============================================================
-if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
+if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
 // ============================================================
 
+// Remonte de 2 niveaux : admin -> public -> racine
 require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 $message = '';
 $error = '';
 
-// Génération / vérification du token CSRF
-if (!isset($_SESSION['csrf_token'])) {
+// Génération du token CSRF
+if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 $csrf_token = $_SESSION['csrf_token'];
@@ -27,66 +28,110 @@ $csrf_token = $_SESSION['csrf_token'];
 // Traitement des actions (Ajouter, Modifier, Supprimer)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_token = $_POST['csrf_token'] ?? '';
+    
     if (!hash_equals($_SESSION['csrf_token'], $posted_token)) {
         $error = 'Erreur de sécurité : token CSRF invalide';
     } else {
         $action = $_POST['action'] ?? '';
 
         if ($action === 'ajouter' || $action === 'modifier') {
-            $nom = htmlspecialchars($_POST['nom'] ?? '');
-            $description = htmlspecialchars($_POST['description'] ?? '');
+            $nom = trim($_POST['nom'] ?? '');
+            $description = trim($_POST['description'] ?? '');
             $prix = (float)($_POST['prix'] ?? 0.0);
             $categorie_id = (int)($_POST['categorie_id'] ?? 1);
-            
-            $image_url = $_POST['current_image'] ?? '';
+            $id = (int)($_POST['id'] ?? 0);
+
+            // Récupération de l'image actuelle
+            $image_url = '';
+            if ($action === 'modifier' && $id > 0) {
+                $stmtImg = $pdo->prepare('SELECT image_url FROM produits WHERE id = ?');
+                $stmtImg->execute([$id]);
+                $image_url = $stmtImg->fetchColumn() ?: '';
+            }
+
+            // Upload d'image sécurisé
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                 $file_tmp = $_FILES['image']['tmp_name'];
-                $file_name = basename($_FILES['image']['name']);
+                $file_name = $_FILES['image']['name'];
                 $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                $allowed = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
                 
-                if (in_array($ext, $allowed)) {
-                    $new_name = uniqid('prod_', true) . '.' . $ext;
+                $allowed_extensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+                if (in_array($ext, $allowed_extensions, true)) {
                     $upload_dir = __DIR__ . '/../images/produits/';
-                    if (move_uploaded_file($file_tmp, $upload_dir . $new_name)) {
-                        // On stocke le chemin relatif comme en BDD
-                        $image_url = 'images/produits/' . $new_name;
+                    
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
                     }
+
+                    $new_name = uniqid('prod_', true) . '.' . $ext;
+                    
+                    if (move_uploaded_file($file_tmp, $upload_dir . $new_name)) {
+                        if ($action === 'modifier' && !empty($image_url)) {
+                            $old_file_path = __DIR__ . '/../' . $image_url;
+                            if (file_exists($old_file_path)) {
+                                @unlink($old_file_path);
+                            }
+                        }
+                        $image_url = 'images/produits/' . $new_name;
+                    } else {
+                        $error = "Erreur lors du déplacement de l'image.";
+                    }
+                } else {
+                    $error = "Format d'image invalide (JPG, PNG, WEBP autorisés).";
                 }
             }
 
-            if (!$nom || $prix <= 0) {
-                $error = 'Le nom et un prix valide sont obligatoires.';
-            } else {
-                try {
-                    if ($action === 'ajouter') {
-                        $stmt = $pdo->prepare('
-                            INSERT INTO produits (nom, description, prix, categorie_id, image_url)
-                            VALUES (?, ?, ?, ?, ?)
-                        ');
-                        $stmt->execute([$nom, $description, $prix, $categorie_id, $image_url]);
-                        $message = '✓ Produit ajouté avec succès !';
-                    } else {
-                        $id = (int)($_POST['id'] ?? 0);
-                        $stmt = $pdo->prepare('
-                            UPDATE produits 
-                            SET nom = ?, description = ?, prix = ?, categorie_id = ?, image_url = ?
-                            WHERE id = ?
-                        ');
-                        $stmt->execute([$nom, $description, $prix, $categorie_id, $image_url, $id]);
-                        $message = '✓ Produit modifié avec succès !';
+            if (empty($error)) {
+                if (empty($nom) || $prix <= 0) {
+                    $error = 'Le nom et un prix valide sont requis.';
+                } else {
+                    try {
+                        if ($action === 'ajouter') {
+                            $stmt = $pdo->prepare('
+                                INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+                                VALUES (?, ?, ?, ?, ?)
+                            ');
+                            $stmt->execute([$nom, $description, $prix, $categorie_id, $image_url]);
+                            $message = '✓ Produit ajouté avec succès !';
+                        } else {
+                            $stmt = $pdo->prepare('
+                                UPDATE produits 
+                                SET nom = ?, description = ?, prix = ?, categorie_id = ?, image_url = ?
+                                WHERE id = ?
+                            ');
+                            $stmt->execute([$nom, $description, $prix, $categorie_id, $image_url, $id]);
+                            $message = '✓ Produit mis à jour avec succès !';
+                        }
+                        
+                        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                        $csrf_token = $_SESSION['csrf_token'];
+                    } catch (PDOException $e) {
+                        $error = 'Erreur lors de l\'enregistrement en base de données.';
                     }
-                } catch (PDOException $e) {
-                    $error = 'Erreur lors de l\'enregistrement en base de données.';
                 }
             }
         } elseif ($action === 'supprimer') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id > 0) {
                 try {
+                    $stmtImg = $pdo->prepare('SELECT image_url FROM produits WHERE id = ?');
+                    $stmtImg->execute([$id]);
+                    $old_image = $stmtImg->fetchColumn();
+
+                    if ($old_image) {
+                        $file_path = __DIR__ . '/../' . $old_image;
+                        if (file_exists($file_path)) {
+                            @unlink($file_path);
+                        }
+                    }
+
                     $stmt = $pdo->prepare('DELETE FROM produits WHERE id = ?');
                     $stmt->execute([$id]);
                     $message = '✓ Produit supprimé avec succès !';
+                    
+                    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                    $csrf_token = $_SESSION['csrf_token'];
                 } catch (PDOException $e) {
                     $error = 'Erreur lors de la suppression du produit.';
                 }
@@ -95,18 +140,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Récupérer le produit à modifier si paramètre "edit" présent
+// Récupération du produit à modifier
 $edit_produit = null;
 if (isset($_GET['edit'])) {
     $edit_id = (int)$_GET['edit'];
     $stmt = $pdo->prepare('SELECT * FROM produits WHERE id = ?');
     $stmt->execute([$edit_id]);
-    $edit_produit = $stmt->fetch();
+    $edit_produit = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Récupérer tous les produits
+// Récupération de tous les produits
 $stmt = $pdo->query('SELECT * FROM produits ORDER BY id DESC');
-$produits = $stmt->fetchAll();
+$produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -173,7 +218,7 @@ $produits = $stmt->fetchAll();
             </div>
             <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <p style="margin: 0 0 5px 0; font-size: 12px; color: #aaa;">Connecté:</p>
-                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 14px;"><?php echo htmlspecialchars($_SESSION['admin_email'] ?? 'Admin'); ?></p>
+                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 14px;"><?= htmlspecialchars($_SESSION['admin_email'] ?? 'Admin') ?></p>
                 <a href="../logout.php" style="color: #FE7B7E; text-decoration: none; font-weight: 600; font-size: 14px;">🚪 Déconnexion</a>
             </div>
         </aside>
@@ -183,47 +228,46 @@ $produits = $stmt->fetchAll();
             <h1>🛍️ Gestion des Produits</h1>
             
             <?php if ($message): ?>
-                <div class="alert alert-success"><?php echo $message; ?></div>
+                <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
             <?php endif; ?>
             
             <?php if ($error): ?>
-                <div class="alert alert-error"><?php echo $error; ?></div>
+                <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
             <!-- Formulaire -->
             <div class="admin-form">
-                <h3><?php echo $edit_produit ? 'Modifier le produit' : 'Ajouter un nouveau produit'; ?></h3>
+                <h3><?= $edit_produit ? 'Modifier le produit' : 'Ajouter un nouveau produit' ?></h3>
                 
                 <form method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                    <input type="hidden" name="action" value="<?php echo $edit_produit ? 'modifier' : 'ajouter'; ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+                    <input type="hidden" name="action" value="<?= $edit_produit ? 'modifier' : 'ajouter' ?>">
                     <?php if ($edit_produit): ?>
-                        <input type="hidden" name="id" value="<?php echo $edit_produit['id']; ?>">
-                        <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($edit_produit['image_url'] ?? ''); ?>">
+                        <input type="hidden" name="id" value="<?= $edit_produit['id'] ?>">
                     <?php endif; ?>
                     
                     <div class="form-group">
                         <label for="nom">Nom du produit *</label>
                         <input type="text" id="nom" name="nom" required 
-                               value="<?php echo $edit_produit ? htmlspecialchars($edit_produit['nom']) : ''; ?>">
+                               value="<?= $edit_produit ? htmlspecialchars($edit_produit['nom']) : '' ?>">
                     </div>
                     
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description"><?php echo $edit_produit ? htmlspecialchars($edit_produit['description'] ?? '') : ''; ?></textarea>
+                        <textarea id="description" name="description"><?= $edit_produit ? htmlspecialchars($edit_produit['description'] ?? '') : '' ?></textarea>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label for="prix">Prix (€) *</label>
                             <input type="number" id="prix" name="prix" step="0.01" min="0.01" required
-                                   value="<?php echo $edit_produit ? $edit_produit['prix'] : ''; ?>">
+                                   value="<?= $edit_produit ? $edit_produit['prix'] : '' ?>">
                         </div>
                         
                         <div class="form-group">
                             <label for="categorie_id">Catégorie ID</label>
                             <input type="number" id="categorie_id" name="categorie_id" min="1" required
-                                   value="<?php echo $edit_produit ? $edit_produit['categorie_id'] : '1'; ?>">
+                                   value="<?= $edit_produit ? $edit_produit['categorie_id'] : '1' ?>">
                         </div>
                     </div>
 
@@ -231,13 +275,13 @@ $produits = $stmt->fetchAll();
                         <label for="image">Image du produit</label>
                         <input type="file" id="image" name="image" accept="image/*">
                         <?php if ($edit_produit && !empty($edit_produit['image_url'])): ?>
-                            <p style="font-size: 12px; margin-top: 5px; color: #666;">Image actuelle : <?php echo htmlspecialchars($edit_produit['image_url']); ?></p>
+                            <p style="font-size: 12px; margin-top: 5px; color: #666;">Image actuelle : <?= htmlspecialchars($edit_produit['image_url']) ?></p>
                         <?php endif; ?>
                     </div>
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
-                            <?php echo $edit_produit ? '✓ Modifier le produit' : '+ Ajouter le produit'; ?>
+                            <?= $edit_produit ? '✓ Modifier le produit' : '+ Ajouter le produit' ?>
                         </button>
                         <?php if ($edit_produit): ?>
                             <a href="produits.php" class="btn btn-secondary">Annuler</a>
@@ -249,7 +293,7 @@ $produits = $stmt->fetchAll();
             <!-- Liste des produits -->
             <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <h3 style="margin-top: 0; color: #2B2B2B; border-bottom: 3px solid #85D6CD; padding-bottom: 10px;">
-                    Produits en boutique (<?php echo count($produits); ?>)
+                    Produits en boutique (<?= count($produits) ?>)
                 </h3>
                 
                 <?php if (empty($produits)): ?>
@@ -259,28 +303,27 @@ $produits = $stmt->fetchAll();
                         <?php foreach ($produits as $produit): ?>
                             <div class="produit-card">
                                 <?php 
-                                    // Comme image_url vaut déjà "images/produits/fichier.jpg", on remonte juste d'un cran : "../"
                                     $img_file = !empty($produit['image_url']) ? htmlspecialchars($produit['image_url']) : '';
                                     $image_path = !empty($img_file) ? "../" . $img_file : "../images/produits/default-product.png";
                                 ?>
-                                <img src="<?php echo $image_path; ?>" 
+                                <img src="<?= $image_path ?>" 
                                      alt="Aperçu" class="produit-img-preview" 
                                      onerror="this.onerror=null; this.src='../images/produits/default-product.png';">
                                 
                                 <div class="produit-details">
-                                    <div class="produit-title"><?php echo htmlspecialchars($produit['nom']); ?></div>
+                                    <div class="produit-title"><?= htmlspecialchars($produit['nom']) ?></div>
                                     <div class="produit-info">
-                                        <div><span class="info-label">Prix:</span> <?php echo number_format((float)$produit['prix'], 2, ',', ' '); ?> €</div>
-                                        <div><span class="info-label">Catégorie:</span> N°<?php echo $produit['categorie_id']; ?></div>
+                                        <div><span class="info-label">Prix:</span> <?= number_format((float)$produit['prix'], 2, ',', ' ') ?> €</div>
+                                        <div><span class="info-label">Catégorie:</span> N°<?= (int)$produit['categorie_id'] ?></div>
                                     </div>
                                 </div>
                                 
                                 <div class="produit-actions">
-                                    <a href="produits.php?edit=<?php echo $produit['id']; ?>" class="btn btn-edit">✏️ Modifier</a>
+                                    <a href="produits.php?edit=<?= $produit['id'] ?>" class="btn btn-edit">✏️ Modifier</a>
                                     <form method="POST" onsubmit="return confirm('Supprimer ce produit définitivement ?');">
-                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                                         <input type="hidden" name="action" value="supprimer">
-                                        <input type="hidden" name="id" value="<?php echo $produit['id']; ?>">
+                                        <input type="hidden" name="id" value="<?= $produit['id'] ?>">
                                         <button type="submit" class="btn btn-edit" style="background: #FE7B7E; border: none; cursor: pointer;">🗑️ Supprimer</button>
                                     </form>
                                 </div>
@@ -293,8 +336,9 @@ $produits = $stmt->fetchAll();
     </div>
 
     <?php 
-    if (file_exists(__DIR__ . '/../../includes/footer.php')) {
-        require_once __DIR__ . '/../../includes/footer.php'; 
+    $footer_path = __DIR__ . '/../../includes/footer.php';
+    if (file_exists($footer_path)) {
+        require_once $footer_path; 
     }
     ?>
 </body>

@@ -4,9 +4,9 @@ declare(strict_types=1);
 session_start();
 
 // ============================================================
-// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
+// 🔒 VÉRIFICATION D'ACCÈS ADMIN
 // ============================================================
-if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
+if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 
-// Récupérer tous les utilisateurs avec leurs informations cumulées
+// Récupérer tous les utilisateurs avec des sous-requêtes pour éviter les faux doublons de SUM()
 $stmt = $pdo->query('
     SELECT 
         u.id,
@@ -24,18 +24,40 @@ $stmt = $pdo->query('
         u.prenom,
         u.email,
         u.date_inscription,
-        COUNT(DISTINCT a.id) as nb_adhesions,
-        COUNT(DISTINCT h.id) as nb_histoires,
-        COUNT(DISTINCT c.id) as nb_commandes,
-        COALESCE(SUM(c.montant_total), 0) as total_depenses
+        COALESCE(a.nb_adhesions, 0) as nb_adhesions,
+        COALESCE(h.nb_histoires, 0) as nb_histoires,
+        COALESCE(c.nb_commandes, 0) as nb_commandes,
+        COALESCE(c.total_depenses, 0) as total_depenses
     FROM utilisateurs u
-    LEFT JOIN adhesions a ON u.id = a.utilisateur_id
-    LEFT JOIN belles_histoires h ON u.id = h.utilisateur_id
-    LEFT JOIN commandes c ON u.id = c.utilisateur_id AND c.statut = "payee"
-    GROUP BY u.id
+    LEFT JOIN (
+        SELECT utilisateur_id, COUNT(id) as nb_adhesions 
+        FROM adhesions 
+        GROUP BY utilisateur_id
+    ) a ON u.id = a.utilisateur_id
+    LEFT JOIN (
+        SELECT utilisateur_id, COUNT(id) as nb_histoires 
+        FROM belles_histoires 
+        GROUP BY utilisateur_id
+    ) h ON u.id = h.utilisateur_id
+    LEFT JOIN (
+        SELECT 
+            utilisateur_id, 
+            COUNT(id) as nb_commandes, 
+            SUM(montant_total) as total_depenses 
+        FROM commandes 
+        WHERE statut = "payee" 
+        GROUP BY utilisateur_id
+    ) c ON u.id = c.utilisateur_id
     ORDER BY u.date_inscription DESC
 ');
-$utilisateurs = $stmt->fetchAll();
+
+$utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculs des statistiques globales pour le haut de page
+$total_utilisateurs = count($utilisateurs);
+$total_adhesions = array_sum(array_column($utilisateurs, 'nb_adhesions'));
+$total_histoires = array_sum(array_column($utilisateurs, 'nb_histoires'));
+$total_revenus   = array_sum(array_column($utilisateurs, 'total_depenses'));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -51,179 +73,44 @@ $utilisateurs = $stmt->fetchAll();
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; background: #F5F5F5; }
         
-        .admin-container { 
-            display: flex; 
-            min-height: 100vh; 
-        }
+        .admin-container { display: flex; min-height: 100vh; }
+        .admin-sidebar { width: 250px; background: #2B2B2B; color: white; padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .admin-logo { padding: 0 20px; margin-bottom: 30px; text-align: center; }
+        .admin-logo img { max-width: 60px; margin-bottom: 10px; }
+        .admin-logo h2 { font-family: 'Pacifico', cursive; color: #85D6CD; font-size: 1.5rem; font-weight: normal; }
         
-        .admin-sidebar { 
-            width: 250px; 
-            background: #2B2B2B; 
-            color: white; 
-            padding: 30px 0; 
-            position: fixed; 
-            height: 100vh; 
-            overflow-y: auto; 
-            display: flex;
-            flex-direction: column;
-        }
+        .admin-menu { list-style: none; }
+        .admin-menu a { display: block; padding: 12px 20px; color: #ccc; text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
+        .admin-menu a:hover { background: rgba(133, 214, 205, 0.1); color: #85D6CD; border-left-color: #85D6CD; }
+        .admin-menu a.active { background: rgba(133, 214, 205, 0.2); color: #85D6CD; border-left-color: #85D6CD; font-weight: 700; }
         
-        .admin-logo { 
-            padding: 0 20px; 
-            margin-bottom: 30px; 
-            text-align: center; 
-        }
-        .admin-logo img { 
-            max-width: 60px; 
-            margin-bottom: 10px; 
-        }
-        .admin-logo h2 { 
-            font-family: 'Pacifico', cursive; 
-            color: #85D6CD; 
-            font-size: 1.5rem; 
-            font-weight: normal; 
-        }
+        .admin-user-info { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto; width: 100%; }
+        .admin-user-info p { margin: 0 0 5px 0; font-size: 12px; color: #aaa; }
+        .admin-user-info strong { display: block; margin-bottom: 15px; color: white; word-break: break-all; }
+        .admin-user-info a { display: block; color: #FE7B7E; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
         
-        .admin-menu { 
-            list-style: none; 
-        }
-        .admin-menu a { 
-            display: block; 
-            padding: 12px 20px; 
-            color: #ccc; 
-            text-decoration: none; 
-            transition: all 0.3s; 
-            border-left: 3px solid transparent; 
-        }
-        .admin-menu a:hover { 
-            background: rgba(133, 214, 205, 0.1); 
-            color: #85D6CD; 
-            border-left-color: #85D6CD; 
-        }
-        .admin-menu a.active { 
-            background: rgba(133, 214, 205, 0.2); 
-            color: #85D6CD; 
-            border-left-color: #85D6CD; 
-            font-weight: 700; 
-        }
+        .admin-main { flex: 1; margin-left: 250px; padding: 30px; }
+        .admin-main h1 { font-size: 1.8rem; color: #2B2B2B; margin-bottom: 20px; }
         
-        .admin-user-info { 
-            padding: 20px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.1); 
-            margin-top: auto; 
-            width: 100%; 
-        }
-        .admin-user-info p {
-            margin: 0 0 5px 0;
-            font-size: 12px;
-            color: #aaa;
-        }
-        .admin-user-info strong {
-            display: block;
-            margin-bottom: 15px;
-            color: white;
-            word-break: break-all;
-        }
-        .admin-user-info a { 
-            display: block; 
-            color: #FE7B7E; 
-            text-decoration: none; 
-            font-weight: 600;
-            font-size: 0.9rem; 
-        }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #85D6CD; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #85D6CD; }
+        .stat-label { font-size: 12px; color: #999; margin-top: 5px; }
         
-        .admin-main { 
-            flex: 1; 
-            margin-left: 250px; 
-            padding: 30px; 
-        }
-        .admin-main h1 { 
-            font-size: 1.8rem; 
-            color: #2B2B2B; 
-            margin-bottom: 20px; 
-        }
+        .section-table { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+        .utilisateurs-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .utilisateurs-table thead { background: #f5f5f5; }
+        .utilisateurs-table th { padding: 12px; text-align: left; font-weight: 600; color: #2B2B2B; border-bottom: 2px solid #85D6CD; }
+        .utilisateurs-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .utilisateurs-table tr:hover { background: #f9f9f9; }
         
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-left: 4px solid #85D6CD;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #85D6CD;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-        
-        .section-table {
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-            overflow-x: auto;
-        }
-        
-        .utilisateurs-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        .utilisateurs-table thead {
-            background: #f5f5f5;
-        }
-        
-        .utilisateurs-table th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #2B2B2B;
-            border-bottom: 2px solid #85D6CD;
-        }
-        
-        .utilisateurs-table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .utilisateurs-table tr:hover {
-            background: #f9f9f9;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: #85D6CD;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 4px;
-        }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; background: #85D6CD; color: white; font-size: 12px; font-weight: 600; margin-right: 4px; }
         
         @media (max-width: 768px) {
-            .utilisateurs-table {
-                font-size: 12px;
-            }
-            .utilisateurs-table th,
-            .utilisateurs-table td {
-                padding: 8px;
-            }
+            .admin-sidebar { width: 100%; height: auto; position: relative; }
+            .admin-main { margin-left: 0; }
+            .utilisateurs-table { font-size: 12px; }
+            .utilisateurs-table th, .utilisateurs-table td { padding: 8px; }
         }
     </style>
 </head>
@@ -246,7 +133,7 @@ $utilisateurs = $stmt->fetchAll();
             </ul>
             <div class="admin-user-info">
                 <p>Connecté en tant que :</p>
-                <strong><?php echo htmlspecialchars($_SESSION['admin_email'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                <strong><?php echo htmlspecialchars($_SESSION['admin_email'] ?? 'Admin', ENT_QUOTES, 'UTF-8'); ?></strong>
                 <a href="../logout.php">🚪 Déconnexion</a>
             </div>
         </aside>
@@ -258,43 +145,19 @@ $utilisateurs = $stmt->fetchAll();
             <!-- Stats rapides -->
             <div class="stat-grid">
                 <div class="stat-card">
-                    <div class="stat-value"><?php echo count($utilisateurs); ?></div>
+                    <div class="stat-value"><?php echo $total_utilisateurs; ?></div>
                     <div class="stat-label">Total utilisateurs</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">
-                        <?php 
-                            $total_adhesions = 0;
-                            foreach ($utilisateurs as $u) {
-                                $total_adhesions += (int)$u['nb_adhesions'];
-                            }
-                            echo $total_adhesions;
-                        ?>
-                    </div>
+                    <div class="stat-value"><?php echo $total_adhesions; ?></div>
                     <div class="stat-label">Adhésions actives</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">
-                        <?php 
-                            $total_histoires = 0;
-                            foreach ($utilisateurs as $u) {
-                                $total_histoires += (int)$u['nb_histoires'];
-                            }
-                            echo $total_histoires;
-                        ?>
-                    </div>
+                    <div class="stat-value"><?php echo $total_histoires; ?></div>
                     <div class="stat-label">Histoires soumises</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">
-                        <?php 
-                            $total_revenus = 0;
-                            foreach ($utilisateurs as $u) {
-                                $total_revenus += (float)$u['total_depenses'];
-                            }
-                            echo number_format($total_revenus, 0, ',', ' ');
-                        ?> €
-                    </div>
+                    <div class="stat-value"><?php echo number_format((float)$total_revenus, 2, ',', ' '); ?> €</div>
                     <div class="stat-label">Revenu total</div>
                 </div>
             </div>
@@ -302,7 +165,7 @@ $utilisateurs = $stmt->fetchAll();
             <!-- Liste des utilisateurs -->
             <div class="section-table">
                 <h3 style="margin-top: 0; color: #2B2B2B; border-bottom: 3px solid #85D6CD; padding-bottom: 10px;">
-                    Utilisateurs enregistrés (<?php echo count($utilisateurs); ?>)
+                    Utilisateurs enregistrés (<?php echo $total_utilisateurs; ?>)
                 </h3>
                 
                 <?php if (empty($utilisateurs)): ?>
@@ -323,9 +186,14 @@ $utilisateurs = $stmt->fetchAll();
                         <tbody>
                             <?php foreach ($utilisateurs as $user): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($user['prenom'] . ' ' . $user['nom'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?php echo date('d/m/Y', strtotime($user['date_inscription'])); ?></td>
+                                    <td><?php echo htmlspecialchars(($user['prenom'] ?? '') . ' ' . ($user['nom'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td>
+                                        <?php 
+                                            $date = !empty($user['date_inscription']) ? date_create($user['date_inscription']) : false;
+                                            echo $date ? date_format($date, 'd/m/Y') : 'N/A';
+                                        ?>
+                                    </td>
                                     <td>
                                         <?php if ($user['nb_adhesions'] > 0): ?>
                                             <span class="badge"><?php echo (int)$user['nb_adhesions']; ?> ✓</span>
@@ -357,6 +225,10 @@ $utilisateurs = $stmt->fetchAll();
         </main>
     </div>
 
-    <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+    <?php 
+    if (file_exists(__DIR__ . '/../../includes/footer.php')) {
+        require_once __DIR__ . '/../../includes/footer.php'; 
+    }
+    ?>
 </body>
 </html>

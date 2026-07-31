@@ -4,9 +4,9 @@ declare(strict_types=1);
 session_start();
 
 // ============================================================
-// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
+// 🔒 VÉRIFICATION D'ACCÈS ADMIN
 // ============================================================
-if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
+if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
@@ -18,17 +18,19 @@ $pdo = getPDO();
 $message = '';
 $error = '';
 
-// Générer un token CSRF pour les actions
-$csrf_token = generateCSRFToken();
+// Token CSRF
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
-// Traiter les actions (uniquement via POST pour la sécurité)
+// Actions POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = (string) ($_POST['action'] ?? '');
     $id = (int) ($_POST['id'] ?? 0);
     $csrf_check = (string) ($_POST['csrf_token'] ?? '');
 
-    // Vérification CSRF
-    if (!validateCSRFToken($csrf_check)) {
+    if (!hash_equals($_SESSION['csrf_token'], $csrf_check)) {
         $error = 'Erreur de sécurité : token CSRF invalide.';
     } elseif ($action === 'publier' && $id > 0) {
         $stmt = $pdo->prepare('
@@ -57,9 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $error = 'Action invalide.';
     }
+    
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $csrf_token = $_SESSION['csrf_token'];
 }
 
-// Récupérer les histoires selon l'onglet
+// Récupération selon l'onglet
 $tab = (string) ($_GET['tab'] ?? 'attente');
 
 $statut = match ($tab) {
@@ -72,7 +77,6 @@ if ($statut === 'en_attente') {
     $tab = 'attente';
 }
 
-// Utilisation de COALESCE pour parer au strict_types=1 et au LEFT JOIN (évite les TypeErrors si NULL)
 $stmt = $pdo->prepare('
     SELECT 
         bh.id, 
@@ -88,16 +92,12 @@ $stmt = $pdo->prepare('
     ORDER BY bh.date_publication DESC
 ');
 $stmt->execute([$statut]);
-$histoires = $stmt->fetchAll();
+$histoires = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Statistiques pour les onglets (Correction : ajout de l'alias AS count)
-$stats = [
-    'en_attente' => 0,
-    'publiee' => 0,
-    'refusee' => 0
-];
+// Stats
+$stats = ['en_attente' => 0, 'publiee' => 0, 'refusee' => 0];
 $stmt = $pdo->query("SELECT statut, COUNT(*) AS count FROM belles_histoires GROUP BY statut");
-while ($row = $stmt->fetch()) {
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     if (isset($stats[$row['statut']])) {
         $stats[$row['statut']] = (int)$row['count'];
     }
@@ -111,345 +111,277 @@ while ($row = $stmt->fetch()) {
     <title>Modérer les Histoires - Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Montserrat', sans-serif;
-            background: #F5F5F5;
+            background-color: #fdfbf7; /* Le fond crème doux */
+            color: #2b2b2b;
         }
-        
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
+
+        .admin-container { display: flex; min-height: 100vh; }
+
+        /* --- SIDEBAR SOMBRE ALIGNÉE SUR "COMMANDES" --- */
         .admin-sidebar {
             width: 250px;
-            background: #2B2B2B;
-            color: white;
-            padding: 30px 0;
+            background: #2b2b2b;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 0 20px 0;
             position: fixed;
             height: 100vh;
-            overflow-y: auto;
         }
-        
+
         .admin-logo {
-            padding: 0 20px;
-            margin-bottom: 30px;
             text-align: center;
+            padding-bottom: 25px;
         }
-        
+
         .admin-logo h2 {
             font-family: 'Pacifico', cursive;
-            color: #85D6CD;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            color: #85D6CD; /* Vert menthe */
             font-weight: normal;
         }
-        
-        .admin-menu {
-            list-style: none;
-        }
-        
-        .admin-menu li {
-            margin: 0;
-        }
-        
-        .admin-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: #ccc;
+
+        .admin-menu { list-style: none; }
+
+        .admin-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 25px;
+            color: #d1d5db;
             text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
-        
+
         .admin-menu a:hover {
-            background: rgba(133, 214, 205, 0.1);
-            color: #85D6CD;
-            border-left-color: #85D6CD;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
         }
-        
+
         .admin-menu a.active {
-            background: rgba(133, 214, 205, 0.2);
+            background: rgba(133, 214, 205, 0.15);
             color: #85D6CD;
-            border-left-color: #85D6CD;
-            font-weight: 700;
+            border-left: 4px solid #85D6CD;
         }
-        
+
+        .admin-menu a.home-link {
+            color: #FE7B7E; /* Rouge Corail */
+            margin-bottom: 15px;
+        }
+
         .admin-user-info {
-            padding: 20px;
+            padding: 20px 25px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: auto;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-        }
-        
-        .admin-user-info p {
             font-size: 0.85rem;
-            color: #999;
-            margin-bottom: 10px;
         }
-        
-        .admin-user-info a {
-            display: block;
-            color: #FE7B7E;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        
+
+        .admin-user-info p { color: #9ca3af; margin-bottom: 4px; }
+        .admin-user-info strong { display: block; color: #ffffff; margin-bottom: 10px; word-break: break-all; }
+        .admin-user-info a { color: #FE7B7E; text-decoration: none; font-weight: 600; }
+
+        /* --- CONTENU PRINCIPAL --- */
         .admin-main {
             flex: 1;
             margin-left: 250px;
-            padding: 30px;
+            padding: 40px;
         }
-        
-        .admin-header {
-            margin-bottom: 30px;
-        }
-        
+
         .admin-header h1 {
             font-size: 1.8rem;
-            color: #2B2B2B;
-            margin-bottom: 20px;
-        }
-        
-        .tabs {
+            font-weight: 800;
+            color: #2b2b2b;
+            margin-bottom: 30px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
         }
-        
+
+        /* Onglets filtres */
+        .tabs { display: flex; gap: 12px; margin-bottom: 25px; }
+
         .tab-btn {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #E0E0E0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
+            padding: 8px 20px;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            font-family: inherit;
             font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
+            font-size: 0.9rem;
+            color: #4b5563;
             text-decoration: none;
-            display: inline-block;
+            transition: all 0.2s ease;
         }
-        
+
         .tab-btn.active {
             background: #85D6CD;
-            color: white;
+            color: #ffffff;
             border-color: #85D6CD;
         }
-        
-        .tab-btn:hover {
-            border-color: #85D6CD;
-        }
-        
-        .badge {
-            background: #FE7B7E;
-            color: white;
-            padding: 2px 10px;
+
+        .tab-btn:hover:not(.active) { border-color: #85D6CD; color: #85D6CD; }
+
+        /* Main Card */
+        .admin-card {
+            background: #ffffff;
             border-radius: 12px;
-            font-size: 0.7rem;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        .admin-card h2 {
+            font-size: 1.25rem;
             font-weight: 700;
-            margin-left: 5px;
+            color: #2b2b2b;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #85D6CD;
         }
-        
-        .message {
-            background: #E0FFE0;
-            border: 1px solid #00A000;
-            color: #009900;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        
-        .error-message {
-            background: #FFE0E0;
-            border: 1px solid #FE7B7E;
-            color: #C00;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        
-        .section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
+
+        /* Cartes Histoires */
         .histoire-card {
-            border: 1px solid #E0E0E0;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid #85D6CD;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            background: #FAFAFA;
+            background: #ffffff;
         }
-        
+
         .histoire-card h3 {
-            color: #2B2B2B;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+            color: #1f2937;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        
+
         .histoire-meta {
             font-size: 0.85rem;
-            color: #999;
+            color: #6b7280;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
         .histoire-contenu {
-            color: #666;
+            color: #374151;
             line-height: 1.6;
             margin-bottom: 15px;
             padding: 15px;
-            background: white;
-            border-radius: 4px;
-            border-left: 3px solid #85D6CD;
+            background: #f9fafb;
+            border-radius: 6px;
+            font-size: 0.95rem;
         }
-        
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 700;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-        
-        .btn-success {
-            background: #00A000;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #009000;
-        }
-        
-        .btn-danger {
-            background: #FE7B7E;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #E66367;
-        }
-        
-        .btn-secondary {
-            background: #E0E0E0;
-            color: #333;
-        }
-        
-        .btn-secondary:hover {
-            background: #ccc;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-        
+
+        /* Badges */
         .statut-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 3px 10px;
+            border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 700;
-            margin-right: 10px;
         }
+        .statut-en_attente { background: #fef3c7; color: #92400e; }
+        .statut-publiee { background: #d1fae5; color: #065f46; }
+        .statut-refusee { background: #fee2e2; color: #991b1b; }
+
+        /* Boutons d'action */
+        .actions { display: flex; gap: 10px; }
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .btn-success { background: #85D6CD; color: white; }
+        .btn-success:hover { background: #6bc3b8; }
+        .btn-danger { background: #FE7B7E; color: white; }
+        .btn-danger:hover { background: #e66769; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #6b7280; }
         
-        .statut-attente {
-            background: #FFF3CD;
-            color: #856404;
-        }
-        
-        .statut-publiee {
-            background: #D4EDDA;
-            color: #155724;
-        }
-        
-        .statut-refusee {
-            background: #F8D7DA;
-            color: #721C24;
-        }
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 0.9rem; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
     <div class="admin-container">
+        <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-logo">
-                <h2>🧔 Admin</h2>
+            <div>
+                <div class="admin-logo">
+                    <h2>Admin</h2>
+                </div>
+                <ul class="admin-menu">
+                    <li><a href="../index.php" class="home-link">🏠 Retour à l'accueil</a></li>
+                    <li><a href="dashboard.php">📊 Dashboard</a></li>
+                    <li><a href="moderer-histoires.php" class="active">📖 Belles Histoires</a></li>
+                    <li><a href="ateliers.php">🎨 Ateliers</a></li>
+                    <li><a href="produits.php">🛍️ Produits</a></li>
+                    <li><a href="commandes.php">📦 Commandes</a></li>
+                    <li><a href="utilisateurs.php">👥 Utilisateurs</a></li>
+                </ul>
             </div>
             
-            <ul class="admin-menu">
-                <li><a href="../index.php" style="color: #FE7B7E; font-weight: 700;">🏠 Retour à l'accueil</a></li>
-                <li style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;"></li>
-                <li><a href="dashboard.php">📊 Dashboard</a></li>
-                <li><a href="moderer-histoires.php" class="active">📖 Belles Histoires</a></li>
-                <li><a href="ateliers.php">🎨 Ateliers</a></li>
-                <li><a href="produits.php">🛍️ Produits</a></li>
-                <li><a href="commandes.php">📦 Commandes</a></li>
-                <li><a href="utilisateurs.php">👥 Utilisateurs</a></li>
-            </ul>
-            
             <div class="admin-user-info">
-                <p>Connecté en tant que:</p>
-                <strong><?php echo htmlspecialchars($_SESSION['admin_email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></strong>
+                <p>Connecté :</p>
+                <strong><?= htmlspecialchars($_SESSION['admin_email'] ?? 'Admin', ENT_QUOTES, 'UTF-8') ?></strong>
                 <a href="../logout.php">🚪 Déconnexion</a>
             </div>
         </aside>
-        
+
+        <!-- Main Content -->
         <main class="admin-main">
             <div class="admin-header">
                 <h1>📖 Gestion des Belles Histoires</h1>
             </div>
-            
+
             <?php if (!empty($message)): ?>
-                <div class="message"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="alert alert-success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
-            
+
             <?php if (!empty($error)): ?>
-                <div class="error-message"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="alert alert-error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
-            
+
+            <!-- Onglets -->
             <div class="tabs">
-                <a href="?tab=attente" class="tab-btn <?php echo $tab === 'attente' ? 'active' : ''; ?>">
-                    ⏳ À modérer
-                    <?php if ($stats['en_attente'] > 0): ?>
-                        <span class="badge"><?php echo $stats['en_attente']; ?></span>
-                    <?php endif; ?>
+                <a href="?tab=attente" class="tab-btn <?= $tab === 'attente' ? 'active' : '' ?>">
+                    ⏳ À modérer <?= $stats['en_attente'] > 0 ? "({$stats['en_attente']})" : '' ?>
                 </a>
-                <a href="?tab=publiees" class="tab-btn <?php echo $tab === 'publiees' ? 'active' : ''; ?>">
-                    ✓ Publiées (<?php echo $stats['publiee']; ?>)
+                <a href="?tab=publiees" class="tab-btn <?= $tab === 'publiees' ? 'active' : '' ?>">
+                    ✓ Publiées (<?= $stats['publiee'] ?>)
                 </a>
-                <a href="?tab=refusees" class="tab-btn <?php echo $tab === 'refusees' ? 'active' : ''; ?>">
-                    ✕ Refusées (<?php echo $stats['refusee']; ?>)
+                <a href="?tab=refusees" class="tab-btn <?= $tab === 'refusees' ? 'active' : '' ?>">
+                    ✕ Refusées (<?= $stats['refusee'] ?>)
                 </a>
             </div>
-            
-            <div class="section">
+
+            <div class="admin-card">
+                <h2>
+                    <?php 
+                        if ($tab === 'attente') echo 'Histoires en attente de modération';
+                        elseif ($tab === 'publiees') echo 'Histoires publiées';
+                        else echo 'Histoires refusées';
+                    ?>
+                </h2>
+
                 <?php if (empty($histoires)): ?>
                     <div class="empty-state">
                         <?php
-                            if ($tab === 'attente') echo 'Aucune histoire en attente de modération. 🎉';
+                            if ($tab === 'attente') echo 'Aucune histoire en attente de modération pour le moment ! 🎉';
                             elseif ($tab === 'publiees') echo 'Aucune histoire publiée pour le moment.';
                             else echo 'Aucune histoire refusée.';
                         ?>
@@ -457,54 +389,45 @@ while ($row = $stmt->fetch()) {
                 <?php else: ?>
                     <?php foreach ($histoires as $histoire): ?>
                         <div class="histoire-card">
-                            <h3><?php echo htmlspecialchars($histoire['titre'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                            <h3><?= htmlspecialchars($histoire['titre'], ENT_QUOTES, 'UTF-8') ?></h3>
                             <div class="histoire-meta">
-                                <span class="statut-badge statut-<?php echo $histoire['statut']; ?>">
+                                <span class="statut-badge statut-<?= $histoire['statut'] ?>">
                                     <?php
                                         $statutLabels = [
                                             'en_attente' => '⏳ En attente',
                                             'publiee' => '✓ Publiée',
-                                            'refusee' => '✕ Refusées'
+                                            'refusee' => '✕ Refusée'
                                         ];
                                         echo $statutLabels[$histoire['statut']] ?? $histoire['statut'];
                                     ?>
                                 </span>
-                                Par <?php echo htmlspecialchars(trim(($histoire['prenom'] ?? '') . ' ' . ($histoire['nom'] ?? '')), ENT_QUOTES, 'UTF-8'); ?> 
-                                | <?php 
-                                    // Correction : Sécurité de formatage de date au cas où elle vaut NULL (en_attente)
-                                    echo !empty($histoire['date_publication']) 
-                                        ? 'Traitée le ' . date('d/m/Y à H:i', strtotime($histoire['date_publication'])) 
-                                        : 'En attente de traitement'; 
-                                ?>
+                                • Par <strong><?= htmlspecialchars(trim(($histoire['prenom'] ?? '') . ' ' . ($histoire['nom'] ?? '')), ENT_QUOTES, 'UTF-8') ?></strong>
+                                • <?= !empty($histoire['date_publication']) ? 'Traitée le ' . date('d/m/Y à H:i', strtotime($histoire['date_publication'])) : 'En attente' ?>
                             </div>
                             <div class="histoire-contenu">
-                                <?php echo nl2br(htmlspecialchars($histoire['contenu'], ENT_QUOTES, 'UTF-8')); ?>
+                                <?= nl2br(htmlspecialchars($histoire['contenu'], ENT_QUOTES, 'UTF-8')) ?>
                             </div>
-                            <div class="actions">
-                                <?php if ($histoire['statut'] === 'en_attente'): ?>
-                                    <!-- Formulaire POST sécurisé pour publier -->
+                            <?php if ($histoire['statut'] === 'en_attente'): ?>
+                                <div class="actions">
                                     <form method="POST" style="display: inline;">
-                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="action" value="publier">
-                                        <input type="hidden" name="id" value="<?php echo (int)$histoire['id']; ?>">
+                                        <input type="hidden" name="id" value="<?= (int)$histoire['id'] ?>">
                                         <button type="submit" class="btn btn-success">✓ Publier</button>
                                     </form>
-                                    <!-- Formulaire POST sécurisé pour rejeter -->
                                     <form method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir rejeter cette histoire ?');">
-                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="action" value="rejeter">
-                                        <input type="hidden" name="id" value="<?php echo (int)$histoire['id']; ?>">
+                                        <input type="hidden" name="id" value="<?= (int)$histoire['id'] ?>">
                                         <button type="submit" class="btn btn-danger">✕ Rejeter</button>
                                     </form>
-                                <?php endif; ?>
-                            </div>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </main>
     </div>
-
-    <?php require_once __DIR__ . '/../../includes/footer.php'; ?>
 </body>
 </html>

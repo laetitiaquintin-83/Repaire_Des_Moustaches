@@ -1,16 +1,47 @@
 <?php
 declare(strict_types=1);
 
-$sitePrefix = ''; include_once '../includes/header.php'; ?>
+// Connexion BDD & Header
+require_once __DIR__ . '/../config/database.php';
+$sitePrefix = ''; 
+include_once '../includes/header.php'; 
+
+// Récupération dynamique depuis la BDD MySQL
+try {
+    $pdo = getPDO();
+    $stmt = $pdo->query("SELECT * FROM pensionnaires ORDER BY id ASC");
+    $pensionnaires = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $pensionnaires = [];
+}
+?>
 
 <style>
+    /* Barre de filtres */
+    .barre-filtres-chats {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 35px;
+        flex-wrap: wrap;
+    }
+    
+    .input-filtre {
+        padding: 10px 16px;
+        border-radius: 25px;
+        border: 2px solid var(--vert-menthe, #2ecc71);
+        font-size: 0.95rem;
+        outline: none;
+        background: white;
+    }
+
     /* 1. On s'assure que la grille répartit bien ses cartes */
     .grille-chats {
         display: flex;
         justify-content: center;
         gap: 40px;
         flex-wrap: wrap; /* Évite que ça déborde sur petit écran */
-        align-items: stretch; /* Force toutes les cartes à  avoir la même hauteur */
+        align-items: stretch; /* Force toutes les cartes à avoir la même hauteur */
     }
 
     /* 2. On configure la carte pour qu'elle pousse les boutons tout en bas */
@@ -23,6 +54,7 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
         border-radius: 20px;
         box-shadow: 0px 10px 20px rgba(0,0,0,0.05);
         width: 320px; /* Largeur fixe propre pour chaque colonne */
+        transition: transform 0.2s ease, opacity 0.2s ease;
     }
 
     /* 3. On gère le bloc qui enveloppe les deux boutons */
@@ -31,12 +63,12 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
         flex-direction: column; /* Aligne les boutons l'un sous l'autre */
         gap: 12px; /* Espace de 12px très propre entre les deux boutons */
         width: 100%;
-        margin-top: auto; /* Force le bloc à  se coller au bas de la carte */
+        margin-top: auto; /* Force le bloc à se coller au bas de la carte */
     }
 
     /* 4. On redéfinit le bouton pour qu'il prenne toute la largeur sans casser le style d'origine */
     .bouton-chat {
-        display: block !important; /* Force le bouton à  se comporter en bloc */
+        display: block !important; /* Force le bouton à se comporter en bloc */
         width: 100% !important;
         text-align: center;
         box-sizing: border-box;
@@ -46,8 +78,8 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
 
     /* Optionnel : Un bouton secondaire vert menthe pour éviter d'avoir deux gros pavés roses identiques */
     .bouton-chat.secondaire {
-        background-color: var(--vert-menthe) !important;
-        color: var(--gris-fonce) !important;
+        background-color: var(--vert-menthe, #2ecc71) !important;
+        color: var(--gris-fonce, #333) !important;
     }
 
     .bouton-chat:hover {
@@ -60,63 +92,95 @@ $sitePrefix = ''; include_once '../includes/header.php'; ?>
 <main>
     <section class="page-section moustachus">
         <h1 class="page-title">Rencontrez l'Équipage</h1>
-        <p class="sous-titre" style="margin-bottom: 40px; font-style: italic;">Les trois mousquetaires du Repaire, chacun avec sa personnalité attachante. Venez les rencontrer pour un moment de ronrons et de tendresse.</p>
-        
-        <div class="grille-chats">
-            <article class="carte-chat">
-                <div>
-                    <picture>
-                    <source srcset="images/chat1.webp" type="image/webp">
-                    <img src="images/chat1.jpg" alt="Velours, chat roux élégant" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
-                    </picture>
-                    <div class="info-chat">
-                        <h3>Velours</h3>
-                        <p class="chat-trait">Le luxe rétro incarné</p>
-                        <p class="chat-histoire">Trouvé errant dans les ruelles du 11e, Velours s'est transformé en diva du Repaire. Ses ronrons mélodieux et son charme naturel en font l'ambassadeur princier de nos adoptions. Rêve d'une maison avec vue sur les toits de Paris.</p>
-                    </div>
-                </div>
-                <div class="actions-chat">
-                <a href="adoption.php" class="bouton-chat">Tomber sous le charme</a>
-                <a href="adoption.php" class="bouton-chat secondaire">Adopter Velours</a>
-                </div>
-            </article>
+        <p class="sous-titre" style="margin-bottom: 25px; font-style: italic;">
+            Les pensionnaires du Repaire, chacun avec sa personnalité attachante. Venez les rencontrer pour un moment de ronrons et de tendresse.
+        </p>
 
-            <article class="carte-chat">
-                <div>
-                    <picture>
-                    <source srcset="images/chat2.webp" type="image/webp">
-                    <img src="images/chat2.jpg" alt="Biscuit, petit chat gourmand" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
-                    </picture>
-                    <div class="info-chat">
-                        <h3>Biscuit</h3>
-                        <p class="chat-trait">Le petit gourmand turbulent</p>
-                        <p class="chat-histoire">Biscuit a grandi sous les tables du dîner et considère chaque assiette comme une invitation personnelle. Plein de vie, de cà¢lins imprévisibles et d'aventures, il transforme chaque jour en jeu. Un compagnon parfait pour ceux qui adorent l'énergie féline.</p>
-                    </div>
-                </div>
-                <div class="actions-chat">
-                <a href="adoption.php" class="bouton-chat">Jouer avec Biscuit</a>
-                <a href="adoption.php" class="bouton-chat secondaire">L'emmener chez toi</a>
-                </div>
-            </article>
+        <!-- 🔍 BARRE DE FILTRES EN DIRECT -->
+        <div class="barre-filtres-chats">
+            <select id="filtre-age" onchange="filtrerChats()" class="input-filtre" style="cursor: pointer; font-weight: bold;">
+                <option value="tous">🐾 Tous les âges</option>
+                <option value="jeune">Jeunes (2 ans et moins)</option>
+                <option value="adulte">Adultes (3 - 4 ans)</option>
+                <option value="senior">Séniors (5 ans et +)</option>
+            </select>
 
-            <article class="carte-chat">
-                <div>
-                    <picture>
-                    <source srcset="images/chat3.webp" type="image/webp">
-                    <img src="images/chat3.jpg" alt="Moonlight, chat mélancolique et poète" width="220" height="220" loading="lazy" style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
-                    </picture>
-                    <div class="info-chat">
-                        <h3>Moonlight</h3>
-                        <p class="chat-trait">Le poète des toits parisiens</p>
-                        <p class="chat-histoire">Moonlight a connu la liberté sauvage avant d'arriver au Repaire. Ses yeux profonds racontent mille histoires. Doux et pensif, il cherche une à¢me sœur qui comprenne ses silences éloquents et aime les nuits étoilées depuis une fenêtre douillette.</p>
+            <input type="text" id="filtre-recherche" onkeyup="filtrerChats()" placeholder="🔍 Rechercher un nom..." class="input-filtre">
+        </div>
+
+        <!-- 🐱 GRILLE DYNAMIQUE DE BDD -->
+        <div class="grille-chats" id="grille-chats">
+            <?php foreach ($pensionnaires as $chat): ?>
+                <article class="carte-chat" 
+                         data-age="<?= (int)$chat['age'] ?>" 
+                         data-nom="<?= htmlspecialchars(strtolower($chat['nom'])) ?>">
+                    <div>
+                        <picture>
+                            <img src="<?= htmlspecialchars($chat['photo_url']) ?>" 
+                                 alt="<?= htmlspecialchars($chat['nom']) ?>" 
+                                 width="220" 
+                                 height="220" 
+                                 loading="lazy" 
+                                 onerror="this.src='images/chats/chat1.jpg'"
+                                 style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block; width: 220px; height: 220px;">
+                        </picture>
+
+                        <div class="info-chat">
+                            <h3><?= htmlspecialchars($chat['nom']) ?> <small style="font-size: 0.8em; opacity: 0.7;">(<?= (int)$chat['age'] ?> ans)</small></h3>
+                            
+                            <?php if (!empty($chat['caractere'])): ?>
+                                <p class="chat-trait"><?= htmlspecialchars($chat['caractere']) ?></p>
+                            <?php endif; ?>
+                            
+                            <p class="chat-histoire"><?= nl2br(htmlspecialchars($chat['description'] ?? '')) ?></p>
+                        </div>
                     </div>
-                </div>
-                <div class="actions-chat">
-                <a href="adoption.php" class="bouton-chat">Découvrir son histoire</a>
-                <a href="adoption.php" class="bouton-chat secondaire">Lui donner un foyer</a>
-                </div>
-            </article>
+
+                    <div class="actions-chat">
+                        <a href="adoption.php?chat_id=<?= $chat['id'] ?>" class="bouton-chat">Rencontrer <?= htmlspecialchars($chat['nom']) ?></a>
+                        <a href="adoption.php?chat_id=<?= $chat['id'] ?>" class="bouton-chat secondaire">Adopter</a>
+                    </div>
+                </article>
+            <?php endforeach; ?>
         </div>
     </section>
 </main>
+
+<!-- ⚡ JAVASCRIPT : Filtre instantané -->
+<script>
+function filtrerChats() {
+    const filtreAge = document.getElementById('filtre-age').value;
+    const recherche = document.getElementById('filtre-recherche').value.toLowerCase().trim();
+    const cartes = document.querySelectorAll('.carte-chat');
+
+    cartes.forEach(carte => {
+        const age = parseInt(carte.getAttribute('data-age')) || 0;
+        const nom = carte.getAttribute('data-nom') || '';
+
+        let correspondAge = false;
+
+        // Condition par Âge
+        if (filtreAge === 'tous') {
+            correspondAge = true;
+        } else if (filtreAge === 'jeune' && age <= 2) {
+            correspondAge = true;
+        } else if (filtreAge === 'adulte' && (age === 3 || age === 4)) {
+            correspondAge = true;
+        } else if (filtreAge === 'senior' && age >= 5) {
+            correspondAge = true;
+        }
+
+        // Condition par Recherche textuelle
+        const correspondRecherche = nom.includes(recherche);
+
+        // Affichage dynamique
+        if (correspondAge && correspondRecherche) {
+            carte.style.display = "flex";
+        } else {
+            carte.style.display = "none";
+        }
+    });
+}
+</script>
+
 <?php include_once '../includes/footer.php'; ?>

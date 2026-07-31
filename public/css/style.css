@@ -1,4 +1,7 @@
-/* --- VARIABLES DE COULEURS (Ta palette Canva) --- */
+/* ==========================================================================
+   VARIABLES & ANIMATIONS
+   ========================================================================== */
+
 :root {
     --creme: #FFF8E7;
     --vert-menthe: #85D6CD;
@@ -6,40 +9,33 @@
     --gris-fonce: #2B2B2B;
 }
 
-/* --- EFFET DINER RÉTRO ÉLÉGANT --- */
 @keyframes diner-glow {
     0% {
-        text-shadow: 
-            2px 2px 4px rgba(254, 123, 126, 0.3),
-            -2px -2px 4px rgba(133, 214, 205, 0.2);
+        text-shadow: 2px 2px 4px rgba(254, 123, 126, 0.3),
+                     -2px -2px 4px rgba(133, 214, 205, 0.2);
     }
     50% {
-        text-shadow: 
-            2px 2px 6px rgba(254, 123, 126, 0.4),
-            -2px -2px 6px rgba(133, 214, 205, 0.3);
+        text-shadow: 2px 2px 6px rgba(254, 123, 126, 0.4),
+                     -2px -2px 6px rgba(133, 214, 205, 0.3);
     }
     100% {
-        text-shadow: 
-            2px 2px 4px rgba(254, 123, 126, 0.3),
-            -2px -2px 4px rgba(133, 214, 205, 0.2);
+        text-shadow: 2px 2px 4px rgba(254, 123, 126, 0.3),
+                     -2px -2px 4px rgba(133, 214, 205, 0.2);
     }
 }
 
 @keyframes diner-box-glow {
     0% {
-        box-shadow: 
-            0 4px 12px rgba(254, 123, 126, 0.2),
-            0 -2px 8px rgba(133, 214, 205, 0.1);
+        box-shadow: 0 4px 12px rgba(254, 123, 126, 0.2),
+                    0 -2px 8px rgba(133, 214, 205, 0.1);
     }
     50% {
-        box-shadow: 
-            0 6px 16px rgba(254, 123, 126, 0.3),
-            0 -2px 12px rgba(133, 214, 205, 0.2);
+        box-shadow: 0 6px 16px rgba(254, 123, 126, 0.3),
+                    0 -2px 12px rgba(133, 214, 205, 0.2);
     }
     100% {
-        box-shadow: 
-            0 4px 12px rgba(254, 123, 126, 0.2),
-            0 -2px 8px rgba(133, 214, 205, 0.1);
+        box-shadow: 0 4px 12px rgba(254, 123, 126, 0.2),
+                    0 -2px 8px rgba(133, 214, 205, 0.1);
     }
 }
 
@@ -52,18 +48,22 @@
     animation: diner-box-glow 2s ease-in-out infinite;
 }
 
-/* --- RESET DE BASE --- */
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* --- LE CORPS DU SITE --- */
+html,
 body {
     background-color: var(--creme);
     color: var(--gris-fonce);
     font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
 }
 
 .page-section {
@@ -80,8 +80,9 @@ body {
 }
 
 /* ==========================================================================
-   L'EN-TÊTE (Header)
+   HEADER
    ========================================================================== */
+
 header {
     background-color: var(--vert-menthe);
     display: flex;
@@ -102,10 +103,7 @@ nav ul {
     list-style: none;
     flex: 1;
     justify-content: center;
-}
-
-nav li {
-    flex-shrink: 1;
+    flex-wrap: wrap;
 }
 
 nav a {
@@ -113,13 +111,9 @@ nav a {
     font-size: 1.3rem !important;
     font-weight: 400 !important;
     color: var(--rose-corail) !important;
-    text-transform: capitalize !important;
     text-decoration: none !important;
     transition: color 0.3s ease !important;
     white-space: nowrap !important;
-    display: block !important;
-    letter-spacing: 0 !important;
-    line-height: 1.2 !important;
 }
 
 nav a:hover {
@@ -150,7 +144,7 @@ nav a:hover {
 .bouton-reserver:hover {
     background-color: #E55C5C;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(254,123,126,0.3);
+    box-shadow: 0 5px 15px rgba(254, 123, 126, 0.3);
 }
 
 .btn-admin-lock {
@@ -164,7 +158,6 @@ nav a:hover {
     background-color: rgba(255, 255, 255, 0.1);
     text-decoration: none;
     transition: all 0.3s ease;
-    cursor: pointer;
     border: 2px solid rgba(255, 255, 255, 0.2);
     flex-shrink: 0;
 }
@@ -179,6 +172,7 @@ nav a:hover {
 /* ==========================================================================
    HERO
    ========================================================================== */
+
 .hero {
     display: flex;
     align-items: center;
@@ -228,27 +222,19 @@ nav a:hover {
 .hero-image img {
     max-width: 100%;
     border-radius: 20px;
-    box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
-}
-
-/* ==========================================================================
-   IMAGE ACCUEIL (Bannière)
-   ========================================================================== */
-.ton-image-accueil-classe {
-    width: 100%;
-    height: 450px;
-    object-fit: cover;
-    object-position: center 20%;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================================================
    SERVICES
    ========================================================================== */
+
 .services {
     display: flex;
     justify-content: center;
     gap: 50px;
     padding: 50px;
+    flex-wrap: wrap;
 }
 
 .carte {
@@ -258,7 +244,7 @@ nav a:hover {
     border-radius: 20px;
     text-align: center;
     width: 250px;
-    box-shadow: 0px 8px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
 }
 
 .carte h3 {
@@ -267,61 +253,67 @@ nav a:hover {
 }
 
 /* ==========================================================================
-   MOUSTACHUS (PENSIONNAIRES)
+   PENSIONNAIRES (ÉQUIPAGE)
    ========================================================================== */
+
 .moustachus {
     padding: 80px 50px;
     text-align: center;
-}
-
-.moustachus h2 {
-    font-size: 2.5rem;
-    margin-bottom: 50px;
 }
 
 .grille-chats {
     display: flex;
     justify-content: center;
     gap: 60px;
+    flex-wrap: wrap;
+    align-items: stretch;
 }
 
 .carte-chat {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    justify-content: space-between;
+    background: white;
+    padding: 30px 20px 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    width: 320px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carte-chat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .carte-chat img {
     width: 220px;
     height: 220px;
     object-fit: cover;
-    object-position: center 20%;
     border-radius: 50%;
-    box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     margin-bottom: 15px;
 }
 
 .info-chat {
     text-align: center;
     margin-bottom: 15px;
-    max-width: 280px;
 }
 
 .info-chat h3 {
     font-family: 'Pacifico', cursive;
     font-size: 2rem;
     color: var(--rose-corail);
-    margin-bottom: 5px;
     font-weight: normal;
+    margin-bottom: 5px;
 }
 
 .chat-trait {
     font-size: 0.95rem;
     font-style: italic;
     color: var(--vert-menthe);
-    margin-bottom: 10px;
     font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .chat-histoire {
@@ -331,26 +323,45 @@ nav a:hover {
     margin-bottom: 15px;
 }
 
+.actions-chat {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: auto;
+}
+
 .bouton-chat {
-    background-color: #F8BBD0;
-    color: var(--gris-fonce);
-    text-decoration: none;
+    display: block !important;
+    width: 100% !important;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0 !important;
     padding: 12px 25px;
     border-radius: 30px;
     font-weight: bold;
-    text-transform: uppercase;
     font-size: 0.9rem;
-    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background-color: #F8BBD0;
+    color: var(--gris-fonce);
 }
 
 .bouton-chat.secondaire {
-    background-color: transparent;
-    border: 2px solid #F8BBD0;
+    background-color: var(--vert-menthe) !important;
+    color: var(--gris-fonce) !important;
+}
+
+.bouton-chat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0.9;
 }
 
 /* ==========================================================================
-   GRILLE PENSIONNAIRES (version moderne)
+   GRILLE PENSIONNAIRES (moderne)
    ========================================================================== */
+
 .grille-pensionnaires {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -394,10 +405,9 @@ nav a:hover {
 
 .pensionnaire-info h2 {
     font-family: 'Pacifico', cursive;
-    color: #2B2B2B;
     font-size: 1.5rem;
     font-weight: normal;
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
 }
 
 .statut-badge {
@@ -432,32 +442,26 @@ nav a:hover {
 .pensionnaire-age {
     color: #666;
     font-size: 0.9rem;
-    margin: 5px 0 10px 0;
+    margin: 5px 0 10px;
 }
 
 .pensionnaire-description {
     color: #444;
     line-height: 1.6;
     font-size: 0.95rem;
-    margin: 0;
 }
 
 /* ==========================================================================
    FOOTER
    ========================================================================== */
+
 footer {
     background-color: var(--gris-fonce);
     color: var(--creme);
     text-align: center;
     padding: 40px 50px;
     margin-top: 80px;
-    font-size: 0.9rem;
     border-top: 3px solid var(--vert-menthe);
-}
-
-footer p {
-    margin-bottom: 15px;
-    line-height: 1.6;
 }
 
 .reseaux-sociaux {
@@ -482,15 +486,11 @@ footer p {
 /* ==========================================================================
    CONCEPT
    ========================================================================== */
+
 .concept {
     padding: 60px 50px;
     text-align: center;
-    background-color: white;
-}
-
-.concept h2 {
-    font-size: 2.5rem;
-    margin-bottom: 40px;
+    background-color: var(--creme);
 }
 
 .grille-concept {
@@ -502,13 +502,16 @@ footer p {
 }
 
 .concept-item {
-    flex: 1;
-    min-width: 200px;
-    background-color: var(--creme);
+    background-color: #ffffff;
     padding: 30px;
     border-radius: 20px;
     border: 2px solid var(--vert-menthe);
-    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.concept-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .concept-item .icon {
@@ -518,12 +521,9 @@ footer p {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
 }
 
 .concept-item .icon img {
-    width: auto;
-    height: auto;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
@@ -535,40 +535,29 @@ footer p {
     margin-bottom: 15px;
 }
 
-.concept-item h3 a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.concept-item p {
-    line-height: 1.6;
-}
-
 /* ==========================================================================
    ATELIERS
    ========================================================================== */
+
 .ateliers {
     padding: 80px 50px;
     text-align: center;
-}
-
-.ateliers h2 {
-    font-size: 2.5rem;
-    margin-bottom: 50px;
 }
 
 .atelier-double-action {
     display: flex;
     justify-content: center;
     gap: 50px;
+    flex-wrap: wrap;
 }
 
 .atelier-card {
     flex: 1;
-    background-color: white;
+    min-width: 280px;
+    background: white;
     padding: 40px;
     border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -588,42 +577,15 @@ footer p {
     margin-bottom: 15px;
 }
 
-.atelier-card p {
-    margin-bottom: 25px;
-    line-height: 1.6;
-}
-
-.sous-titre-ateliers {
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-    font-style: italic;
-    color: var(--gris-fonce);
-}
-
-.description-atelier {
-    line-height: 1.7;
-    margin-bottom: 18px;
-}
-
-.impact {
-    font-size: 0.95rem;
-    margin-bottom: 22px;
-    color: var(--gris-fonce);
-}
-
 /* ==========================================================================
    GALERIES
    ========================================================================== */
+
 .grille-atelier-visuels,
 .grille-espace {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    align-items: stretch;
-}
-
-.grille-espace {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .visuel-card {
@@ -631,6 +593,12 @@ footer p {
     border-radius: 18px;
     background: white;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.visuel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .visuel-card img {
@@ -651,13 +619,6 @@ footer p {
 .contenu-atelier h3 {
     color: var(--rose-corail);
     font-size: 1.3rem;
-    margin: 0;
-}
-
-.contenu-atelier p {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin: 0;
 }
 
 .bouton-secondaire {
@@ -667,7 +628,6 @@ footer p {
     padding: 10px 20px;
     border-radius: 20px;
     font-weight: bold;
-    font-size: 0.9rem;
     display: inline-block;
     align-self: flex-start;
     transition: background-color 0.3s ease;
@@ -680,22 +640,16 @@ footer p {
 /* ==========================================================================
    DOUCEURS
    ========================================================================== */
+
 .douceurs {
     padding: 80px 50px 40px;
     text-align: center;
 }
 
-.douceurs h2,
-.attente h2 {
-    font-size: 2.5rem;
-    margin-bottom: 40px;
-}
-
 .grille-douceurs {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
-    align-items: stretch;
 }
 
 .douceur-card {
@@ -713,7 +667,7 @@ footer p {
     box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12);
 }
 
-.grille-douceurs img {
+.douceur-card img {
     width: 100%;
     height: 220px;
     object-fit: cover;
@@ -731,18 +685,12 @@ footer p {
     font-size: 1.2rem;
     color: var(--rose-corail);
     margin-bottom: 8px;
-    font-weight: 700;
-}
-
-.douceur-info p {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: var(--gris-fonce);
 }
 
 /* ==========================================================================
    ATTENTE
    ========================================================================== */
+
 .attente {
     padding: 40px 50px 90px;
     text-align: center;
@@ -755,7 +703,6 @@ footer p {
     background: white;
     border: 4px solid var(--vert-menthe);
     border-radius: 28px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 .attente-banniere img {
@@ -768,9 +715,10 @@ footer p {
 /* ==========================================================================
    LE REPAIRE
    ========================================================================== */
+
 .le-repaire {
     padding: 80px 50px;
-    background-color: white;
+    background-color: var(--creme);
 }
 
 .repaire-container {
@@ -794,14 +742,6 @@ footer p {
     margin-bottom: 15px;
 }
 
-.sous-titre-repaire {
-    font-size: 1.1rem;
-    color: var(--gris-fonce);
-    font-style: italic;
-    margin-bottom: 30px;
-    line-height: 1.5;
-}
-
 .bloc-histoire,
 .bloc-valeurs {
     margin-bottom: 30px;
@@ -818,13 +758,6 @@ footer p {
     margin-bottom: 12px;
 }
 
-.bloc-histoire p,
-.bloc-valeurs p {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: var(--gris-fonce);
-}
-
 .repaire-image {
     flex: 1;
 }
@@ -833,60 +766,31 @@ footer p {
     width: 100%;
     height: auto;
     border-radius: 20px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.repaire-galerie {
-    background-color: var(--creme);
-    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================================================
    BELLES HISTOIRES
    ========================================================================== */
+
 .belles-histoires-section {
     padding: 80px 50px 90px;
     text-align: center;
 }
 
-.belles-histoires-liste {
-    padding: 40px 50px 60px;
-}
-
-.liste-header {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.liste-header h1 {
-    font-family: 'Pacifico', cursive;
-    color: var(--rose-corail);
-    font-size: 3rem;
-    font-weight: normal;
-    margin-bottom: 15px;
-}
-
-.liste-header p {
-    font-size: 1.2rem;
-    color: var(--gris-fonce);
-    font-style: italic;
-}
-
 .grille-histoires {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
     max-width: 1100px;
     margin: 0 auto;
-    align-items: start;
 }
 
 .carte-histoire {
     background: white;
     border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
     padding: 30px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -917,36 +821,17 @@ footer p {
     font-style: italic;
 }
 
-.histoire-contenu {
-    flex-grow: 1;
-}
-
-.histoire-contenu p {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: var(--gris-fonce);
-    text-align: justify;
-}
-
-.page-liste {
-    min-height: calc(100vh - 200px);
-}
-
 /* ==========================================================================
    BOUTIQUE
    ========================================================================== */
+
 .boutique-principale {
     background-color: var(--creme);
 }
 
-.boutique-hero-catalog {
-    padding: 60px 50px 40px;
-    text-align: center;
-}
-
 .grille-categories-boutique {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 30px;
     max-width: 1000px;
     margin: 0 auto;
@@ -975,13 +860,6 @@ footer p {
     font-size: 1.5rem;
     color: var(--rose-corail);
     margin-bottom: 12px;
-    font-weight: 600;
-}
-
-.categorie-preview p {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--gris-fonce);
 }
 
 .boutique-section {
@@ -990,30 +868,10 @@ footer p {
     margin: 0 auto;
 }
 
-.boutique-section-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.boutique-section-header h2 {
-    font-family: 'Pacifico', cursive;
-    color: var(--rose-corail);
-    font-size: 2rem;
-    font-weight: normal;
-    margin-bottom: 8px;
-}
-
-.boutique-section-description {
-    font-size: 0.95rem;
-    color: var(--gris-fonce);
-    font-style: italic;
-}
-
 .grille-produits-boutique {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 30px;
-    align-items: stretch;
 }
 
 .carte-produit-boutique {
@@ -1023,8 +881,7 @@ footer p {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .carte-produit-boutique:hover {
@@ -1037,7 +894,6 @@ footer p {
     height: 180px;
     overflow: hidden;
     background: linear-gradient(135deg, var(--creme) 0%, #f5f5f5 100%);
-    position: relative;
 }
 
 .produit-image-boutique img {
@@ -1064,8 +920,6 @@ footer p {
     font-size: 1.25rem;
     color: var(--rose-corail);
     margin-bottom: 10px;
-    font-weight: 700;
-    line-height: 1.4;
 }
 
 .produit-description-boutique {
@@ -1112,13 +966,10 @@ footer p {
     box-shadow: 0 4px 12px rgba(133, 214, 205, 0.3);
 }
 
-.boutique-info-finales {
-    border-top: 3px solid var(--vert-menthe);
-}
-
 /* ==========================================================================
-   PANIER (CART)
+   PANIER
    ========================================================================== */
+
 .panier-section {
     padding: 50px;
     max-width: 1200px;
@@ -1126,6 +977,7 @@ footer p {
     display: flex;
     gap: 40px;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .panier-vide {
@@ -1133,15 +985,7 @@ footer p {
     padding: 80px 20px;
     background: white;
     border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     width: 100%;
-}
-
-.panier-vide h2 {
-    font-family: 'Pacifico', cursive;
-    color: var(--rose-corail);
-    font-size: 2.5rem;
-    margin-bottom: 20px;
 }
 
 .panier-articles {
@@ -1149,6 +993,7 @@ footer p {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 300px;
 }
 
 .carte-panier {
@@ -1160,6 +1005,7 @@ footer p {
     gap: 25px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease;
+    flex-wrap: wrap;
 }
 
 .carte-panier:hover {
@@ -1190,12 +1036,6 @@ footer p {
     font-size: 1.2rem;
     color: var(--rose-corail);
     margin-bottom: 8px;
-}
-
-.panier-prix-unitaire {
-    font-size: 0.9rem;
-    color: var(--gris-fonce);
-    font-weight: 600;
 }
 
 .panier-quantite {
@@ -1265,10 +1105,11 @@ footer p {
     background: white;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     border-top: 5px solid var(--vert-menthe);
     position: sticky;
     top: 120px;
+    min-width: 250px;
 }
 
 .panier-resume h3 {
@@ -1280,8 +1121,9 @@ footer p {
 }
 
 /* ==========================================================================
-   FORMULAIRE D'INSCRIPTION AUX ATELIERS
+   FORMULAIRES
    ========================================================================== */
+
 .ateliers-container {
     display: flex;
     flex-wrap: wrap;
@@ -1291,16 +1133,6 @@ footer p {
     padding: 0 20px;
     align-items: center;
     justify-content: center;
-}
-
-.ateliers-image img {
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease;
-}
-
-.ateliers-image img:hover {
-    transform: scale(1.02);
 }
 
 .formulaire-box {
@@ -1325,12 +1157,9 @@ footer p {
     font-weight: bold;
     color: var(--gris-fonce);
     margin-bottom: 8px;
-    font-family: 'Montserrat', sans-serif;
 }
 
-.form-groupe input[type="text"],
-.form-groupe input[type="email"],
-.form-groupe input[type="date"],
+.form-groupe input,
 .form-groupe select,
 .form-groupe textarea {
     width: 100%;
@@ -1375,10 +1204,6 @@ footer p {
     box-shadow: 0 6px 15px rgba(254, 123, 126, 0.35);
 }
 
-.btn-envoyer:active {
-    transform: translateY(0);
-}
-
 .message-success {
     background-color: #E8F7F5;
     color: #2E7D73;
@@ -1386,8 +1211,6 @@ footer p {
     padding: 15px;
     border-radius: 12px;
     margin-bottom: 20px;
-    font-size: 0.95rem;
-    line-height: 1.5;
 }
 
 .message-error {
@@ -1397,7 +1220,6 @@ footer p {
     padding: 15px;
     border-radius: 12px;
     margin-bottom: 20px;
-    font-size: 0.95rem;
 }
 
 .btn-return {
@@ -1417,21 +1239,81 @@ footer p {
 }
 
 /* ==========================================================================
+   ADMIN
+   ========================================================================== */
+
+/* Menu latéral */
+aside,
+.sidebar,
+[class*="sidebar"],
+[class*="admin-menu"] {
+    background-color: var(--gris-fonce) !important;
+}
+
+/* Fond de page admin */
+.admin-container,
+.admin-wrapper,
+main {
+    background-color: var(--creme) !important;
+}
+
+/* Cartes admin */
+.form-container,
+.admin-card,
+[class*="card"] {
+    background-color: #ffffff !important;
+    border: 2px solid var(--vert-menthe) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    padding: 30px !important;
+}
+
+/* Titres admin */
+.admin-card h2,
+form h2,
+.form-title,
+.admin-container h1,
+.main-content h1,
+h1 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 800 !important;
+    color: var(--gris-fonce) !important;
+    font-size: 2.2rem !important;
+    border-bottom: 3px solid var(--vert-menthe);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+/* Liens sidebar admin */
+.sidebar a,
+.admin-sidebar a,
+nav.admin-nav a {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    color: #FFFFFF !important;
+    text-transform: none !important;
+}
+
+.sidebar a:hover,
+.admin-sidebar a.active {
+    color: var(--vert-menthe) !important;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
    RESPONSIVE
    ========================================================================== */
+
 @media (max-width: 1100px) {
     header,
     .hero,
     .grille-concept,
     .grille-chats,
     .atelier-double-action,
-    .grille-atelier-visuels,
-    .grille-espace,
-    .grille-douceurs,
     .repaire-container,
     .panier-section {
         flex-direction: column;
-        grid-template-columns: 1fr;
     }
 
     header {
@@ -1442,10 +1324,6 @@ footer p {
         flex-wrap: nowrap;
         justify-content: center;
         gap: 8px !important;
-    }
-
-    nav li {
-        flex-shrink: 0 !important;
     }
 
     nav a {
@@ -1463,17 +1341,11 @@ footer p {
         width: 100%;
     }
 
-    .visuel-card img,
-    .grille-douceurs img {
-        height: 220px;
-    }
-
     .panier-resume {
         position: static;
     }
 
     .carte-panier {
-        flex-wrap: wrap;
         justify-content: center;
         text-align: center;
     }
@@ -1486,18 +1358,18 @@ footer p {
 
 @media (max-width: 768px) {
     .grille-produits-boutique {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: 1fr 1fr;
         gap: 20px;
     }
-    
+
     .produit-image-boutique {
         height: 200px;
     }
-    
+
     .boutique-section {
         padding: 30px 20px;
     }
-    
+
     .boutique-section-header h2 {
         font-size: 1.6rem;
     }
@@ -1514,111 +1386,28 @@ footer p {
         grid-template-columns: 1fr 1fr;
         gap: 15px;
     }
+
+    .grille-douceurs,
+    .grille-atelier-visuels {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 @media (max-width: 480px) {
+    .grille-produits-boutique {
+        grid-template-columns: 1fr;
+    }
+
     .grille-pensionnaires {
         grid-template-columns: 1fr;
     }
-    
+
     .pensionnaire-photo {
         height: 180px;
     }
-}
 
-/* ==========================================================================
-   🎨 UNIFICATION DU STYLE (AJOUTS LAETITIA)
-   ========================================================================== */
-
-/* 1. Unifier le fond général de TOUTES les pages en crème chaleureux */
-html,
-body,
-main,
-.page-section,
-.belles-histoires-section,
-.boutique-principale,
-.ateliers,
-.douceurs,
-.attente,
-.le-repaire,
-.panier-section,
-.boutique-hero-catalog,
-.boutique-section,
-.liste-header,
-.moustachus,
-.concept,
-.repaire-galerie {
-    background-color: var(--creme) !important;
-}
-
-/* 2. Unifier les cartes de contenu (fond blanc sur fond crème) */
-.concept-item,
-.equipage-card,
-.projet-card,
-.atelier-card,
-.carte-histoire,
-.carte-produit-boutique,
-.carte-pensionnaire,
-.douceur-card,
-.visuel-card,
-.carte-panier,
-.categorie-preview,
-.formulaire-box,
-.panier-resume,
-.carte-chat,
-.grille-pensionnaires .carte-pensionnaire,
-.visuel-card .contenu-atelier {
-    background-color: #ffffff !important;
-    border: 2px solid var(--vert-menthe) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Effet au survol (optionnel) */
-.concept-item:hover,
-.equipage-card:hover,
-.projet-card:hover,
-.atelier-card:hover,
-.carte-histoire:hover,
-.carte-produit-boutique:hover,
-.carte-pensionnaire:hover,
-.douceur-card:hover,
-.categorie-preview:hover,
-.carte-panier:hover,
-.carte-chat:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
-}
-/* ==========================================================================
-   FIX DÉFINITIF : CARTES ATELIERS & VISUELS (Règle la double carte)
-   ========================================================================== */
-.grille-atelier-visuels {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-    gap: 30px !important;
-    align-items: stretch !important;
-}
-
-/* On réinitialise la carte principale pour qu'elle s'adapte à 100% au contenu */
-.visuel-card {
-    height: auto !important;
-    min-height: 100% !important;
-    max-height: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    overflow: hidden !important; /* Coupe l'élément parasite qui dépasse en bas */
-    box-sizing: border-box !important;
-}
-
-/* On s'assure que le contenu interne s'étire correctement */
-.visuel-card .contenu-atelier {
-    flex-grow: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    background: transparent !important; /* Pas de double fond blanc */
-    border: none !important; /* Pas de double bordure turquoise */
-    box-shadow: none !important;
+    .grille-douceurs,
+    .grille-atelier-visuels {
+        grid-template-columns: 1fr;
+    }
 }
