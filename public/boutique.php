@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-// On force le serveur à envoyer la page en UTF-8 pour éliminer les caractères bizarres
+// On force le serveur à envoyer la page en UTF-8
 header('Content-Type: text/html; charset=utf-8');
 
 $sitePrefix = '';
@@ -13,12 +13,19 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getPDO();
-$csrf_token = generateCSRFToken();
 
-// Récupérer tous les produits avec leurs catégories
-$sql = 'SELECT p.id, p.nom, p.description, p.prix, cp.nom AS categorie
+// Génération CSRF sécurisée
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
+// Récupérer tous les produits avec leurs catégories et leur image
+// CORRECTION : p.image au lieu de p.image_url
+$sql = 'SELECT p.id, p.nom, p.description, p.prix, p.image, cp.nom AS categorie
         FROM produits p
         JOIN categories_produits cp ON p.categorie_id = cp.id
+        WHERE p.actif = 1
         ORDER BY cp.nom ASC, p.nom ASC';
 
 $produits = $pdo->query($sql)->fetchAll();
@@ -54,15 +61,16 @@ function getCategoryConfig(string $cat): array
 
 function getImagePath(string $productName): string
 {
-    // Mapping direct produit → image (toutes dans images/produits/)
     $imageMap = [
         'Milkshake Fraise' => 'images/produits/milkshake-fraise.jpg',
         'Burger Veggie Moustache' => 'images/produits/burger-veggie.jpg',
         'Mug Diner' => 'images/produits/mug-diner.jpg',
         'Tablier Vintage' => 'images/produits/tablier-vintage.jpg',
+        'Pins Émaillés' => 'images/produits/pins-emailles.jpg',
         'Pins Emailles' => 'images/produits/pins-emailles.jpg',
         'Tote Bag Solidaire' => 'images/produits/tote-bag.jpg',
         'Jouets Catnip Deluxe' => 'images/produits/jouets-catnip.jpg',
+        'Planches de Stickers Rétro' => 'images/produits/stickers-retro.jpg',
         'Planches de Stickers Retro' => 'images/produits/stickers-retro.jpg',
         'Cartes Postales Polaroid' => 'images/produits/cartes-postales.jpg',
         'Badge Solidaire' => 'images/produits/badge-solidaire.jpg',
@@ -88,7 +96,6 @@ if (isset($_SESSION['cart'])) {
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Styles de la boutique ajustés */
         .boutique-principale {
             max-width: 1100px;
             margin: 0 auto;
@@ -135,14 +142,12 @@ if (isset($_SESSION['cart'])) {
             font-size: 0.95rem;
         }
 
-        /* Grille des produits */
         .grille-produits-boutique {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
         }
 
-        /* Carte Produit */
         .carte-produit-boutique {
             background: #ffffff;
             border: 2px solid #82ceca;
@@ -159,7 +164,6 @@ if (isset($_SESSION['cart'])) {
             box-shadow: 0 8px 20px rgba(130, 206, 202, 0.25);
         }
 
-        /* Image Produit - Hauteur et cadrage corrigés */
         .produit-image-boutique {
             width: 100%;
             height: 230px;
@@ -182,7 +186,6 @@ if (isset($_SESSION['cart'])) {
             transform: scale(1.05);
         }
 
-        /* Infos Produit */
         .produit-info-boutique {
             padding: 20px;
             display: flex;
@@ -241,7 +244,6 @@ if (isset($_SESSION['cart'])) {
             transform: translateY(-1px);
         }
 
-        /* Header action bar */
         .panier-link {
             background: #82ceca;
             color: white;
@@ -331,9 +333,15 @@ if (isset($_SESSION['cart'])) {
                     
                     <div class="grille-produits-boutique">
                         <?php foreach ($items as $produit): ?>
+                            <?php 
+                                // On utilise la colonne $produit['image'] du nouveau schéma
+                                $srcImage = !empty($produit['image']) 
+                                    ? $produit['image'] 
+                                    : getImagePath((string) $produit['nom']);
+                            ?>
                             <article class="carte-produit-boutique">
                                 <div class="produit-image-boutique">
-                                    <img src="<?php echo htmlspecialchars(getImagePath((string) $produit['nom']), ENT_QUOTES, 'UTF-8'); ?>" 
+                                    <img src="<?php echo htmlspecialchars($srcImage, ENT_QUOTES, 'UTF-8'); ?>" 
                                          alt="<?php echo htmlspecialchars((string) $produit['nom'], ENT_QUOTES, 'UTF-8'); ?>"
                                          loading="lazy">
                                 </div>

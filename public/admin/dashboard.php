@@ -16,37 +16,27 @@ require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 
-// Récupérer les statistiques pour le dashboard
-$stats = [];
-
-try {
-    // Nombre de pensionnaires (chats)
-    $stmt = $pdo->query('SELECT COUNT(*) FROM pensionnaires');
-    $stats['pensionnaires'] = (int)$stmt->fetchColumn();
-
-    // Nombre de commandes
-    $stmt = $pdo->query('SELECT COUNT(*) FROM commandes');
-    $stats['commandes'] = (int)$stmt->fetchColumn();
-
-    // Nombre de produits
-    $stmt = $pdo->query('SELECT COUNT(*) FROM produits');
-    $stats['produits'] = (int)$stmt->fetchColumn();
-
-    // Nombre de réservations ateliers
-    $stmt = $pdo->query('SELECT COUNT(*) FROM reservations_ateliers');
-    $stats['reservations'] = (int)$stmt->fetchColumn();
-
-    // Nombre d'utilisateurs
-    $stmt = $pdo->query('SELECT COUNT(*) FROM utilisateurs');
-    $stats['utilisateurs'] = (int)$stmt->fetchColumn();
-
-    // Nombre d'histoires en attente de modération
-    $stmt = $pdo->query("SELECT COUNT(*) FROM belles_histoires WHERE statut = 'en_attente'");
-    $stats['histoires_attente'] = (int)$stmt->fetchColumn();
-} catch (PDOException $e) {
-    error_log($e->getMessage());
-    die('Une erreur est survenue lors du chargement des statistiques du dashboard.');
+// Helper sécurisé pour exécuter un COUNT(*) sans faire planter la page
+function getSafeCount(PDO $pdo, string $query): int {
+    try {
+        $stmt = $pdo->query($query);
+        return $stmt ? (int)$stmt->fetchColumn() : 0;
+    } catch (PDOException $e) {
+        // Log la sous-erreur discrètement
+        error_log('Erreur Stat Dashboard SQL : ' . $e->getMessage());
+        return 0;
+    }
 }
+
+// Récupérer les statistiques pour le dashboard
+$stats = [
+    'pensionnaires'     => getSafeCount($pdo, 'SELECT COUNT(*) FROM pensionnaires'),
+    'commandes'         => getSafeCount($pdo, 'SELECT COUNT(*) FROM commandes'),
+    'produits'          => getSafeCount($pdo, 'SELECT COUNT(*) FROM produits'),
+    'reservations'      => getSafeCount($pdo, 'SELECT COUNT(*) FROM reservations_ateliers'),
+    'utilisateurs'      => getSafeCount($pdo, 'SELECT COUNT(*) FROM utilisateurs'),
+    'histoires_attente' => getSafeCount($pdo, "SELECT COUNT(*) FROM belles_histoires WHERE statut = 'en_attente'"),
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr">

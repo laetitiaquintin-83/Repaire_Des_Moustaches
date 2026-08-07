@@ -33,10 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'] ?? '';
 
         if ($action === 'ajouter' || $action === 'modifier') {
-            $nom = htmlspecialchars(trim($_POST['nom'] ?? ''));
-            $age = (int)($_POST['age'] ?? 0);
-            $caractere = htmlspecialchars(trim($_POST['caractere'] ?? ''));
-            $description = htmlspecialchars(trim($_POST['description'] ?? ''));
+            // ✅ NOUVEAU CODE (Complet avec l'âge)
+$nom = trim($_POST['nom'] ?? '');
+$age = (int)($_POST['age'] ?? 0);
+$caractere = trim($_POST['caractere'] ?? '');
+$description = trim($_POST['description'] ?? '');
             $statut = $_POST['statut'] ?? 'a_l_adoption';
             $refuge_id = !empty($_POST['refuge_id']) ? (int)$_POST['refuge_id'] : null;
             $admin_id = $_SESSION['admin_id'];

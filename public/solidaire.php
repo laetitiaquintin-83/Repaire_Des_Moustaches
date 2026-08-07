@@ -25,6 +25,10 @@ require_once __DIR__ . '/../includes/header.php';
 
 <style>
 /* --- STYLES CHARTE EXACTE : LA PATTE SUSPENDUE --- */
+html {
+    scroll-behavior: smooth;
+}
+
 .solidaire-container {
     max-width: 1000px;
     margin: 40px auto 70px auto;
@@ -59,7 +63,7 @@ require_once __DIR__ . '/../includes/header.php';
     gap: 40px;
     align-items: center;
     background: #FFFFFF;
-    border: 3px solid #72C2BB; /* Vert menthe/turquoise de ton header */
+    border: 3px solid #72C2BB; /* Vert menthe/turquoise du header */
     border-radius: 24px;
     padding: 30px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -86,7 +90,7 @@ require_once __DIR__ . '/../includes/header.php';
 }
 
 .solidaire-hero-text h2 {
-    color: #802C38; /* Bordeaux sombre pour la lisibilité des sous-titres */
+    color: #802C38; /* Bordeaux sombre pour la lisibilité */
     font-size: 1.6rem;
     margin-bottom: 15px;
     line-height: 1.3;
@@ -135,12 +139,12 @@ require_once __DIR__ . '/../includes/header.php';
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 25px;
-    margin-bottom: 50px;
+    margin-bottom: 60px;
 }
 
 .don-card {
     background: #FFFFFF;
-    border: 2px solid #72C2BB; /* Bordure menthe/turquoise identique aux cartes équipage */
+    border: 2px solid #72C2BB;
     border-radius: 20px;
     padding: 25px;
     text-align: center;
@@ -185,7 +189,8 @@ require_once __DIR__ . '/../includes/header.php';
 }
 
 .btn-don {
-    background-color: #FF7B7B; /* Corail bouton Réserver */
+    display: inline-block;
+    background-color: #FF7B7B;
     color: #FFFFFF;
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
@@ -200,7 +205,79 @@ require_once __DIR__ . '/../includes/header.php';
 
 .btn-don:hover {
     background-color: #802C38;
+    color: #FFFFFF;
     transform: scale(1.03);
+}
+
+/* SECTION MODE D'EMPLOI */
+.mode-emploi-section {
+    scroll-margin-top: 100px;
+    margin-bottom: 60px;
+}
+
+.mode-emploi-intro {
+    background: #FFFFFF;
+    border: 2px solid #72C2BB;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 850px;
+    margin: 0 auto 35px auto;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+}
+
+.mode-emploi-intro h3 {
+    color: #802C38;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.mode-emploi-intro p {
+    font-family: 'Montserrat', sans-serif;
+    color: #4A5568;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.etapes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.etape-card {
+    background: #FFFFFF;
+    padding: 25px 20px;
+    border-radius: 18px;
+    text-align: center;
+    border-top: 5px solid #FF7B7B;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.etape-card:nth-child(2) {
+    border-top-color: #72C2BB;
+}
+
+.etape-number {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.etape-card h4 {
+    color: #802C38;
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.etape-card p {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.5;
 }
 
 /* Section Bénéficier */
@@ -272,7 +349,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="don-price">2,50 €</div>
                 <div class="don-desc">Offre un café, un thé chaud ou une infusion réconfortante à un(e) inconnu(e).</div>
             </div>
-            <button class="btn-don">Offrir un café 🐾</button>
+            <a href="#mode-d-emploi" class="btn-don">Offrir un café 🐾</a>
         </div>
 
         <!-- Option 2 -->
@@ -283,7 +360,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="don-price">6,00 €</div>
                 <div class="don-desc">Offre une boisson gourmande et une pâtisserie artisanale du Repaire.</div>
             </div>
-            <button class="btn-don">Offrir un goûter 🐾</button>
+            <a href="#mode-d-emploi" class="btn-don">Offrir un goûter 🐾</a>
         </div>
 
         <!-- Option 3 -->
@@ -294,9 +371,47 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="don-price">15,00 €</div>
                 <div class="don-desc">Permet à une personne d'assister gratuitement à un atelier créatif ou de ronronthérapie.</div>
             </div>
-            <button class="btn-don">Offrir un atelier 🐾</button>
+            <a href="#mode-d-emploi" class="btn-don">Offrir un atelier 🐾</a>
         </div>
     </div>
+
+    <!-- Mode d'emploi : Comment participer -->
+    <section id="mode-d-emploi" class="mode-emploi-section">
+        <h2 style="text-align: center; font-family: 'Pacifico', cursive; color: #FF7B7B; margin-bottom: 25px; font-weight: normal; font-size: 2.2rem;">
+            🐾 Comment offrir un coup de patte ?
+        </h2>
+
+        <div class="mode-emploi-intro">
+            <h3>Une grande ardoise solidaire au comptoir</h3>
+            <p>
+                <strong>Le Repaire des Moustaches</strong> s'engage pour la solidarité ! Le principe de « La Patte Suspendue » est simple : vous offrez une prestation qui sera directement ajoutée à notre ardoise au salon de thé.
+            </p>
+        </div>
+
+        <h3 style="text-align: center; font-family: 'Montserrat', sans-serif; color: #802C38; margin-bottom: 25px; font-weight: 700;">
+            Le fonctionnement en 3 étapes :
+        </h3>
+
+        <div class="etapes-grid">
+            <div class="etape-card">
+                <div class="etape-number">1️⃣</div>
+                <h4>Au comptoir</h4>
+                <p>Indiquez simplement à notre équipe le coup de patte que vous souhaitez offrir (café, goûter ou atelier) lors de votre passage.</p>
+            </div>
+
+            <div class="etape-card">
+                <div class="etape-number">2️⃣</div>
+                <h4>Sur l'ardoise</h4>
+                <p>Votre don est immédiatement inscrit sur notre ardoise solidaire visible par tous les visiteurs du salon de thé.</p>
+            </div>
+
+            <div class="etape-card">
+                <div class="etape-number">3️⃣</div>
+                <h4>Un moment de bonheur !</h4>
+                <p>Une personne dans le besoin ou traversant un moment difficile en profite gratuitement et en toute discrétion.</p>
+            </div>
+        </div>
+    </section>
 
     <!-- Comment en bénéficier -->
     <div class="beneficier-box">

@@ -16,11 +16,11 @@ $stmt = $pdo->prepare('SELECT * FROM pensionnaires ORDER BY nom');
 $stmt->execute();
 $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// On associe chaque chat à son image (fixe)
-$images = [
-    'Velours' => ['webp' => 'images/chat1.webp', 'jpg' => 'images/chat1.jpg', 'alt' => 'Velours, chat roux élégant'],
-    'Biscuit' => ['webp' => 'images/chat2.webp', 'jpg' => 'images/chat2.jpg', 'alt' => 'Biscuit, petit chat gourmand'],
-    'Moonlight' => ['webp' => 'images/chat3.webp', 'jpg' => 'images/chat3.jpg', 'alt' => 'Moonlight, chat mélancolique et poète'],
+// Fallback pour les images d'origine si le champ BDD est vide
+$images_fallback = [
+    'Velours' => 'images/chat1.jpg',
+    'Biscuit' => 'images/chat2.jpg',
+    'Moonlight' => 'images/chat3.jpg',
 ];
 ?>
 
@@ -96,7 +96,7 @@ $images = [
     <section class="page-section moustachus">
         <h1 class="page-title">Rencontrez l'Équipage</h1>
         <p class="sous-titre" style="margin-bottom: 25px; font-style: italic;">
-            Les trois mousquetaires du Repaire, chacun avec sa personnalité attachante. Venez les rencontrer pour un moment de ronrons et de tendresse.
+            Découvrez les résidents de notre refuge et trouvez votre futur compagnon de vie.
         </p>
         
         <!-- 🔍 BARRE DE FILTRES EN DIRECT -->
@@ -114,9 +114,14 @@ $images = [
         <div class="grille-chats">
             <?php foreach ($chats as $chat): 
                 $nom = $chat['nom'];
-                // Récupération de l'image associée
-                $img = isset($images[$nom]) ? $images[$nom] : null;
-                if (!$img) continue; // Si le chat n'a pas d'image associée, on passe
+                
+                // Détermination dynamique de l'image (BDD d'abord, puis fallback, puis placeholder)
+                $img_src = 'images/placeholder.jpg';
+                if (!empty($chat['photo_url'])) {
+                    $img_src = $chat['photo_url'];
+                } elseif (isset($images_fallback[$nom])) {
+                    $img_src = $images_fallback[$nom];
+                }
                 
                 $age = isset($chat['age']) ? (int)$chat['age'] : 0;
             ?>
@@ -124,20 +129,19 @@ $images = [
                          data-age="<?= $age ?>" 
                          data-nom="<?= htmlspecialchars(strtolower($nom)) ?>">
                     <div>
-                        <picture>
-                            <source srcset="<?= $img['webp'] ?>" type="image/webp">
-                            <img src="<?= $img['jpg'] ?>" 
-                                 alt="<?= $img['alt'] ?>" 
+                        <div class="photo-container-chat">
+                            <img src="<?= $img_src ?>" 
+                                 alt="<?= htmlspecialchars($nom) ?>" 
                                  width="220" height="220" loading="lazy" 
-                                 style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block;">
-                        </picture>
+                                 style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block; width: 220px; height: 220px;">
+                        </div>
                         <div class="info-chat">
                             <h3><?= htmlspecialchars($nom) ?> <?php if ($age > 0): ?><small style="font-size: 0.8em; opacity: 0.7;">(<?= $age ?> ans)</small><?php endif; ?></h3>
-                            <p class="chat-trait"><?= htmlspecialchars($chat['caractere'] ?? 'À découvrir') ?></p>
-                            <p class="chat-histoire"><?= nl2br(htmlspecialchars($chat['description'])) ?></p>
+                            <p class="chat-trait" style="font-weight: bold; color: #ff7b7b; margin-bottom: 10px;"><?= htmlspecialchars($chat['caractere'] ?? 'À découvrir') ?></p>
+                            <p class="chat-histoire" style="font-size: 0.95rem; line-height: 1.5; color: #555;"><?= nl2br(htmlspecialchars($chat['description'])) ?></p>
                         </div>
                     </div>
-                    <div class="actions-chat">
+                    <div class="actions-chat" style="margin-top: 20px;">
                         <a href="adoption.php?id=<?= $chat['id'] ?>" class="bouton-chat">Tomber sous le charme</a>
                         <a href="adoption.php?id=<?= $chat['id'] ?>" class="bouton-chat secondaire">Adopter <?= htmlspecialchars($nom) ?></a>
                     </div>
