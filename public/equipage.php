@@ -18,9 +18,12 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fallback pour les images d'origine si le champ BDD est vide
 $images_fallback = [
-    'Velours' => 'images/chat1.jpg',
-    'Biscuit' => 'images/chat2.jpg',
-    'Moonlight' => 'images/chat3.jpg',
+    'Velours'   => 'images/chat1.webp',
+    'Biscuit'   => 'images/chat2.webp',
+    'Moonlight' => 'images/chat3.webp',
+    'Caramel'   => 'images/caramel.webp',
+    'Cookie'    => 'images/cookie_siamois.webp',
+    'Elvis'     => 'images/elvis.webp',
 ];
 ?>
 
@@ -115,10 +118,10 @@ $images_fallback = [
             <?php foreach ($chats as $chat): 
                 $nom = $chat['nom'];
                 
-                // Détermination dynamique de l'image (BDD d'abord, puis fallback, puis placeholder)
+                // Détermination dynamique de l'image (BDD d'abord via 'photo', puis fallback, puis placeholder)
                 $img_src = 'images/placeholder.jpg';
-                if (!empty($chat['photo_url'])) {
-                    $img_src = $chat['photo_url'];
+                if (!empty($chat['photo'])) {
+                    $img_src = $chat['photo'];
                 } elseif (isset($images_fallback[$nom])) {
                     $img_src = $images_fallback[$nom];
                 }
@@ -130,7 +133,7 @@ $images_fallback = [
                          data-nom="<?= htmlspecialchars(strtolower($nom)) ?>">
                     <div>
                         <div class="photo-container-chat">
-                            <img src="<?= $img_src ?>" 
+                            <img src="<?= htmlspecialchars($img_src) ?>" 
                                  alt="<?= htmlspecialchars($nom) ?>" 
                                  width="220" height="220" loading="lazy" 
                                  style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block; width: 220px; height: 220px;">

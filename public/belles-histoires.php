@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 // Force l'encodage UTF-8 au niveau du serveur pour supprimer les caractères bizarres
