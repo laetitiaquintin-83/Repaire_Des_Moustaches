@@ -120,6 +120,11 @@ nav a {
     white-space: nowrap !important;
 }
 
+:where(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid var(--gris-fonce);
+    outline-offset: 3px;
+}
+
 nav a:hover {
     color: var(--gris-fonce) !important;
 }
@@ -134,7 +139,7 @@ nav a:hover {
 
 .bouton-reserver {
     background-color: var(--rose-corail);
-    color: white;
+    color: var(--gris-fonce);
     text-decoration: none;
     padding: 12px 25px;
     border-radius: 30px;
@@ -1437,4 +1442,9 @@ nav.admin-nav a {
     margin-right: auto !important;
     max-width: 100%;
     height: auto;
+}
+
+:focus-visible {
+    outline: 3px solid var(--gris-fonce) !important;
+    outline-offset: 3px;
 }

@@ -104,15 +104,15 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
             <div class="grid-partenaires">
                 <?php foreach ($pensionnaires_partenaires as $animal): ?>
                     <div class="card-animal">
-                        <img src="<?php echo htmlspecialchars($animal['image']); ?>" alt="<?php echo htmlspecialchars($animal['nom']); ?>" class="card-img">
+                        <img src="<?php echo htmlspecialchars((string) $animal['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars((string) $animal['nom'], ENT_QUOTES, 'UTF-8'); ?>" class="card-img">
                         <div class="card-content">
-                            <h3 class="animal-name"><?php echo htmlspecialchars($animal['nom']); ?></h3>
+                            <h3 class="animal-name"><?php echo htmlspecialchars((string) $animal['nom'], ENT_QUOTES, 'UTF-8'); ?></h3>
                             <div class="animal-info">
-                                <strong>Espèce :</strong> <?php echo htmlspecialchars($animal['espece']); ?><br>
-                                <strong>Race :</strong> <?php echo htmlspecialchars($animal['race']); ?><br>
-                                <strong>Âge :</strong> <?php echo htmlspecialchars($animal['age']); ?>
+                                <strong>Espèce :</strong> <?php echo htmlspecialchars((string) $animal['espece'], ENT_QUOTES, 'UTF-8'); ?><br>
+                                <strong>Race :</strong> <?php echo htmlspecialchars((string) $animal['race'], ENT_QUOTES, 'UTF-8'); ?><br>
+                                <strong>Âge :</strong> <?php echo htmlspecialchars((string) $animal['age'], ENT_QUOTES, 'UTF-8'); ?>
                             </div>
-                            <span class="badge-refuge">📍 <?php echo htmlspecialchars($animal['refuge_provenance']); ?></span>
+                            <span class="badge-refuge">📍 <?php echo htmlspecialchars((string) $animal['refuge_provenance'], ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                     </div>
                 <?php endforeach; ?>

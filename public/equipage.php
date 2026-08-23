@@ -131,7 +131,7 @@ $images_fallback = [
             <select id="filtre-caractere" onchange="filtrerChats()" class="input-filtre" style="cursor: pointer; font-weight: bold;">
                 <option value="tous">✨ Tous les caractères</option>
                 <?php foreach ($caracteres_uniques as $caractere): ?>
-                    <option value="<?= htmlspecialchars(strtolower($caractere)) ?>">
+                    <option value="<?= htmlspecialchars(strtolower($caractere), ENT_QUOTES, 'UTF-8') ?>">
                         <?= htmlspecialchars($caractere) ?>
                     </option>
                 <?php endforeach; ?>

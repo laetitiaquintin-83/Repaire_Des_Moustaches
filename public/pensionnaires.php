@@ -9,7 +9,8 @@ include_once '../includes/header.php';
 // Récupération dynamique depuis la BDD MySQL
 try {
     $pdo = getPDO();
-    $stmt = $pdo->query("SELECT * FROM pensionnaires ORDER BY id ASC");
+    $stmt = $pdo->prepare('SELECT * FROM pensionnaires ORDER BY id ASC');
+    $stmt->execute();
     $pensionnaires = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $pensionnaires = [];

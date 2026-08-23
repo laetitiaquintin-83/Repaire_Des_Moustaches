@@ -17,7 +17,7 @@ require_once __DIR__ . '/../../config/database.php';
 $pdo = getPDO();
 
 // Récupérer tous les utilisateurs avec des sous-requêtes pour éviter les faux doublons de SUM()
-$stmt = $pdo->query('
+$stmt = $pdo->prepare('
     SELECT 
         u.id,
         u.nom,
@@ -50,6 +50,7 @@ $stmt = $pdo->query('
     ) c ON u.id = c.utilisateur_id
     ORDER BY u.date_inscription DESC
 ');
+$stmt->execute();
 
 $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

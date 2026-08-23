@@ -27,12 +27,12 @@ $csrf_token = $_SESSION['csrf_token'];
 
 // Traitement des actions (Ajouter, Modifier, Supprimer)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $posted_token = $_POST['csrf_token'] ?? '';
+    $posted_token = trim((string) ($_POST['csrf_token'] ?? ''));
     
     if (!hash_equals($_SESSION['csrf_token'], $posted_token)) {
         $error = 'Erreur de sécurité : token CSRF invalide';
     } else {
-        $action = $_POST['action'] ?? '';
+        $action = trim((string) ($_POST['action'] ?? ''));
 
         if ($action === 'ajouter' || $action === 'modifier') {
             $nom = trim($_POST['nom'] ?? '');
@@ -150,7 +150,8 @@ if (isset($_GET['edit'])) {
 }
 
 // Récupération de tous les produits
-$stmt = $pdo->query('SELECT * FROM produits ORDER BY id DESC');
+$stmt = $pdo->prepare('SELECT * FROM produits ORDER BY id DESC');
+$stmt->execute();
 $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -218,7 +219,7 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <p style="margin: 0 0 5px 0; font-size: 12px; color: #aaa;">Connecté:</p>
-                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 14px;"><?= htmlspecialchars($_SESSION['admin_email'] ?? 'Admin') ?></p>
+                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 14px;"><?= htmlspecialchars((string) ($_SESSION['admin_email'] ?? 'Admin'), ENT_QUOTES, 'UTF-8') ?></p>
                 <a href="../logout.php" style="color: #FE7B7E; text-decoration: none; font-weight: 600; font-size: 14px;">🚪 Déconnexion</a>
             </div>
         </aside>
@@ -228,11 +229,11 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <h1>🛍️ Gestion des Produits</h1>
             
             <?php if ($message): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
+                <div class="alert alert-success"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
             
             <?php if ($error): ?>
-                <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+                <div class="alert alert-error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
 
             <!-- Formulaire -->
@@ -240,7 +241,7 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h3><?= $edit_produit ? 'Modifier le produit' : 'Ajouter un nouveau produit' ?></h3>
                 
                 <form method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
                     <input type="hidden" name="action" value="<?= $edit_produit ? 'modifier' : 'ajouter' ?>">
                     <?php if ($edit_produit): ?>
                         <input type="hidden" name="id" value="<?= $edit_produit['id'] ?>">
@@ -249,12 +250,12 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="form-group">
                         <label for="nom">Nom du produit *</label>
                         <input type="text" id="nom" name="nom" required 
-                               value="<?= $edit_produit ? htmlspecialchars($edit_produit['nom']) : '' ?>">
+                               value="<?= $edit_produit ? htmlspecialchars((string) $edit_produit['nom'], ENT_QUOTES, 'UTF-8') : '' ?>">
                     </div>
                     
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description"><?= $edit_produit ? htmlspecialchars($edit_produit['description'] ?? '') : '' ?></textarea>
+                        <textarea id="description" name="description"><?= $edit_produit ? htmlspecialchars((string) ($edit_produit['description'] ?? ''), ENT_QUOTES, 'UTF-8') : '' ?></textarea>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -275,7 +276,7 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <label for="image">Image du produit</label>
                         <input type="file" id="image" name="image" accept="image/*">
                         <?php if ($edit_produit && !empty($edit_produit['image_url'])): ?>
-                            <p style="font-size: 12px; margin-top: 5px; color: #666;">Image actuelle : <?= htmlspecialchars($edit_produit['image_url']) ?></p>
+                            <p style="font-size: 12px; margin-top: 5px; color: #666;">Image actuelle : <?= htmlspecialchars((string) $edit_produit['image_url'], ENT_QUOTES, 'UTF-8') ?></p>
                         <?php endif; ?>
                     </div>
                     
@@ -303,7 +304,7 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($produits as $produit): ?>
                             <div class="produit-card">
                                 <?php 
-                                    $img_file = !empty($produit['image_url']) ? htmlspecialchars($produit['image_url']) : '';
+                                    $img_file = !empty($produit['image_url']) ? htmlspecialchars((string) $produit['image_url'], ENT_QUOTES, 'UTF-8') : '';
                                     $image_path = !empty($img_file) ? "../" . $img_file : "../images/produits/default-product.png";
                                 ?>
                                 <img src="<?= $image_path ?>" 
@@ -311,7 +312,7 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                      onerror="this.onerror=null; this.src='../images/produits/default-product.png';">
                                 
                                 <div class="produit-details">
-                                    <div class="produit-title"><?= htmlspecialchars($produit['nom']) ?></div>
+                                    <div class="produit-title"><?= htmlspecialchars((string) $produit['nom'], ENT_QUOTES, 'UTF-8') ?></div>
                                     <div class="produit-info">
                                         <div><span class="info-label">Prix:</span> <?= number_format((float)$produit['prix'], 2, ',', ' ') ?> €</div>
                                         <div><span class="info-label">Catégorie:</span> N°<?= (int)$produit['categorie_id'] ?></div>

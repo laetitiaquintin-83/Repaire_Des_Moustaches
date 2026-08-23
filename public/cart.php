@@ -25,7 +25,7 @@ $csrf_token = generateCSRFToken();
 // 1. GESTION DE L'AJOUT AU PANIER VIA URL (GET) Ex: ?action=add&type=adhesion
 // ---------------------------------------------------------------------
 if (isset($_GET['action']) && $_GET['action'] === 'add') {
-    $type = $_GET['type'] ?? 'produit';
+    $type = trim((string) ($_GET['type'] ?? 'produit'));
 
     if ($type === 'adhesion') {
         // Clé unique pour l'adhésion dans la session
@@ -74,22 +74,22 @@ if (isset($_GET['action']) && $_GET['action'] === 'add') {
 // ---------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérification CSRF
-    $csrf_check = $_POST['csrf_token'] ?? '';
+    $csrf_check = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!validateCSRFToken($csrf_check)) {
         die('Erreur de sécurité : token CSRF invalide');
     }
 
     if (isset($_POST['action'])) {
-        $action = $_POST['action'];
+        $action = trim((string) $_POST['action']);
         
         if ($action === 'remove') {
-            $produit_id = $_POST['produit_id'] ?? '';
+            $produit_id = trim((string) ($_POST['produit_id'] ?? ''));
             if (isset($_SESSION['cart'][$produit_id])) {
                 unset($_SESSION['cart'][$produit_id]);
                 $message = 'Article retiré du panier';
             }
         } elseif ($action === 'update_quantity') {
-            $produit_id = $_POST['produit_id'] ?? '';
+            $produit_id = trim((string) ($_POST['produit_id'] ?? ''));
             $nouvelle_quantite = (int)($_POST['quantite'] ?? 0);
             
             if (isset($_SESSION['cart'][$produit_id])) {

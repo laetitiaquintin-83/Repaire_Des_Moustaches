@@ -19,7 +19,8 @@ $pdo = getPDO();
 // Helper sécurisé pour exécuter un COUNT(*) sans faire planter la page
 function getSafeCount(PDO $pdo, string $query): int {
     try {
-        $stmt = $pdo->query($query);
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
         return $stmt ? (int)$stmt->fetchColumn() : 0;
     } catch (PDOException $e) {
         // Log la sous-erreur discrètement

@@ -26,9 +26,9 @@ $csrf_token = $_SESSION['csrf_token'];
 
 // Actions POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = (string) ($_POST['action'] ?? '');
+    $action = trim((string) ($_POST['action'] ?? ''));
     $id = (int) ($_POST['id'] ?? 0);
-    $csrf_check = (string) ($_POST['csrf_token'] ?? '');
+    $csrf_check = trim((string) ($_POST['csrf_token'] ?? ''));
 
     if (!hash_equals($_SESSION['csrf_token'], $csrf_check)) {
         $error = 'Erreur de sécurité : token CSRF invalide.';
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Récupération selon l'onglet
-$tab = (string) ($_GET['tab'] ?? 'attente');
+$tab = trim((string) ($_GET['tab'] ?? 'attente'));
 
 $statut = match ($tab) {
     'publiees' => 'publiee',
@@ -96,7 +96,8 @@ $histoires = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Stats
 $stats = ['en_attente' => 0, 'publiee' => 0, 'refusee' => 0];
-$stmt = $pdo->query("SELECT statut, COUNT(*) AS count FROM belles_histoires GROUP BY statut");
+$stmt = $pdo->prepare('SELECT statut, COUNT(*) AS count FROM belles_histoires GROUP BY statut');
+$stmt->execute();
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     if (isset($stats[$row['statut']])) {
         $stats[$row['statut']] = (int)$row['count'];

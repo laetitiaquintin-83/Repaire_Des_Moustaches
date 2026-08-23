@@ -21,15 +21,15 @@ $error = '';
 
 // Traitement des actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrf_check = $_POST['csrf_token'] ?? '';
+    $csrf_check = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!validateCSRFToken($csrf_check)) {
         $error = 'Erreur de sécurité : token CSRF invalide.';
     } elseif (isset($_POST['action'])) {
-        $action = $_POST['action'];
+        $action = trim((string) $_POST['action']);
         
         if ($action === 'changer_statut') {
             $id = (int)($_POST['id'] ?? 0);
-            $nouveau_statut = $_POST['statut'] ?? '';
+            $nouveau_statut = trim((string) ($_POST['statut'] ?? ''));
             
             if ($id > 0 && in_array($nouveau_statut, ['en_attente', 'payee', 'annulee'])) {
                 try {
@@ -37,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([$nouveau_statut, $id]);
                     $message = '✓ Statut de la commande modifié !';
                 } catch (PDOException $e) {
-                    $error = 'Erreur lors de la modification : ' . htmlspecialchars($e->getMessage());
+                    error_log('Erreur lors de la modification de commande : ' . $e->getMessage());
+                    $error = 'Erreur lors de la modification de la commande.';
                 }
             }
         }
@@ -71,12 +72,13 @@ if (isset($_GET['view'])) {
 }
 
 // Récupérer toutes les commandes
-$stmt = $pdo->query('
+$stmt = $pdo->prepare('
     SELECT c.id, c.date_commande, c.montant_total, c.statut, u.prenom, u.nom
     FROM commandes c
     JOIN utilisateurs u ON c.utilisateur_id = u.id
     ORDER BY c.date_commande DESC
 ');
+$stmt->execute();
 $commandes = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>

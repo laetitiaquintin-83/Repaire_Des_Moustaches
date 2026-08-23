@@ -1,9 +1,6 @@
 <?php
 declare(strict_types=1);
 
-ini_set('display_errors', '1');
-error_reporting(E_ALL);
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -121,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             } catch (PDOException $e) {
                 error_log('Erreur checkout : ' . $e->getMessage());
-                $error = 'Une erreur est survenue lors de la création de la commande : ' . $e->getMessage();
+                $error = 'Une erreur est survenue lors de la création de la commande. Veuillez réessayer.';
             }
         }
     }

@@ -26,19 +26,19 @@ $csrf_token = $_SESSION['csrf_token'];
 
 // Traitement des actions (Ajouter, Modifier, Supprimer)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $posted_token = $_POST['csrf_token'] ?? '';
+    $posted_token = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!hash_equals($_SESSION['csrf_token'], $posted_token)) {
         $error = 'Erreur de sécurité : token CSRF invalide.';
     } else {
-        $action = $_POST['action'] ?? '';
+        $action = trim((string) ($_POST['action'] ?? ''));
 
         if ($action === 'ajouter' || $action === 'modifier') {
             $titre = trim($_POST['titre'] ?? '');
             $description = trim($_POST['description'] ?? '');
-            $date_heure = $_POST['date_heure'] ?? '';
+            $date_heure = trim((string) ($_POST['date_heure'] ?? ''));
             $capacite_max = (int)($_POST['capacite_max'] ?? 10);
             
-            $image_url = $_POST['current_image'] ?? '';
+            $image_url = trim((string) ($_POST['current_image'] ?? ''));
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                 $file_tmp = $_FILES['image']['tmp_name'];
                 $file_name = basename($_FILES['image']['name']);
@@ -111,7 +111,8 @@ if (isset($_GET['edit'])) {
 }
 
 // Récupérer tous les ateliers
-$stmt = $pdo->query('SELECT * FROM ateliers ORDER BY date_heure DESC');
+$stmt = $pdo->prepare('SELECT * FROM ateliers ORDER BY date_heure DESC');
+$stmt->execute();
 $ateliers = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>

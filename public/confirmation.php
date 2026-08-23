@@ -211,11 +211,11 @@ if ($commande_id > 0) {
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Client:</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($commande['prenom'] . ' ' . $commande['nom']); ?></span>
+                        <span class="detail-value"><?php echo htmlspecialchars((string) $commande['prenom'] . ' ' . (string) $commande['nom'], ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Email:</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($commande['email']); ?></span>
+                        <span class="detail-value"><?php echo htmlspecialchars((string) $commande['email'], ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Date:</span>
@@ -227,7 +227,7 @@ if ($commande_id > 0) {
                     <h3>Articles commandés</h3>
                     <?php foreach ($commande['lignes'] as $ligne): ?>
                         <div class="item-row">
-                            <span><?php echo htmlspecialchars($ligne['produit_nom']); ?> (x<?php echo $ligne['quantite']; ?>)</span>
+                            <span><?php echo htmlspecialchars((string) $ligne['produit_nom'], ENT_QUOTES, 'UTF-8'); ?> (x<?php echo (int) $ligne['quantite']; ?>)</span>
                             <span><?php echo number_format((float)$ligne['prix_unitaire'] * (int)$ligne['quantite'], 2, ',', ' '); ?> €</span>
                         </div>
                     <?php endforeach; ?>
@@ -238,7 +238,7 @@ if ($commande_id > 0) {
                 </div>
                 
                 <div class="info-box">
-                    🍔“§ <strong>Confirmation envoyée!</strong> Un email de confirmation a été envoyé à  <strong><?php echo htmlspecialchars($commande['email']); ?></strong>
+                            🍔“§ <strong>Confirmation envoyée!</strong> Un email de confirmation a été envoyé à  <strong><?php echo htmlspecialchars((string) $commande['email'], ENT_QUOTES, 'UTF-8'); ?></strong>
                 </div>
                 
                 <div class="actions">

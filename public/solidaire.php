@@ -11,8 +11,8 @@ require_once __DIR__ . '/../config/database.php';
 // Code PHP de traitement des dons (sécurisé)
 $message_status = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $type_don = trim($_POST['type_don'] ?? '');
-    $mot_doux = trim($_POST['mot_doux'] ?? '');
+    $type_don = trim((string) ($_POST['type_don'] ?? ''));
+    $mot_doux = trim((string) ($_POST['mot_doux'] ?? ''));
     
     if (!empty($type_don)) {
         // Enregistrement fictif ou en BDD du don

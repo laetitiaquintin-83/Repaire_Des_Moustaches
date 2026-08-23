@@ -42,12 +42,12 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrf_check = $_POST['csrf_token'] ?? '';
+    $csrf_check = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!validateCSRFToken($csrf_check)) {
         $error = 'âŒ CSRF invalide.';
     } else {
-        $titre = trim($_POST['titre'] ?? '');
-        $contenu = trim($_POST['contenu'] ?? '');
+        $titre = trim((string) ($_POST['titre'] ?? ''));
+        $contenu = trim((string) ($_POST['contenu'] ?? ''));
         $utilisateur_id = (int)($_POST['utilisateur_id'] ?? 0);
 
         if (strlen($titre) < 3) {
@@ -76,10 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ============================================================
 $utilisateurs = [];
 try {
-    $stmt = $pdo->query('SELECT id, nom, prenom FROM utilisateurs ORDER BY nom');
+    $stmt = $pdo->prepare('SELECT id, nom, prenom FROM utilisateurs ORDER BY nom');
+    $stmt->execute();
     $utilisateurs = $stmt->fetchAll();
 } catch (PDOException $e) {
-    $error = 'âŒ Erreur récupération utilisateurs : ' . $e->getMessage();
+    error_log('Erreur récupération utilisateurs : ' . $e->getMessage());
+    $error = 'Erreur lors du chargement des utilisateurs. Veuillez réessayer.';
 }
 
 // On inclut le header global propre et dynamique !

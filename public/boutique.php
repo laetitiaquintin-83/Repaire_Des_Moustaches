@@ -28,7 +28,9 @@ $sql = 'SELECT p.id, p.nom, p.description, p.prix, p.image, cp.nom AS categorie
         WHERE p.actif = 1
         ORDER BY cp.nom ASC, p.nom ASC';
 
-$produits = $pdo->query($sql)->fetchAll();
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$produits = $stmt->fetchAll();
 
 // Grouper par catégories
 $produits_par_categorie = [];

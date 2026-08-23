@@ -26,11 +26,11 @@ $csrf_token = $_SESSION['csrf_token'];
 
 // Traitement des actions (Ajouter, Modifier, Supprimer, Mettre à jour le statut)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $posted_token = $_POST['csrf_token'] ?? '';
+    $posted_token = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!hash_equals($_SESSION['csrf_token'], $posted_token)) {
         $error = 'Erreur de sécurité : token CSRF invalide';
     } else {
-        $action = $_POST['action'] ?? '';
+        $action = trim((string) ($_POST['action'] ?? ''));
 
         if ($action === 'ajouter' || $action === 'modifier') {
             // ✅ NOUVEAU CODE (Complet avec l'âge)
@@ -38,12 +38,12 @@ $nom = trim($_POST['nom'] ?? '');
 $age = (int)($_POST['age'] ?? 0);
 $caractere = trim($_POST['caractere'] ?? '');
 $description = trim($_POST['description'] ?? '');
-            $statut = $_POST['statut'] ?? 'a_l_adoption';
+            $statut = trim((string) ($_POST['statut'] ?? 'a_l_adoption'));
             $refuge_id = !empty($_POST['refuge_id']) ? (int)$_POST['refuge_id'] : null;
             $admin_id = $_SESSION['admin_id'];
 
             // Gestion de l'upload et conversion en WebP
-            $photo_url = $_POST['current_image'] ?? '';
+            $photo_url = trim((string) ($_POST['current_image'] ?? ''));
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                 $file_tmp = $_FILES['photo']['tmp_name'];
                 $file_name = basename($_FILES['photo']['name']);
@@ -157,14 +157,18 @@ if (isset($_GET['edit'])) {
 }
 
 // Récupération des données
-$pensionnaires = $pdo->query("
+$stmt = $pdo->prepare('
     SELECT p.*, r.nom AS refuge_nom 
     FROM pensionnaires p 
     LEFT JOIN refuges_partenaires r ON p.refuge_id = r.id 
     ORDER BY p.id DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+$');
+$stmt->execute();
+$pensionnaires = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC")->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $pdo->prepare('SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC');
+$stmt->execute();
+$refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -233,7 +237,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
             </div>
             <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <p style="margin: 0 0 5px 0; font-size: 12px; color: #aaa;">Connecté:</p>
-                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 14px;"><?php echo htmlspecialchars($_SESSION['admin_email'] ?? 'Admin'); ?></p>
+                <p style="margin: 0 0 15px 0; font-weight: 600; color: white; font-size: 14px;"><?php echo htmlspecialchars((string) ($_SESSION['admin_email'] ?? 'Admin'), ENT_QUOTES, 'UTF-8'); ?></p>
                 <a href="../logout.php" style="color: #FE7B7E; text-decoration: none; font-weight: 600; font-size: 14px;">🚪 Déconnexion</a>
             </div>
         </aside>
@@ -255,18 +259,18 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                 <h3><?php echo $edit_pensionnaire ? 'Modifier le pensionnaire' : 'Ajouter un nouveau pensionnaire'; ?></h3>
                 
                 <form method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                     <input type="hidden" name="action" value="<?php echo $edit_pensionnaire ? 'modifier' : 'ajouter'; ?>">
                     <?php if ($edit_pensionnaire): ?>
                         <input type="hidden" name="id" value="<?php echo $edit_pensionnaire['id']; ?>">
-                        <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($edit_pensionnaire['photo_url'] ?? ''); ?>">
+                        <input type="hidden" name="current_image" value="<?php echo htmlspecialchars((string) ($edit_pensionnaire['photo_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                     <?php endif; ?>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label for="nom">Nom du chat *</label>
                             <input type="text" id="nom" name="nom" required placeholder="Ex: Chaussette"
-                                   value="<?php echo $edit_pensionnaire ? htmlspecialchars($edit_pensionnaire['nom']) : ''; ?>">
+                                   value="<?php echo $edit_pensionnaire ? htmlspecialchars((string) $edit_pensionnaire['nom'], ENT_QUOTES, 'UTF-8') : ''; ?>">
                         </div>
 
                         <div class="form-group">
@@ -280,7 +284,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                         <div class="form-group">
                             <label for="caractere">Caractère / Traits</label>
                             <input type="text" id="caractere" name="caractere" placeholder="Ex: Joueur, câlin, peureux..."
-                                   value="<?php echo $edit_pensionnaire ? htmlspecialchars($edit_pensionnaire['caractere'] ?? '') : ''; ?>">
+                                   value="<?php echo $edit_pensionnaire ? htmlspecialchars((string) ($edit_pensionnaire['caractere'] ?? ''), ENT_QUOTES, 'UTF-8') : ''; ?>">
                         </div>
 
                         <div class="form-group">
@@ -300,7 +304,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                                 <option value="">-- Aucun --</option>
                                 <?php foreach ($refuges as $refuge): ?>
                                     <option value="<?php echo $refuge['id']; ?>" <?php echo ($edit_pensionnaire && $edit_pensionnaire['refuge_id'] == $refuge['id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($refuge['nom']); ?>
+                                        <?php echo htmlspecialchars((string) $refuge['nom'], ENT_QUOTES, 'UTF-8'); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -310,14 +314,14 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                             <label for="photo">Photo du matou (convertie auto en WebP)</label>
                             <input type="file" id="photo" name="photo" accept="image/webp,image/png,image/jpeg">
                             <?php if ($edit_pensionnaire && !empty($edit_pensionnaire['photo_url'])): ?>
-                                <p style="font-size: 12px; margin-top: 5px; color: #666;">Photo actuelle : <?php echo htmlspecialchars($edit_pensionnaire['photo_url']); ?></p>
+                                <p style="font-size: 12px; margin-top: 5px; color: #666;">Photo actuelle : <?php echo htmlspecialchars((string) $edit_pensionnaire['photo_url'], ENT_QUOTES, 'UTF-8'); ?></p>
                             <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="description">Histoire / Description</label>
-                        <textarea id="description" name="description" placeholder="Racontez son histoire..."><?php echo $edit_pensionnaire ? htmlspecialchars($edit_pensionnaire['description'] ?? '') : ''; ?></textarea>
+                        <textarea id="description" name="description" placeholder="Racontez son histoire..."><?php echo $edit_pensionnaire ? htmlspecialchars((string) ($edit_pensionnaire['description'] ?? ''), ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
                     </div>
                     
                     <div class="form-actions">
@@ -344,7 +348,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                         <?php foreach ($pensionnaires as $p): ?>
                             <div class="produit-card">
                                 <?php 
-                                    $img_file = !empty($p['photo_url']) ? htmlspecialchars($p['photo_url']) : '';
+                                    $img_file = !empty($p['photo_url']) ? htmlspecialchars((string) $p['photo_url'], ENT_QUOTES, 'UTF-8') : '';
                                     $image_path = !empty($img_file) ? '/' . ltrim($img_file, '/') : '/images/chat1.webp';
                                 ?>
                                 <img src="<?php echo $image_path; ?>" 
@@ -352,7 +356,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                                      onerror="this.onerror=null; this.src='/images/chat1.webp';">
                                 
                                 <div class="produit-details">
-                                    <div class="produit-title"><?php echo htmlspecialchars($p['nom']); ?> (<?php echo (int)$p['age']; ?> an<?php echo $p['age'] > 1 ? 's' : ''; ?>)</div>
+                                    <div class="produit-title"><?php echo htmlspecialchars((string) $p['nom'], ENT_QUOTES, 'UTF-8'); ?> (<?php echo (int)$p['age']; ?> an<?php echo $p['age'] > 1 ? 's' : ''; ?>)</div>
                                     <div class="produit-info">
                                         <div><span class="info-label">Traits:</span> <?php echo htmlspecialchars($p['caractere'] ?: 'Non précisé'); ?></div>
                                         <div><span class="info-label">Refuge:</span> <?php echo htmlspecialchars($p['refuge_nom'] ?: 'Indépendant'); ?></div>
@@ -362,7 +366,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                                 <div class="produit-actions">
                                     <!-- Changement rapide de statut -->
                                     <form method="POST">
-                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                                         <input type="hidden" name="action" value="update_statut">
                                         <input type="hidden" name="id" value="<?php echo $p['id']; ?>">
                                         <select name="statut" onchange="this.form.submit()" class="select-statut">
@@ -375,7 +379,7 @@ $refuges = $pdo->query("SELECT id, nom FROM refuges_partenaires ORDER BY nom ASC
                                     <a href="pensionnaires.php?edit=<?php echo $p['id']; ?>" class="btn btn-edit">✏️ Modifier</a>
 
                                     <form method="POST" onsubmit="return confirm('Supprimer définitivement la fiche de ce pensionnaire ?');">
-                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                                         <input type="hidden" name="action" value="supprimer">
                                         <input type="hidden" name="id" value="<?php echo $p['id']; ?>">
                                         <button type="submit" class="btn btn-edit" style="background: #FE7B7E; border: none; cursor: pointer;">🗑️ Supprimer</button>

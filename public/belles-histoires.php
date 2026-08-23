@@ -10,16 +10,25 @@ session_start();
 
 require_once __DIR__ . '/../config/database.php';
 
-$pdo = getPDO();
+try {
+    $pdo = getPDO();
+    $sql = 'SELECT bh.id, bh.titre, bh.contenu, bh.date_publication, u.prenom, u.nom
+            FROM belles_histoires bh
+            LEFT JOIN utilisateurs u ON bh.utilisateur_id = u.id
+            WHERE bh.statut = :statut
+            ORDER BY bh.date_publication DESC';
+    $requete = $pdo->prepare($sql);
+    $requete->execute(['statut' => 'publiee']);
+    $histoires = $requete->fetchAll();
+} catch (PDOException $exception) {
+    error_log('Erreur lors du chargement des belles histoires : ' . $exception->getMessage());
+    $histoires = [];
+}
 
-// Récupérer les histoires publiées
-$sql = 'SELECT bh.id, bh.titre, bh.contenu, bh.date_publication, u.prenom, u.nom
-        FROM belles_histoires bh
-        LEFT JOIN utilisateurs u ON bh.utilisateur_id = u.id
-        WHERE bh.statut = "publiee"
-        ORDER BY bh.date_publication DESC';
-
-$histoires = $pdo->query($sql)->fetchAll();
+function e(string $value): string
+{
+    return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+}
 
 function formatDate(string $date): string
 {
@@ -45,7 +54,7 @@ include_once __DIR__ . '/../includes/header.php';
         $image_path = 'images/souvenir.jpg';
         if (file_exists(__DIR__ . '/images/souvenir.jpg')): 
         ?>
-            <img src="<?php echo htmlspecialchars($image_path, ENT_QUOTES, 'UTF-8'); ?>" 
+            <img src="<?php echo e($image_path); ?>"
                  alt="Mur des souvenirs du Repaire des Moustaches" 
                  style="width: 100%; max-width: 600px; margin: 30px auto 0; display: block; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
                  loading="lazy">
@@ -64,15 +73,15 @@ include_once __DIR__ . '/../includes/header.php';
             <?php foreach ($histoires as $histoire): ?>
                 <article class="carte-histoire">
                     <div class="histoire-header">
-                        <h2><?php echo htmlspecialchars($histoire['titre'], ENT_QUOTES, 'UTF-8'); ?></h2>
+                        <h2><?php echo e((string) $histoire['titre']); ?></h2>
                         <p class="histoire-date">
-                            <span style="font-weight: 600;"><?php echo htmlspecialchars($histoire['prenom'] . ' ' . $histoire['nom'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span style="font-weight: 600;"><?php echo e((string) $histoire['prenom'] . ' ' . (string) $histoire['nom']); ?></span>
                             — 
-                            <span>Publié le <?php echo htmlspecialchars(formatDate((string) $histoire['date_publication']), ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span>Publié le <?php echo e(formatDate((string) $histoire['date_publication'])); ?></span>
                         </p>
                     </div>
                     <div class="histoire-contenu">
-                        <p><?php echo nl2br(htmlspecialchars($histoire['contenu'], ENT_QUOTES, 'UTF-8')); ?></p>
+                        <p><?php echo nl2br(e((string) $histoire['contenu'])); ?></p>
                     </div>
                 </article>
             <?php endforeach; ?>
