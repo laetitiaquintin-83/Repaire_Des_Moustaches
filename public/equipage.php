@@ -16,6 +16,22 @@ $stmt = $pdo->prepare('SELECT * FROM pensionnaires ORDER BY nom');
 $stmt->execute();
 $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Extraction dynamique de tous les caractères uniques pour la liste déroulante
+$caracteres_uniques = [];
+foreach ($chats as $chat) {
+    if (!empty($chat['caractere'])) {
+        // Sépare par virgule au cas où il y en a plusieurs
+        $mots = explode(',', $chat['caractere']);
+        foreach ($mots as $mot) {
+            $mot_clean = trim($mot);
+            if (!empty($mot_clean) && !in_array($mot_clean, $caracteres_uniques)) {
+                $caracteres_uniques[] = $mot_clean;
+            }
+        }
+    }
+}
+natcasesort($caracteres_uniques); // Tri alphabétique
+
 // Fallback pour les images d'origine si le champ BDD est vide
 $images_fallback = [
     'Velours'   => 'images/chat1.webp',
@@ -111,14 +127,25 @@ $images_fallback = [
                 <option value="senior">Séniors (5 ans et +)</option>
             </select>
 
+            <!-- 🎭 FILTRE PAR CARACTÈRE DYNAMIQUE -->
+            <select id="filtre-caractere" onchange="filtrerChats()" class="input-filtre" style="cursor: pointer; font-weight: bold;">
+                <option value="tous">✨ Tous les caractères</option>
+                <?php foreach ($caracteres_uniques as $caractere): ?>
+                    <option value="<?= htmlspecialchars(strtolower($caractere)) ?>">
+                        <?= htmlspecialchars($caractere) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
             <input type="text" id="filtre-recherche" onkeyup="filtrerChats()" placeholder="🔍 Rechercher un nom..." class="input-filtre">
         </div>
 
         <div class="grille-chats">
             <?php foreach ($chats as $chat): 
                 $nom = $chat['nom'];
+                $caractere = $chat['caractere'] ?? 'À découvrir';
                 
-                // Détermination dynamique de l'image (BDD d'abord via 'photo', puis fallback, puis placeholder)
+                // Détermination dynamique de l'image
                 $img_src = 'images/placeholder.jpg';
                 if (!empty($chat['photo'])) {
                     $img_src = $chat['photo'];
@@ -130,7 +157,8 @@ $images_fallback = [
             ?>
                 <article class="carte-chat" 
                          data-age="<?= $age ?>" 
-                         data-nom="<?= htmlspecialchars(strtolower($nom)) ?>">
+                         data-nom="<?= htmlspecialchars(strtolower($nom)) ?>"
+                         data-caractere="<?= htmlspecialchars(strtolower($caractere)) ?>">
                     <div>
                         <div class="photo-container-chat">
                             <img src="<?= htmlspecialchars($img_src) ?>" 
@@ -140,7 +168,7 @@ $images_fallback = [
                         </div>
                         <div class="info-chat">
                             <h3><?= htmlspecialchars($nom) ?> <?php if ($age > 0): ?><small style="font-size: 0.8em; opacity: 0.7;">(<?= $age ?> ans)</small><?php endif; ?></h3>
-                            <p class="chat-trait" style="font-weight: bold; color: #ff7b7b; margin-bottom: 10px;"><?= htmlspecialchars($chat['caractere'] ?? 'À découvrir') ?></p>
+                            <p class="chat-trait" style="font-weight: bold; color: #ff7b7b; margin-bottom: 10px;"><?= htmlspecialchars($caractere) ?></p>
                             <p class="chat-histoire" style="font-size: 0.95rem; line-height: 1.5; color: #555;"><?= nl2br(htmlspecialchars($chat['description'])) ?></p>
                         </div>
                     </div>
@@ -158,15 +186,17 @@ $images_fallback = [
 <script>
 function filtrerChats() {
     const filtreAge = document.getElementById('filtre-age').value;
+    const filtreCaractere = document.getElementById('filtre-caractere').value;
     const recherche = document.getElementById('filtre-recherche').value.toLowerCase().trim();
     const cartes = document.querySelectorAll('.carte-chat');
 
     cartes.forEach(carte => {
         const age = parseInt(carte.getAttribute('data-age')) || 0;
         const nom = carte.getAttribute('data-nom') || '';
+        const caractere = carte.getAttribute('data-caractere') || '';
 
+        // 1. Filtre Âge
         let correspondAge = false;
-
         if (filtreAge === 'tous') {
             correspondAge = true;
         } else if (filtreAge === 'jeune' && age <= 2) {
@@ -177,9 +207,17 @@ function filtrerChats() {
             correspondAge = true;
         }
 
+        // 2. Filtre Caractère
+        let correspondCaractere = false;
+        if (filtreCaractere === 'tous' || caractere.includes(filtreCaractere)) {
+            correspondCaractere = true;
+        }
+
+        // 3. Filtre Recherche
         const correspondRecherche = nom.includes(recherche);
 
-        if (correspondAge && correspondRecherche) {
+        // Affichage final
+        if (correspondAge && correspondCaractere && correspondRecherche) {
             carte.style.display = "flex";
         } else {
             carte.style.display = "none";

@@ -37,7 +37,7 @@ include_once __DIR__ . '/../includes/header.php';
 ?>
 
 <main class="page-liste belles-histoires-liste">
-    <section class="liste-header">
+    <section class="liste-header" style="text-align: center; margin-bottom: 40px;">
         <h1>Belles Histoires</h1>
         <p>Les aventures de nos moustachus adoptés et leurs nouvelles vies.</p>
         
@@ -47,7 +47,7 @@ include_once __DIR__ . '/../includes/header.php';
         ?>
             <img src="<?php echo htmlspecialchars($image_path, ENT_QUOTES, 'UTF-8'); ?>" 
                  alt="Mur des souvenirs du Repaire des Moustaches" 
-                 style="width: 100%; max-width: 600px; margin-top: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+                 style="width: 100%; max-width: 600px; margin: 30px auto 0; display: block; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
                  loading="lazy">
         <?php endif; ?>
     </section>

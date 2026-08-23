@@ -1412,3 +1412,29 @@ nav.admin-nav a {
         grid-template-columns: 1fr;
     }
 }
+/* ==========================================================================
+   BELLES HISTOIRES : CENTRAGE SOUS-TITRE & IMAGE
+   ========================================================================== */
+
+/* 1. Centrer le sous-titre (texte) */
+.belles-histoires-section .sous-titre,
+.belles-histoires-section .subtitle,
+.belles-histoires-section p:first-of-type {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 30px !important; /* Ajoute un espace avant l'image */
+    max-width: 700px; 
+}
+
+/* 2. Centrer l'image dans son conteneur */
+.belles-histoires-section .hero-image,
+.belles-histoires-section .banner-image,
+.belles-histoires-section picture,
+.belles-histoires-section img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100%;
+    height: auto;
+}
