@@ -84,9 +84,6 @@ Repaire_Des_Moustaches/
 │   └── utilisateurs.php      # Gestion des membres et accès
 │
 ├── images/                   # Visuels, logos, illustrations & photos
-├── MCD.md                    # Modèle Conceptuel des Données
-├── SECURITE_AUDIT.md         # Audit détaillé des 6 niveaux de sécurité
-├── GUIDE_PRESENTATION_JURY.md# Support et trame pour la soutenance
 └── README.md                 # Documentation du projet
 🗄️ Modèle de Données (MySQL - 13 Tables)
 utilisateurs : Gestion des membres et clients.
@@ -133,7 +130,7 @@ Accéder à l'application : http://localhost/Repaire_Des_Moustaches/.
 
 ✅ Responsive Design : Testé et optimisé pour écrans mobiles, tablettes et ordinateurs.
 
-✅ Soutenance prête : Livrables MCD, SQL, Wireframes UX/UI et code source documenté.
+✅ Soutenance prête : code source, schéma SQL et interface responsive documentés dans le projet.
 
 Auteur : Projet réalisé dans le cadre du Titre Professionnel DWWM 2026.
 
