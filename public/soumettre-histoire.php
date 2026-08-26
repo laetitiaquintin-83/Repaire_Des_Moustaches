@@ -4,9 +4,7 @@ declare(strict_types=1);
 $sitePrefix = '';
 session_start();
 
-// ============================================================
-// 1. CONNEXION PDO DIRECTE (sans ../config/database.php)
-// ============================================================
+// Connexion BDD
 $host = 'localhost';
 $dbname = 'repaire_des_moustaches';
 $user = 'root';
@@ -19,9 +17,7 @@ try {
     die('âŒ Erreur BDD : ' . $e->getMessage());
 }
 
-// ============================================================
-// 2. TOKEN CSRF SIMPLIFIÉ (sans functions.php)
-// ============================================================
+// Token CSRF
 function generateCSRFToken() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -35,9 +31,7 @@ function validateCSRFToken($token) {
 
 $csrf_token = generateCSRFToken();
 
-// ============================================================
-// 3. TRAITEMENT DU FORMULAIRE
-// ============================================================
+// Traitement du formulaire
 $message = '';
 $error = '';
 
@@ -71,9 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ============================================================
-// 4. RÉCUPÉRATION DES UTILISATEURS
-// ============================================================
+// Chargement des utilisateurs
 $utilisateurs = [];
 try {
     $stmt = $pdo->prepare('SELECT id, nom, prenom FROM utilisateurs ORDER BY nom');
@@ -84,7 +76,7 @@ try {
     $error = 'Erreur lors du chargement des utilisateurs. Veuillez réessayer.';
 }
 
-// On inclut le header global propre et dynamique !
+// Header global
 include_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -139,6 +131,6 @@ include_once __DIR__ . '/../includes/header.php';
 </main>
 
 <?php 
-// Inclusion automatique de ton footer global
+// Footer global
 require_once __DIR__ . '/../includes/footer.php'; 
 ?>

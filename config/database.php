@@ -6,19 +6,19 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
 
-// Configuration de la gestion des erreurs
+// Gestion des erreurs
 error_reporting(E_ALL);
 ini_set('display_errors', '0'); // Desactiver en production
 ini_set('log_errors', '1');
 
-// Création automatique du dossier logs s'il n'existe pas
+// Création du dossier de logs
 $logDir = __DIR__ . '/../logs';
 if (!is_dir($logDir)) {
     mkdir($logDir, 0777, true);
 }
 ini_set('error_log', $logDir . '/php-errors.log');
 
-// Gestionnaire d'erreurs personnalisé
+// Gestionnaire d'erreurs
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
     error_log("[$errno] $errstr in $errfile:$errline");
     
@@ -60,9 +60,7 @@ function getPDO(): PDO
     }
 }
 
-/**
- * Génère un token CSRF et le stocke en session
- */
+/** Génère un token CSRF. */
 function generateCSRFToken(): string
 {
     if (empty($_SESSION['csrf_token'])) {
@@ -71,9 +69,7 @@ function generateCSRFToken(): string
     return $_SESSION['csrf_token'];
 }
 
-/**
- * Valide un token CSRF depuis le formulaire
- */
+/** Valide un token CSRF. */
 function validateCSRFToken(string $token): bool
 {
     if (empty($_SESSION['csrf_token'])) {

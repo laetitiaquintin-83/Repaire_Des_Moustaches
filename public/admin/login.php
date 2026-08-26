@@ -4,19 +4,19 @@ declare(strict_types=1);
 $sitePrefix = '../';
 session_start();
 
-// Chemin ajusté : on remonte de 2 dossiers (admin/ -> public/ -> racine config)
+// Configuration BDD
 require_once __DIR__ . '/../../config/database.php';
 
 $error = '';
 $success = '';
 
-// Si déjà connecté, rediriger vers le dashboard
+// Vérification de session
 if (isset($_SESSION['admin_id'])) {
     header('Location: dashboard.php');
     exit;
 }
 
-// --- TRAITEMENT DU FORMULAIRE ---
+// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim((string) ($_POST['email'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$email]);
             $admin = $stmt->fetch();
 
-            // Vérification des identifiants et du hash
+            // Vérification des identifiants
             if ($admin && password_verify($password, $admin['mot_de_passe'])) {
                 session_regenerate_id(true);
                 $_SESSION['admin_id'] = $admin['id'];
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_role'] = $admin['role'];
                 $_SESSION['admin_login_time'] = time();
 
-                // Redirection interne au dossier admin
+                // Redirection admin
                 header('Location: dashboard.php');
                 exit;
             } else {

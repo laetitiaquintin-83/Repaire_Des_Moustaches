@@ -1,7 +1,4 @@
-/**
- * form-validation.js - Validation JavaScript côté client
- * Formulaires: Inscription Ateliers, Contact, Checkout
- */
+/** Validation des formulaires. */
 
 class FormValidator {
     constructor(formSelector) {
@@ -13,57 +10,53 @@ class FormValidator {
     }
 
     init() {
-        // Valider en temps réel au blur
+        // Validation au changement de champ
         this.form.querySelectorAll('input, textarea, select').forEach(field => {
             field.addEventListener('blur', () => this.validateField(field));
             field.addEventListener('change', () => this.validateField(field));
         });
 
-        // Empêcher la soumission si erreurs
+        // Validation à la soumission
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
 
-    /**
-     * Valider un champ individuel
-     */
+    /** Valide un champ. */
     validateField(field) {
         const name = field.name;
         const value = field.value.trim();
         const type = field.type;
         let error = null;
 
-        // Validation requise
+        // Champ obligatoire
         if (field.hasAttribute('required') && !value) {
             error = `${field.getAttribute('data-label') || field.placeholder || name} est requis`;
         }
-        // Validation email
+        // Adresse e-mail
         else if (type === 'email' && value && !this.isValidEmail(value)) {
             error = 'Email invalide. Format: user@exemple.fr';
         }
-        // Validation date
+        // Date
         else if (type === 'date' && value && !this.isValidDate(value)) {
             error = 'Format de date invalide (YYYY-MM-DD)';
         }
-        // Validation longueur minimum
+        // Longueur minimale
         else if (field.hasAttribute('minlength')) {
             const minlen = parseInt(field.getAttribute('minlength'));
             if (value.length > 0 && value.length < minlen) {
                 error = `Minimum ${minlen} caractères requis`;
             }
         }
-        // Validation custom par name
+        // Règles spécifiques
         error = error || this.customValidation(name, value, field);
 
-        // Mettre à jour l'UI
+        // Mise à jour de l'interface
         this.setFieldError(field, error);
         this.errors[name] = error;
 
         return !error;
     }
 
-    /**
-     * Validations personnalisées par champ
-     */
+    /** Applique les règles spécifiques. */
     customValidation(name, value, field) {
         if (name === 'nom' && value) {
             if (value.length < 3) return 'Le nom doit avoir au moins 3 caractères';
@@ -82,7 +75,7 @@ class FormValidator {
         }
 
         if (name === 'telephone' && value) {
-            // Accepter formats: 0123456789, 01 23 45 67 89, +33123456789
+            // Numéro français
             if (!/^(\+33|0)[1-9](?:[0-9]{8})$|^\+33[1-9](?:[0-9]{8})$|^0[1-9](?:[ ]?[0-9]{2}){4}$/.test(value.replace(/\s/g, ''))) {
                 return 'Numéro de téléphone invalide';
             }
@@ -97,11 +90,9 @@ class FormValidator {
         return null;
     }
 
-    /**
-     * Afficher l'erreur pour un champ
-     */
+    /** Affiche l'erreur d'un champ. */
     setFieldError(field, error) {
-        // Supprimer l'erreur précédente si elle existe
+        // Suppression de l'erreur précédente
         const existingError = field.parentElement?.querySelector('.field-error');
         if (existingError) existingError.remove();
 
@@ -118,27 +109,21 @@ class FormValidator {
         }
     }
 
-    /**
-     * Valider un email
-     */
+    /** Valide une adresse e-mail. */
     isValidEmail(email) {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
     }
 
-    /**
-     * Valider une date au format YYYY-MM-DD
-     */
+    /** Valide une date. */
     isValidDate(dateString) {
         const date = new Date(dateString);
         return date instanceof Date && !isNaN(date);
     }
 
-    /**
-     * Gérer la soumission du formulaire
-     */
+    /** Gère la soumission du formulaire. */
     handleSubmit(event) {
-        // Valider tous les champs
+        // Validation complète
         let isValid = true;
         this.form.querySelectorAll('input, textarea, select').forEach(field => {
             if (!this.validateField(field)) {
@@ -152,13 +137,11 @@ class FormValidator {
             return false;
         }
 
-        // ✅ Formulaire valide, laisser la soumission se faire
+        // Soumission autorisée
         return true;
     }
 
-    /**
-     * Afficher une erreur générale du formulaire
-     */
+    /** Affiche une erreur générale. */
     showFormError(message) {
         let errorContainer = this.form.querySelector('.form-error-container');
         if (!errorContainer) {
@@ -175,18 +158,18 @@ class FormValidator {
     }
 }
 
-// Initialiser les validateurs au chargement
+// Initialisation au chargement
 document.addEventListener('DOMContentLoaded', () => {
-    // Formulaire des ateliers
+    // Formulaire atelier
     new FormValidator('form[action*="formulaire"]');
     
-    // Formulaire de checkout
+    // Formulaire commande
     new FormValidator('form[action*="checkout"]');
     
-    // Formulaire de contact si présent
+    // Formulaire contact
     new FormValidator('form[class*="contact"]');
 
-    // Appliquer CSS pour les champs invalides
+    // Styles de validation
     const style = document.createElement('style');
     style.textContent = `
         input.is-invalid,

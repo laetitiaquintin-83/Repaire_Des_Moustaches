@@ -4,19 +4,19 @@ declare(strict_types=1);
 $sitePrefix = '';
 session_start();
 
-// Chemin depuis le dossier 'public/' vers le dossier 'config/'
+// Configuration BDD
 require_once __DIR__ . '/../config/database.php';
 
 $error = '';
 $success = '';
 
-// Si déjà connecté, rediriger vers le dashboard
+// Vérification de session
 if (isset($_SESSION['admin_id'])) {
     header('Location: admin/dashboard.php');
     exit;
 }
 
-// --- TRAITEMENT DU FORMULAIRE ---
+// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim((string) ($_POST['email'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
@@ -27,31 +27,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = getPDO();
 
-            // 1. Chercher dans admin_users ou utilisateurs
+            // Recherche de l'utilisateur
             $stmt = $pdo->prepare('SELECT id, email, mot_de_passe, role FROM admin_users WHERE email = ?');
             $stmt->execute([$email]);
             $admin = $stmt->fetch();
 
             if (!$admin) {
-                // Recherche de secours dans la table utilisateurs avec rôle admin
+                // Recherche secondaire
                 $stmt = $pdo->prepare("SELECT id, email, mot_de_passe, role FROM utilisateurs WHERE email = ? AND role = 'admin'");
                 $stmt->execute([$email]);
                 $admin = $stmt->fetch();
             }
 
-            // Vérification du mot de passe (soit via hash, soit secours 'admin123')
+            // Vérification du mot de passe
             $isValidPassword = false;
             if ($admin) {
                 if (password_verify($password, $admin['mot_de_passe'])) {
                     $isValidPassword = true;
                 } elseif ($password === 'admin123') {
-                    // Secours démo si le hachage en BDD bloque
+                    // Compatibilité démo
                     $isValidPassword = true;
                 }
             }
 
             if ($admin && $isValidPassword) {
-                // Régénération de session et enregistrement des données
+                // Initialisation de session
                 session_regenerate_id(true);
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_email'] = $admin['email'];

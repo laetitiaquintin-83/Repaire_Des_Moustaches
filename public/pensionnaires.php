@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-// Connexion BDD & Header
+// Connexion BDD et header
 require_once __DIR__ . '/../config/database.php';
 $sitePrefix = ''; 
 include_once '../includes/header.php'; 
 
-// Récupération dynamique depuis la BDD MySQL
+// Chargement des pensionnaires
 try {
     $pdo = getPDO();
     $stmt = $pdo->prepare('SELECT * FROM pensionnaires ORDER BY id ASC');
@@ -18,7 +18,7 @@ try {
 ?>
 
 <style>
-    /* Barre de filtres */
+    /* Filtres */
     .barre-filtres-chats {
         display: flex;
         justify-content: center;
@@ -36,48 +36,48 @@ try {
         background: white;
     }
 
-    /* 1. On s'assure que la grille répartit bien ses cartes */
+    /* Grille */
     .grille-chats {
         display: flex;
         justify-content: center;
         gap: 40px;
-        flex-wrap: wrap; /* Évite que ça déborde sur petit écran */
-        align-items: stretch; /* Force toutes les cartes à avoir la même hauteur */
+        flex-wrap: wrap;
+        align-items: stretch;
     }
 
-    /* 2. On configure la carte pour qu'elle pousse les boutons tout en bas */
+    /* Carte */
     .carte-chat {
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Pousse les blocs info en haut et boutons en bas */
-        background: white; /* Donne un fond blanc propre pour faire ressortir le texte */
+        justify-content: space-between;
+        background: white;
         padding: 30px 20px 25px 20px;
         border-radius: 20px;
         box-shadow: 0px 10px 20px rgba(0,0,0,0.05);
-        width: 320px; /* Largeur fixe propre pour chaque colonne */
+        width: 320px;
         transition: transform 0.2s ease, opacity 0.2s ease;
     }
 
-    /* 3. On gère le bloc qui enveloppe les deux boutons */
+    /* Actions */
     .actions-chat {
         display: flex;
-        flex-direction: column; /* Aligne les boutons l'un sous l'autre */
-        gap: 12px; /* Espace de 12px très propre entre les deux boutons */
+        flex-direction: column;
+        gap: 12px;
         width: 100%;
-        margin-top: auto; /* Force le bloc à se coller au bas de la carte */
+        margin-top: auto;
     }
 
-    /* 4. On redéfinit le bouton pour qu'il prenne toute la largeur sans casser le style d'origine */
+    /* Boutons */
     .bouton-chat {
-        display: block !important; /* Force le bouton à se comporter en bloc */
+        display: block !important;
         width: 100% !important;
         text-align: center;
         box-sizing: border-box;
-        margin: 0 !important; /* Retire les marges parasites qui causaient des décalages */
+        margin: 0 !important;
         transition: all 0.3s ease;
     }
 
-    /* Optionnel : Un bouton secondaire vert menthe pour éviter d'avoir deux gros pavés roses identiques */
+    /* Bouton secondaire */
     .bouton-chat.secondaire {
         background-color: var(--vert-menthe, #2ecc71) !important;
         color: var(--gris-fonce, #333) !important;
@@ -97,7 +97,7 @@ try {
             Les pensionnaires du Repaire, chacun avec sa personnalité attachante. Venez les rencontrer pour un moment de ronrons et de tendresse.
         </p>
 
-        <!-- 🔍 BARRE DE FILTRES EN DIRECT -->
+        <!-- Filtres -->
         <div class="barre-filtres-chats">
             <select id="filtre-age" onchange="filtrerChats()" class="input-filtre" style="cursor: pointer; font-weight: bold;">
                 <option value="tous">🐾 Tous les âges</option>
@@ -109,7 +109,7 @@ try {
             <input type="text" id="filtre-recherche" onkeyup="filtrerChats()" placeholder="🔍 Rechercher un nom..." class="input-filtre">
         </div>
 
-        <!-- 🐱 GRILLE DYNAMIQUE DE BDD -->
+        <!-- Liste dynamique -->
         <div class="grille-chats" id="grille-chats">
             <?php foreach ($pensionnaires as $chat): ?>
                 <article class="carte-chat" 
@@ -147,7 +147,7 @@ try {
     </section>
 </main>
 
-<!-- ⚡ JAVASCRIPT : Filtre instantané -->
+<!-- Filtre dynamique -->
 <script>
 function filtrerChats() {
     const filtreAge = document.getElementById('filtre-age').value;
@@ -160,7 +160,7 @@ function filtrerChats() {
 
         let correspondAge = false;
 
-        // Condition par Âge
+        // Filtre par âge
         if (filtreAge === 'tous') {
             correspondAge = true;
         } else if (filtreAge === 'jeune' && age <= 2) {
@@ -171,10 +171,10 @@ function filtrerChats() {
             correspondAge = true;
         }
 
-        // Condition par Recherche textuelle
+        // Filtre textuel
         const correspondRecherche = nom.includes(recherche);
 
-        // Affichage dynamique
+        // Affichage
         if (correspondAge && correspondRecherche) {
             carte.style.display = "flex";
         } else {

@@ -1,8 +1,4 @@
-/**
- * cart.js - Gestion dynamique du panier avec fetch() AJAX
- * Stockage en session PHP, mise à jour sans rechargement
- * ⚠️ Fallback : si JS désactivé, le formulaire s'envoie normalement (redirection vers cart.php)
- */
+/** Gestion du panier. */
 
 class CartManager {
     constructor() {
@@ -12,7 +8,7 @@ class CartManager {
     }
 
     init() {
-        // ✅ Attacher l'événement sur le submit du formulaire (pas sur le click du bouton)
+        // Écoute des formulaires
         document.querySelectorAll('.form-add-to-cart').forEach(form => {
             form.addEventListener('submit', (e) => this.handleAddToCart(e));
         });
@@ -21,17 +17,14 @@ class CartManager {
         this.updateCartCount();
     }
 
-    /**
-     * Ajouter un produit au panier via AJAX (fetch)
-     * En cas d'erreur, le formulaire est soumis normalement (fallback)
-     */
+    /** Ajoute un produit au panier. */
     async handleAddToCart(event) {
-        event.preventDefault(); // On empêche la soumission par défaut
+        event.preventDefault();
 
         const form = event.target;
         const submitBtn = form.querySelector('.bouton-ajouter-panier') || form.querySelector('button[type="submit"]');
         
-        // Sauvegarder le texte original pour le feedback
+        // Texte initial du bouton
         const originalText = submitBtn ? submitBtn.textContent : '';
         if (submitBtn) {
             submitBtn.textContent = '⏳ Ajout...';
@@ -40,32 +33,32 @@ class CartManager {
 
         try {
             const formData = new FormData(form);
-            // Ajouter un flag pour indiquer qu'on veut du JSON (optionnel)
+            // Demande de réponse JSON
             formData.append('json', '1');
 
             const response = await fetch('./add-to-cart.php', {
                 method: 'POST',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest' // Indiquer que c'est AJAX
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: formData
             });
 
-            // Vérifier si la réponse est du JSON
+            // Vérification du format
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
-                // Si la réponse n'est pas JSON (ex: redirection), on fait un fallback
+                // Fallback sur la soumission standard
                 throw new Error('Réponse non-JSON reçue, fallback vers la soumission normale.');
             }
 
             const data = await response.json();
 
             if (data.success) {
-                // ✅ Succès : mettre à jour l'UI
+                // Mise à jour de l'interface
                 this.showNotification(data.message || 'Produit ajouté !', 'success');
                 this.updateCartCount(data.cart_count);
                 
-                // Feedback visuel sur le bouton
+                // Retour visuel
                 if (submitBtn) {
                     submitBtn.textContent = '✅ Ajouté !';
                     submitBtn.style.background = '#6bc3b8';
@@ -76,7 +69,7 @@ class CartManager {
                     }, 2000);
                 }
             } else {
-                // ❌ Erreur retournée par le serveur
+                // Erreur serveur
                 this.showNotification(data.message || 'Erreur lors de l\'ajout', 'error');
                 if (submitBtn) {
                     submitBtn.textContent = originalText;
@@ -85,20 +78,17 @@ class CartManager {
             }
         } catch (error) {
             console.warn('Erreur AJAX, fallback vers la soumission classique:', error);
-            // 🔄 FALLBACK : soumettre le formulaire normalement
-            // On retire event.preventDefault() en le remplaçant par un submit pur
+            // Soumission standard en cas d'erreur
             event.target.submit();
         }
     }
 
-    /**
-     * Mettre à jour le compteur du panier dynamiquement
-     */
+    /** Met à jour le compteur du panier. */
     updateCartCount(count = null) {
         if (count !== null) {
             if (count > 0) {
                 if (!this.cartCountElement) {
-                    // Créer le badge s'il n'existe pas
+                    // Création du badge
                     const badge = document.createElement('span');
                     badge.className = 'panier-count';
                     badge.textContent = count;
@@ -110,16 +100,14 @@ class CartManager {
                     this.cartCountElement.textContent = count;
                 }
             } else if (this.cartCountElement) {
-                // Supprimer le badge si 0 articles
+                // Suppression du badge vide
                 this.cartCountElement.remove();
                 this.cartCountElement = null;
             }
         }
     }
 
-    /**
-     * Afficher une notification toast
-     */
+    /** Affiche une notification. */
     showNotification(message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
@@ -141,7 +129,7 @@ class CartManager {
 
         document.body.appendChild(toast);
 
-        // Supprimer automatiquement après 3 secondes
+        // Suppression automatique
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease-in-out';
             setTimeout(() => toast.remove(), 300);
@@ -149,12 +137,12 @@ class CartManager {
     }
 }
 
-// Initialiser le gestionnaire de panier quand le DOM est prêt
+// Initialisation au chargement
 document.addEventListener('DOMContentLoaded', () => {
     new CartManager();
 });
 
-// Ajouter les animations CSS pour les toasts (une seule fois)
+// Styles des notifications
 (function addToastStyles() {
     if (document.getElementById('cart-toast-styles')) return;
     const style = document.createElement('style');

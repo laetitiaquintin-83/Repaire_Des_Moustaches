@@ -1,14 +1,10 @@
 <?php
-// ============================================================
-// DÉTECTION AUTOMATIQUE DU CHEMIN
-// ============================================================
+// Détection du préfixe
 if (!isset($sitePrefix)) {
     $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
     $sitePrefix = (strpos($scriptPath, '/public/') !== false) ? '../' : '';
 }
-// ============================================================
-
-// Inclusion du composant Cookie RGPD
+// Module cookies
 if (file_exists(__DIR__ . '/cookies-modal.php')) {
     include __DIR__ . '/cookies-modal.php';
 }
@@ -16,7 +12,7 @@ if (file_exists(__DIR__ . '/cookies-modal.php')) {
 
 <footer>
     <div class="footer-container">
-        <!-- Copyright & Liens juridiques sur la même ligne ou très compact -->
+        <!-- Liens légaux -->
         <p>
             &copy; 2026 Le Repaire des Moustaches. 
             <a href="<?php echo $sitePrefix; ?>mentions-legales.php">Mentions légales</a> |
@@ -25,7 +21,7 @@ if (file_exists(__DIR__ . '/cookies-modal.php')) {
             <a href="<?php echo $sitePrefix; ?>confidentialite.php">Confidentialité</a>
         </p>
 
-        <!-- Réseaux sociaux & Admin -->
+        <!-- Liens externes et admin -->
         <div class="reseaux-sociaux">
             <a href="<?php echo $sitePrefix; ?>facebook-preview.php" target="_blank" rel="noopener">Facebook</a> |
             <a href="<?php echo $sitePrefix; ?>instagram-preview.php" target="_blank" rel="noopener">Instagram</a> |

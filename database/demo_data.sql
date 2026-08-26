@@ -1,7 +1,4 @@
--- =====================================================
--- Donnees de demo : repaire_des_moustaches
--- A executer apres schema.sql
--- =====================================================
+-- Données de démonstration
 
 USE repaire_des_moustaches;
 SET NAMES utf8mb4;
@@ -9,9 +6,7 @@ SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
--- -----------------------------------------------------
--- 1) Categories (idempotent)
--- -----------------------------------------------------
+-- Catégories
 INSERT INTO categories_produits (nom)
 VALUES ('diner')
 ON DUPLICATE KEY UPDATE nom = VALUES(nom);
@@ -28,9 +23,7 @@ INSERT INTO categories_produits (nom)
 VALUES ('solidaire')
 ON DUPLICATE KEY UPDATE nom = VALUES(nom);
 
--- -----------------------------------------------------
--- 2) Admin (email unique - Mot de passe : admin123)
--- -----------------------------------------------------
+-- Administrateur
 INSERT INTO admin_users (email, mot_de_passe, role)
 VALUES ('admin@repaire.local', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHe1V.g540oU7w7A7uD1nU0gX1G6m9V12O', 'admin')
 ON DUPLICATE KEY UPDATE mot_de_passe = VALUES(mot_de_passe), role = VALUES(role);
@@ -39,9 +32,7 @@ SET @admin_id = (
   SELECT id FROM admin_users WHERE email = 'admin@repaire.local' LIMIT 1
 );
 
--- -----------------------------------------------------
--- 3) Utilisateurs (emails uniques)
--- -----------------------------------------------------
+-- Utilisateurs
 INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe)
 VALUES ('Martin', 'Lea', 'lea.martin@example.com', '$2y$10$demo_hash_1')
 ON DUPLICATE KEY UPDATE nom = VALUES(nom), prenom = VALUES(prenom);
@@ -58,9 +49,7 @@ SET @u1 = (SELECT id FROM utilisateurs WHERE email = 'lea.martin@example.com' LI
 SET @u2 = (SELECT id FROM utilisateurs WHERE email = 'hugo.bernard@example.com' LIMIT 1);
 SET @u3 = (SELECT id FROM utilisateurs WHERE email = 'nina.petit@example.com' LIMIT 1);
 
--- -----------------------------------------------------
--- 4) Refuge partenaire
--- -----------------------------------------------------
+-- Refuge partenaire
 INSERT INTO refuges_partenaires (nom, contact_email, telephone)
 SELECT 'Refuge Les Pattes Libres', 'contact@pattes-libres.fr', '0494000001'
 WHERE NOT EXISTS (
@@ -71,9 +60,7 @@ SET @refuge_id = (
   SELECT id FROM refuges_partenaires WHERE nom = 'Refuge Les Pattes Libres' LIMIT 1
 );
 
--- -----------------------------------------------------
--- 5) Pensionnaires (Velours, Biscuit, Moonlight)
--- -----------------------------------------------------
+-- Pensionnaires
 INSERT INTO pensionnaires (nom, age, description, caractere, photo_url, statut, refuge_id, admin_id)
 SELECT 'Velours', 3,
        'Né sur les quais du Mourillon, Velours a passé ses premières années à chercher un toit chaleureux.',
@@ -104,9 +91,7 @@ WHERE NOT EXISTS (
   SELECT 1 FROM pensionnaires WHERE nom = 'Moonlight'
 );
 
--- -----------------------------------------------------
--- 6) Adhesions (regle metier 5.00 EUR)
--- -----------------------------------------------------
+-- Adhésions
 INSERT INTO adhesions (utilisateur_id, date_debut, date_fin, montant, statut)
 SELECT @u1, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), 5.00, 'valide'
 WHERE NOT EXISTS (
@@ -121,9 +106,7 @@ WHERE NOT EXISTS (
   WHERE utilisateur_id = @u2 AND statut = 'valide' AND date_fin >= CURDATE()
 );
 
--- -----------------------------------------------------
--- 7) Ateliers
--- -----------------------------------------------------
+-- Ateliers
 INSERT INTO ateliers (titre, description, image, date_heure, capacite_max, admin_id)
 SELECT 'Création de Jouets Écolos',
        'Récupérez, transformez, créez ! Fabriquez des jouets stimulants pour vos futurs compagnons ou pour nos pensionnaires, à partir de matériaux recyclés. Pendant que vos mains s\'activent, Velours, Biscuit et Moonlight vous observent avec leur curiosité légendaire. Créativité garantie, fou rire inclus.',
@@ -171,9 +154,7 @@ WHERE NOT EXISTS (
 SET @atelier_1 = (SELECT id FROM ateliers WHERE titre = 'Création de Jouets Écolos' LIMIT 1);
 SET @atelier_2 = (SELECT id FROM ateliers WHERE titre = 'Bien-être & Ronronthérapie' LIMIT 1);
 
--- -----------------------------------------------------
--- 8) Reservations ateliers (participant + animateur)
--- -----------------------------------------------------
+-- Réservations d'ateliers
 INSERT INTO reservations_ateliers (utilisateur_id, atelier_id, role, montant_libre)
 SELECT @u1, @atelier_1, 'participant', 8.00
 WHERE NOT EXISTS (
@@ -192,9 +173,7 @@ WHERE NOT EXISTS (
   SELECT 1 FROM reservations_ateliers WHERE utilisateur_id = @u3 AND atelier_id = @atelier_2
 );
 
--- -----------------------------------------------------
--- 9) Belles histoires
--- -----------------------------------------------------
+-- Histoires
 INSERT INTO belles_histoires (utilisateur_id, titre, contenu, statut, admin_id)
 SELECT @u1,
        'Des nouvelles de Velours',
@@ -215,15 +194,13 @@ WHERE NOT EXISTS (
   SELECT 1 FROM belles_histoires WHERE titre = 'Premier atelier au top'
 );
 
--- -----------------------------------------------------
--- 10) Produits (diner + goodies)
--- -----------------------------------------------------
+-- Produits
 SET @cat_diner = (SELECT id FROM categories_produits WHERE nom = 'diner' LIMIT 1);
 SET @cat_diner_retro = (SELECT id FROM categories_produits WHERE nom = 'diner_retro' LIMIT 1);
 SET @cat_cat_lovers = (SELECT id FROM categories_produits WHERE nom = 'cat_lovers' LIMIT 1);
 SET @cat_solidaire = (SELECT id FROM categories_produits WHERE nom = 'solidaire' LIMIT 1);
 
--- Produits Diner
+-- Produits du diner
 INSERT INTO produits (nom, description, prix, categorie_id, image_url)
 SELECT 'Milkshake Fraise', 'Milkshake maison creme et fraises', 6.50, @cat_diner, 'images/produits/milkshake-fraise.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Milkshake Fraise');
@@ -232,7 +209,7 @@ INSERT INTO produits (nom, description, prix, categorie_id, image_url)
 SELECT 'Burger Veggie Moustache', 'Burger vegetarien sauce maison', 12.90, @cat_diner, 'images/produits/burger-veggie.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Burger Veggie Moustache');
 
--- Goodies Diner Retro
+-- Goodies rétro
 INSERT INTO produits (nom, description, prix, categorie_id, image_url)
 SELECT 'Mug Diner', 'Mug en céramique épaisse style 50s américain, logo floqué', 12.99, @cat_diner_retro, 'images/produits/mug-diner.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Mug Diner');
@@ -258,7 +235,7 @@ INSERT INTO produits (nom, description, prix, categorie_id, image_url)
 SELECT 'Planches de Stickers Retro', 'Pack de 24 autocollants vintage style 50s et chats', 5.99, @cat_cat_lovers, 'images/produits/stickers-retro.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Planches de Stickers Retro');
 
--- Goodies Solidaires
+-- Goodies solidaires
 INSERT INTO produits (nom, description, prix, categorie_id, image_url)
 SELECT 'Cartes Postales Polaroid', 'Set de 6 cartes photos rétro de nos pensionnaires. 1 carte = 1 repas financé', 9.99, @cat_solidaire, 'images/produits/cartes-postales.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Cartes Postales Polaroid');
@@ -267,9 +244,7 @@ INSERT INTO produits (nom, description, prix, categorie_id, image_url)
 SELECT 'Badge Solidaire', 'Badge 56mm "Soutien officiel du Repaire des Moustaches"', 3.99, @cat_solidaire, 'images/produits/badge-solidaire.jpg'
 WHERE NOT EXISTS (SELECT 1 FROM produits WHERE nom = 'Badge Solidaire');
 
--- -----------------------------------------------------
--- 11) Commande de demo
--- -----------------------------------------------------
+-- Commande de démonstration
 INSERT INTO commandes (utilisateur_id, montant_total, statut)
 SELECT @u1, 19.89, 'payee'
 WHERE NOT EXISTS (
@@ -303,9 +278,7 @@ WHERE NOT EXISTS (
 
 COMMIT;
 
--- -----------------------------------------------------
--- Verification rapide
--- -----------------------------------------------------
+-- Vérification
 SELECT 'utilisateurs' AS table_name, COUNT(*) AS total FROM utilisateurs
 UNION ALL
 SELECT 'pensionnaires', COUNT(*) FROM pensionnaires

@@ -3,28 +3,24 @@ declare(strict_types=1);
 
 session_start();
 
-// ============================================================
-// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
-// ============================================================
+// Contrôle d'accès
 if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
-// ============================================================
-
 require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 $message = '';
 $error = '';
 
-// Génération / vérification du token CSRF
+// Token CSRF
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 $csrf_token = $_SESSION['csrf_token'];
 
-// Traitement des actions (Ajouter, Modifier, Supprimer, Mettre à jour le statut)
+// Traitement des actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_token = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!hash_equals($_SESSION['csrf_token'], $posted_token)) {
@@ -33,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = trim((string) ($_POST['action'] ?? ''));
 
         if ($action === 'ajouter' || $action === 'modifier') {
-            // ✅ NOUVEAU CODE (Complet avec l'âge)
+            // Données du formulaire
 $nom = trim($_POST['nom'] ?? '');
 $age = (int)($_POST['age'] ?? 0);
 $caractere = trim($_POST['caractere'] ?? '');
@@ -42,7 +38,7 @@ $description = trim($_POST['description'] ?? '');
             $refuge_id = !empty($_POST['refuge_id']) ? (int)$_POST['refuge_id'] : null;
             $admin_id = $_SESSION['admin_id'];
 
-            // Gestion de l'upload et conversion en WebP
+            // Téléversement de l'image
             $photo_url = trim((string) ($_POST['current_image'] ?? ''));
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                 $file_tmp = $_FILES['photo']['tmp_name'];
@@ -51,7 +47,7 @@ $description = trim($_POST['description'] ?? '');
                 $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
                 if (in_array($ext, $allowed)) {
-                    $upload_dir = __DIR__ . '/../images/'; // Dossier public/images/
+                    $upload_dir = __DIR__ . '/../images/'; // Dossier des images
 
                     if (!is_dir($upload_dir)) {
                         mkdir($upload_dir, 0777, true);
@@ -62,7 +58,7 @@ $description = trim($_POST['description'] ?? '');
 
                     $image_created = false;
 
-                    // Traitement / Conversion en WebP avec GD
+                    // Conversion WebP
                     if ($ext === 'webp') {
                         $image_created = move_uploaded_file($file_tmp, $target_path);
                     } else {
@@ -147,7 +143,7 @@ $description = trim($_POST['description'] ?? '');
     }
 }
 
-// Récupérer le pensionnaire à modifier
+// Pensionnaire à modifier
 $edit_pensionnaire = null;
 if (isset($_GET['edit'])) {
     $edit_id = (int)$_GET['edit'];
@@ -156,7 +152,7 @@ if (isset($_GET['edit'])) {
     $edit_pensionnaire = $stmt->fetch();
 }
 
-// Récupération des données
+// Liste des pensionnaires
 $stmt = $pdo->prepare('
     SELECT p.*, r.nom AS refuge_nom 
     FROM pensionnaires p 
@@ -220,7 +216,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="admin-container">
-        <!-- Sidebar -->
+        <!-- Barre latérale -->
         <aside class="admin-sidebar">
             <div>
                 <h2>Admin</h2>
@@ -242,7 +238,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Contenu principal -->
         <main class="admin-main">
             <h1>🐱 Gestion des Pensionnaires</h1>
             
@@ -254,7 +250,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="alert alert-error"><?php echo $error; ?></div>
             <?php endif; ?>
 
-            <!-- Formulaire -->
+            <!-- Formulaire pensionnaire -->
             <div class="admin-form">
                 <h3><?php echo $edit_pensionnaire ? 'Modifier le pensionnaire' : 'Ajouter un nouveau pensionnaire'; ?></h3>
                 
@@ -335,7 +331,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </form>
             </div>
 
-            <!-- Liste des pensionnaires -->
+            <!-- Liste -->
             <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <h3 style="margin-top: 0; color: #2B2B2B; border-bottom: 3px solid #85D6CD; padding-bottom: 10px;">
                     Matous enregistrés (<?php echo count($pensionnaires); ?>)
@@ -364,7 +360,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
 
                                 <div class="produit-actions">
-                                    <!-- Changement rapide de statut -->
+                                    <!-- Statut -->
                                     <form method="POST">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                                         <input type="hidden" name="action" value="update_statut">

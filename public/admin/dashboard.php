@@ -3,33 +3,29 @@ declare(strict_types=1);
 
 session_start();
 
-// ============================================================
-// 🔒 VÉRIFICATION D'ACCÈS ADMIN (rôle requis)
-// ============================================================
+// Contrôle d'accès
 if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
-// ============================================================
-
 require_once __DIR__ . '/../../config/database.php';
 
 $pdo = getPDO();
 
-// Helper sécurisé pour exécuter un COUNT(*) sans faire planter la page
+// Compte une requête SQL
 function getSafeCount(PDO $pdo, string $query): int {
     try {
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         return $stmt ? (int)$stmt->fetchColumn() : 0;
     } catch (PDOException $e) {
-        // Log la sous-erreur discrètement
+        // Journalisation de l'erreur
         error_log('Erreur Stat Dashboard SQL : ' . $e->getMessage());
         return 0;
     }
 }
 
-// Récupérer les statistiques pour le dashboard
+// Statistiques du dashboard
 $stats = [
     'pensionnaires'     => getSafeCount($pdo, 'SELECT COUNT(*) FROM pensionnaires'),
     'commandes'         => getSafeCount($pdo, 'SELECT COUNT(*) FROM commandes'),
@@ -59,7 +55,7 @@ $stats = [
 
         .admin-container { display: flex; min-height: 100vh; }
 
-        /* --- SIDEBAR SOMBRE ALIGNÉE SUR LE RESTE DU PANNEAU --- */
+        /* Barre latérale */
         .admin-sidebar {
             width: 250px;
             background: #2b2b2b;
@@ -119,7 +115,7 @@ $stats = [
         .admin-user-info strong { display: block; color: #ffffff; margin-bottom: 10px; word-break: break-all; }
         .admin-user-info a { color: #FE7B7E; text-decoration: none; font-weight: 600; }
 
-        /* --- CONTENU PRINCIPAL --- */
+        /* Contenu principal */
         .admin-main {
             flex: 1;
             margin-left: 250px;
@@ -133,7 +129,7 @@ $stats = [
             color: #2b2b2b;
         }
 
-        /* METRIQUES / GRILLE STATS */
+        /* Grille des statistiques */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -170,7 +166,7 @@ $stats = [
             letter-spacing: 0.5px;
         }
 
-        /* MODULE ACCÈS RAPIDES PRO */
+        /* Accès rapides */
         .admin-card {
             background: #ffffff;
             border-radius: 12px;
@@ -239,7 +235,7 @@ $stats = [
 </head>
 <body>
     <div class="admin-container">
-        <!-- Sidebar -->
+        <!-- Barre latérale -->
         <aside class="admin-sidebar">
             <div>
                 <div class="admin-logo">
@@ -263,13 +259,13 @@ $stats = [
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Contenu principal -->
         <main class="admin-main">
             <div class="admin-header">
                 <h1>📊 Vue d'ensemble</h1>
             </div>
 
-            <!-- Grille de métriques -->
+            <!-- Statistiques -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="number"><?= htmlspecialchars((string)$stats['pensionnaires'], ENT_QUOTES, 'UTF-8') ?></div>
@@ -297,7 +293,7 @@ $stats = [
                 </div>
             </div>
 
-            <!-- Tableau des modules d'administration -->
+            <!-- Modules d'administration -->
             <div class="admin-card">
                 <h2>Modules de Gestion</h2>
                 <table class="quick-actions-table">

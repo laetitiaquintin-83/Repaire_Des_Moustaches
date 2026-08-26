@@ -1,8 +1,8 @@
 <?php
-// On force le serveur à envoyer la page en UTF-8
+// Encodage UTF-8
 header('Content-Type: text/html; charset=utf-8');
 
-// Détection automatique du préfixe si non défini
+// Détection du préfixe
 if (!isset($sitePrefix)) {
     $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
     $sitePrefix = (strpos($scriptPath, '/public/') !== false) ? '../' : '';
@@ -23,20 +23,20 @@ if (!isset($sitePrefix)) {
     
     <link rel="stylesheet" href="<?php echo $sitePrefix; ?>css/style.css">
 
-    <!-- Styles CSS du Header & Effets de survol uniformes -->
+    <!-- Styles du header -->
     <style>
-        /* Alignment global de l'en-tête pour éviter tout débordement */
+        /* En-tête */
         header {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
-            flex-wrap: nowrap !important;
             padding: 10px 20px;
             box-sizing: border-box;
             width: 100%;
+            position: relative;
         }
 
-        /* Agrandissement et mise en valeur du logo */
+        /* Logo */
         header .logo img {
             width: auto;
             height: 70px;
@@ -48,17 +48,49 @@ if (!isset($sitePrefix)) {
             transform: scale(1.05);
         }
 
-        /* Navigation resserrée */
+        /* Menu mobile */
+        .burger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .burger-btn span {
+            width: 100%;
+            height: 3px;
+            background-color: #ff7b7b;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* Animation du menu */
+        .burger-btn.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        .burger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .burger-btn.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        /* Navigation */
         nav ul {
             list-style: none;
             margin: 0;
             padding: 0;
             display: flex;
             align-items: center;
-            gap: 10px; /* Réduit pour éviter de pousser le bouton hors de l'écran */
+            gap: 10px;
         }
 
-        /* Styles de base pour TOUS les liens du menu principal */
         nav ul > li > a {
             transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease !important;
             display: inline-block;
@@ -66,19 +98,16 @@ if (!isset($sitePrefix)) {
             white-space: nowrap;
         }
 
-        /* Effet au survol UNIFORME pour tous les onglets principaux */
         nav ul > li > a:hover {
             color: #FFFFFF !important;
             text-shadow: 0 2px 6px rgba(255, 123, 123, 0.3);
             transform: scale(1.04);
         }
 
-        /* Ancrage du sous-menu à son parent exact */
         nav ul li.has-dropdown {
             position: relative !important;
         }
 
-        /* Indicateur flèche discrète */
         .has-dropdown > a::after {
             content: " ▾";
             font-size: 0.75rem;
@@ -91,7 +120,6 @@ if (!isset($sitePrefix)) {
             transform: rotate(180deg);
         }
 
-        /* Conteneur du sous-menu */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -107,7 +135,6 @@ if (!isset($sitePrefix)) {
             z-index: 1000;
         }
 
-        /* Affichage au survol */
         .has-dropdown:hover .dropdown-menu {
             display: block;
             animation: fadeIn 0.15s ease-in-out;
@@ -118,7 +145,6 @@ if (!isset($sitePrefix)) {
             to { opacity: 1; transform: translate(-50%, 0); }
         }
 
-        /* Liens dans le sous-menu */
         .dropdown-menu li {
             width: 100%;
             display: block;
@@ -145,19 +171,17 @@ if (!isset($sitePrefix)) {
             transform: none !important;
         }
 
-        /* Typographie Pacifico pour La Patte Suspendue */
         .nav-patte-suspendue {
             font-family: 'Pacifico', cursive !important;
-            font-size: 0.95rem; /* Ajusté légèrement */
+            font-size: 0.95rem;
             font-weight: 400 !important;
         }
 
-        /* Zone d'action (Bouton Réserver + Admin) */
         .action {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex-shrink: 0; /* Empêche le bloc bouton de se réduire ou de sortir */
+            flex-shrink: 0;
         }
 
         .bouton-reserver {
@@ -165,7 +189,6 @@ if (!isset($sitePrefix)) {
             white-space: nowrap;
         }
 
-        /* STYLES DU MACARON FLOTTANT */
         .macaron-sticker {
             position: fixed;
             bottom: 25px;
@@ -210,6 +233,53 @@ if (!isset($sitePrefix)) {
             border-radius: 10px;
             text-transform: uppercase;
         }
+
+        /* Responsive mobile */
+        @media screen and (max-width: 900px) {
+            .burger-btn {
+                display: flex; /* Affiche l'icône burger */
+            }
+
+            nav {
+                display: none; /* Cache le menu par défaut */
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: #ffffff;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                padding: 20px 0;
+                z-index: 999;
+            }
+
+            /* Menu ouvert */
+            nav.mobile-open {
+                display: block;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul li {
+                width: 100%;
+                text-align: center;
+            }
+
+            .dropdown-menu {
+                position: static;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                background-color: #fafafa;
+                margin-top: 5px;
+            }
+
+            .dropdown-menu a {
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -222,14 +292,16 @@ if (!isset($sitePrefix)) {
             </picture>
         </a>
 
-        <nav>
-            <ul>
-                <!-- Menu 0 : Accueil -->
-                <li>
-                    <a href="<?php echo $sitePrefix; ?>index.php">Accueil</a>
-                </li>
+        <!-- Menu mobile -->
+        <button class="burger-btn" id="burgerBtn" aria-label="Ouvrir le menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-                <!-- Menu 1 : Le Concept & Projet -->
+        <nav id="mainNav">
+            <ul>
+                <li><a href="<?php echo $sitePrefix; ?>index.php">Accueil</a></li>
                 <li class="has-dropdown">
                     <a href="<?php echo $sitePrefix; ?>concept.php">Le Concept</a>
                     <ul class="dropdown-menu">
@@ -240,8 +312,6 @@ if (!isset($sitePrefix)) {
                         <li><a href="<?php echo $sitePrefix; ?>contact.php">💌 Nous Contacter</a></li>
                     </ul>
                 </li>
-
-                <!-- Menu 2 : L'Équipage & Chats -->
                 <li class="has-dropdown">
                     <a href="<?php echo $sitePrefix; ?>equipage.php">L'Équipage</a>
                     <ul class="dropdown-menu">
@@ -250,15 +320,11 @@ if (!isset($sitePrefix)) {
                         <li><a href="<?php echo $sitePrefix; ?>adoption.php">🐾 Comment Adopter ?</a></li>
                     </ul>
                 </li>
-
-                <!-- Menu 3 : La Patte Suspendue -->
                 <li>
                     <a href="<?php echo $sitePrefix; ?>solidaire.php" class="nav-patte-suspendue">
                         🐾 La Patte Suspendue
                     </a>
                 </li>
-
-                <!-- Menu 4 : Les Ateliers & Événements (MODIFIÉ ICI) -->
                 <li class="has-dropdown">
                     <a href="<?php echo $sitePrefix; ?>ateliers.php">Ateliers</a>
                     <ul class="dropdown-menu">
@@ -266,11 +332,7 @@ if (!isset($sitePrefix)) {
                         <li><a href="<?php echo $sitePrefix; ?>escape-game.php">🕵️‍♂️ Escape Game Le Jukebox</a></li>
                     </ul>
                 </li>
-
-                <!-- Menu 5 : Belles Histoires -->
                 <li><a href="<?php echo $sitePrefix; ?>belles-histoires.php">Belles Histoires</a></li>
-
-                <!-- Menu 6 : Boutique & Gourmandises -->
                 <li class="has-dropdown">
                     <a href="<?php echo $sitePrefix; ?>boutique.php">Boutique</a>
                     <ul class="dropdown-menu">
@@ -287,7 +349,22 @@ if (!isset($sitePrefix)) {
         </div>
     </header>
 
-    <!-- MACARON FLOTTANT "ADHÉSION" -->
+    <!-- Script du menu mobile -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const burgerBtn = document.getElementById('burgerBtn');
+            const mainNav = document.getElementById('mainNav');
+
+            if (burgerBtn && mainNav) {
+                burgerBtn.addEventListener('click', function() {
+                    burgerBtn.classList.toggle('active');
+                    mainNav.classList.toggle('mobile-open');
+                });
+            }
+        });
+    </script>
+
+    <!-- Accès adhésion -->
     <a href="<?php echo $sitePrefix; ?>adhesion.php" class="macaron-sticker">
       <span class="pattes">🐾🐾</span>
       <span class="titre-club">CLUB DES<br>MOUSTACHES</span>
