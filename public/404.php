@@ -46,7 +46,7 @@ http_response_code(404);
 
     <!-- Ton image du chat dans le carton -->
    <!-- Le '/' au début force le navigateur à chercher à la racine du site -->
-<img src="/images/404.jpg" alt="404 Cat Not Found">
+<img src="images/404.jpg" alt="404 Cat Not Found">
     <h1>Oups ! Chat introuvable...</h1>
     <p>La page que vous cherchez a probablement été cachée par l'un de nos pensionnaires.</p>
 
