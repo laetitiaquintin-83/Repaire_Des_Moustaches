@@ -1,72 +1,69 @@
 <?php
-declare(strict_types=1);
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+try {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-$sitePrefix = '';
+    require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../config/stripe.php';
+    require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once __DIR__ . '/../config/database.php';
+    $pdo = getPDO();
+    $message = '';
+    $error = '';
 
-$pdo = getPDO();
-$message = '';
-$error = '';
+    // Gestion CSRF
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    $csrf_token = $_SESSION['csrf_token'];
 
-// Génération du token CSRF
-$csrf_token = function_exists('generateCSRFToken') ? generateCSRFToken() : ($_SESSION['csrf_token'] ?? '');
+    // Panier vide -> retour boutique/panier
+    $cart = $_SESSION['cart'] ?? [];
+    if (empty($cart)) {
+        header('Location: cart.php');
+        exit;
+    }
 
-// Vérifier que le panier n'est pas vide
-$cart = $_SESSION['cart'] ?? [];
-if (empty($cart)) {
-    header('Location: cart.php');
-    exit;
-}
+    // Utilisateur connecté
+    $user = null;
+    if (isset($_SESSION['user_id'])) {
+        $stmt = $pdo->prepare('SELECT id, prenom, nom, email FROM utilisateurs WHERE id = ?');
+        $stmt->execute([(int)$_SESSION['user_id']]);
+        $user = $stmt->fetch();
+    }
 
-// Récupérer les informations de l'utilisateur connecté
-$user = null;
-if (isset($_SESSION['user_id'])) {
-    $stmt = $pdo->prepare('SELECT id, prenom, nom, email FROM utilisateurs WHERE id = ?');
-    $stmt->execute([(int)$_SESSION['user_id']]);
-    $user = $stmt->fetch();
-}
-
-// Traiter le formulaire
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrf_check = $_POST['csrf_token'] ?? '';
-    
-    // Validation CSRF
-    $isValidCsrf = function_exists('validateCSRFToken') 
-        ? validateCSRFToken($csrf_check) 
-        : hash_equals($_SESSION['csrf_token'] ?? '', $csrf_check);
-
-    if (!$isValidCsrf) {
-        $error = 'Erreur de sécurité : token CSRF invalide. Veuillez réessayer.';
-    } else {
-        $prenom = trim($_POST['prenom'] ?? '');
-        $nom = trim($_POST['nom'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $adresse = trim($_POST['adresse'] ?? '');
-        $code_postal = trim($_POST['code_postal'] ?? '');
-        $ville = trim($_POST['ville'] ?? '');
-
-        // Validations métier
-        if (!$prenom || !$nom || !$email || !$adresse || !$code_postal || !$ville) {
-            $error = 'Tous les champs sont obligatoires.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = 'Adresse email invalide.';
-        } elseif (mb_strlen($prenom) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/u', $prenom)) {
-            $error = 'Le prénom doit comporter au moins 2 caractères valides (lettres, espaces ou tirets).';
-        } elseif (mb_strlen($nom) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/u', $nom)) {
-            $error = 'Le nom doit comporter au moins 2 caractères valides (lettres, espaces ou tirets).';
-        } elseif (mb_strlen($adresse) < 5) {
-            $error = 'L\'adresse doit comporter au moins 5 caractères.';
-        } elseif (!preg_match('/^[0-9]{5}$/', $code_postal)) {
-            $error = 'Le code postal doit être composé de 5 chiffres (ex: 83000).';
-        } elseif (mb_strlen($ville) < 2 || !preg_match('/^[a-zA-ZÀ-ÿ\s\-]+$/u', $ville)) {
-            $error = 'La ville doit comporter au moins 2 caractères valides (lettres, espaces ou tirets).';
+    // Soumission du formulaire
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $csrf_check = $_POST['csrf_token'] ?? '';
+        
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_check)) {
+            $error = 'Erreur de sécurité : token CSRF invalide. Veuillez réessayer.';
         } else {
-            try {
+            $prenom = trim($_POST['prenom'] ?? '');
+            $nom = trim($_POST['nom'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $adresse = trim($_POST['adresse'] ?? '');
+            $code_postal = trim($_POST['code_postal'] ?? '');
+            $ville = trim($_POST['ville'] ?? '');
+
+            if (!$prenom || !$nom || !$email || !$adresse || !$code_postal || !$ville) {
+                $error = 'Tous les champs sont obligatoires.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error = 'Adresse email invalide.';
+            } elseif (mb_strlen($prenom) < 2 || mb_strlen($nom) < 2) {
+                $error = 'Le nom et le prénom doivent faire au moins 2 caractères.';
+            } elseif (mb_strlen($adresse) < 5) {
+                $error = 'L\'adresse doit faire au moins 5 caractères.';
+            } elseif (!preg_match('/^[0-9]{5}$/', $code_postal)) {
+                $error = 'Le code postal doit contenir 5 chiffres.';
+            } elseif (mb_strlen($ville) < 2) {
+                $error = 'La ville doit faire au moins 2 caractères.';
+            } else {
                 $utilisateur_id = $_SESSION['user_id'] ?? null;
 
                 if (!$utilisateur_id) {
@@ -93,40 +90,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $stmt = $pdo->prepare('
-                    INSERT INTO commandes (utilisateur_id, date_commande, montant_total, statut)
-                    VALUES (?, NOW(), ?, "en_attente")
+                    INSERT INTO commandes (utilisateur_id, total, statut)
+                    VALUES (?, ?, "panier")
                 ');
                 $stmt->execute([$utilisateur_id, $total]);
                 $commande_id = (int)$pdo->lastInsertId();
 
                 foreach ($cart as $produit_id => $item) {
+                    $clean_id = (int) preg_replace('/[^0-9]/', '', (string) $produit_id);
+
                     $stmt = $pdo->prepare('
                         INSERT INTO lignes_commandes (commande_id, produit_id, quantite, prix_unitaire)
                         VALUES (?, ?, ?, ?)
                     ');
                     $stmt->execute([
                         $commande_id,
-                        $produit_id,
+                        $clean_id,
                         (int)$item['quantite'],
                         (float)$item['prix']
                     ]);
                 }
 
-                unset($_SESSION['cart']);
-                header('Location: confirmation.php?commande_id=' . $commande_id);
-                exit;
+                // Stripe Checkout
+                \Stripe\Stripe::setApiKey(getStripeSecretKey());
 
-            } catch (PDOException $e) {
-                error_log('Erreur checkout : ' . $e->getMessage());
-                $error = 'Une erreur est survenue lors de la création de la commande. Veuillez réessayer.';
+                $line_items = [];
+                foreach ($cart as $item) {
+                    $line_items[] = [
+                        'price_data' => [
+                            'currency' => 'eur',
+                            'product_data' => [
+                                'name' => $item['nom'],
+                            ],
+                            'unit_amount' => (int)round((float)$item['prix'] * 100),
+                        ],
+                        'quantity' => (int)$item['quantite'],
+                    ];
+                }
+
+                $checkout_session = \Stripe\Checkout\Session::create([
+                    'payment_method_types' => ['card'],
+                    'line_items' => $line_items,
+                    'mode' => 'payment',
+                    'customer_email' => $email,
+                    'metadata' => ['commande_id' => $commande_id],
+                    'success_url' => 'http://repaire_des_moustaches.test/success.php?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => 'http://repaire_des_moustaches.test/checkout.php',
+                ]);
+
+                header("HTTP/1.1 303 See Other");
+                header("Location: " . $checkout_session->url);
+                exit;
             }
         }
     }
-}
 
-$total_price = 0;
-foreach ($cart as $item) {
-    $total_price += (float)$item['prix'] * (int)$item['quantite'];
+    $total_price = 0;
+    foreach ($cart as $item) {
+        $total_price += (float)$item['prix'] * (int)$item['quantite'];
+    }
+
+} catch (Throwable $e) {
+    // Si une erreur survient n'importe où, elle sera affichée en grand
+    echo "<div style='background:#f8d7da; color:#721c24; padding:20px; font-family:sans-serif; border:2px solid #f5c6cb;'>";
+    echo "<h2>❌ Erreur PHP interceptée :</h2>";
+    echo "<p><strong>Message :</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<p><strong>Fichier :</strong> " . htmlspecialchars($e->getFile()) . " (Ligne " . $e->getLine() . ")</p>";
+    echo "</div>";
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -138,9 +169,8 @@ foreach ($cart as $item) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #f5f5f5; }
+        body { font-family: 'Montserrat', sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
         .checkout-container { max-width: 900px; margin: 40px auto; padding: 20px; }
         .checkout-header { text-align: center; margin-bottom: 40px; }
         .checkout-header h1 { font-size: 2.5rem; color: #2B2B2B; margin-bottom: 10px; }
@@ -150,120 +180,82 @@ foreach ($cart as $item) {
         .form-section h3 { color: #2B2B2B; font-size: 1.1rem; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #85D6CD; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #2B2B2B; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #85D6CD; box-shadow: 0 0 0 3px rgba(133, 214, 205, 0.1); }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .checkout-resume { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; height: fit-content; position: sticky; top: 20px; }
+        .checkout-resume { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; height: fit-content; }
         .resume-title { font-weight: 600; color: #2B2B2B; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 2px solid #85D6CD; padding-bottom: 10px; }
         .resume-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .resume-item:last-child { border-bottom: none; }
-        .resume-item-name { flex: 1; color: #666; }
-        .resume-item-qty { color: #999; min-width: 40px; text-align: right; }
-        .resume-item-total { font-weight: 600; color: #2B2B2B; min-width: 70px; text-align: right; }
         .resume-total { font-size: 1.3rem; font-weight: 700; color: #2B2B2B; border-top: 2px solid #eee; padding-top: 12px; margin-top: 12px; display: flex; justify-content: space-between; }
-        .btn { display: block; width: 100%; padding: 14px; margin-top: 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; transition: all 0.3s ease; font-size: 16px; }
+        .btn { display: block; width: 100%; padding: 14px; margin-top: 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; box-sizing: border-box; }
         .btn-primary { background: #85D6CD; color: white; }
-        .btn-primary:hover { background: #6bc3b8; }
         .btn-secondary { background: #ddd; color: #2B2B2B; margin-top: 10px; }
-        .btn-secondary:hover { background: #ccc; }
-        .alert { padding: 12px 15px; border-radius: 4px; margin-bottom: 20px; }
-        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .info-box { background: #f0f8f7; border-left: 4px solid #85D6CD; padding: 12px; border-radius: 4px; margin-top: 15px; font-size: 13px; color: #666; }
-        @media (max-width: 768px) {
-            .checkout-grid { grid-template-columns: 1fr; }
-            .checkout-resume { position: static; }
-            .form-row { grid-template-columns: 1fr; }
-        }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin-bottom: 20px; }
+        @media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <header style="background: white; border-bottom: 2px solid #85D6CD; position: sticky; top: 0; z-index: 100;">
-        <nav style="max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🐾 Repaire</a>
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <a href="../index.php">Accueil</a>
-                <a href="boutique.php">Boutique</a>
-                <a href="belles-histoires.php">Histoires</a>
-                <a href="cart.php" style="color: #2B2B2B;">🛒 Panier</a>
-                <a href="../login.php" style="color: #85D6CD; font-weight: bold;">Admin</a>
-            </div>
-        </nav>
-    </header>
-
     <div class="checkout-container">
         <div class="checkout-header">
             <h1>📋 Finaliser la commande</h1>
         </div>
         
         <?php if ($error): ?>
-            <div class="alert alert-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
+            <div class="alert-error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
         <?php endif; ?>
 
         <div class="checkout-grid">
             <form method="POST" class="checkout-form">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars((string)$csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+                
                 <div class="form-section">
                     <h3>Informations personnelles</h3>
-                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="prenom">Prénom *</label>
-                            <input type="text" id="prenom" name="prenom" required 
-                                   value="<?php echo $user ? htmlspecialchars($user['prenom'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                            <input type="text" id="prenom" name="prenom" required value="<?php echo htmlspecialchars($_POST['prenom'] ?? ($user['prenom'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="form-group">
                             <label for="nom">Nom *</label>
-                            <input type="text" id="nom" name="nom" required 
-                                   value="<?php echo $user ? htmlspecialchars($user['nom'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                            <input type="text" id="nom" name="nom" required value="<?php echo htmlspecialchars($_POST['nom'] ?? ($user['nom'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                     </div>
-                    
                     <div class="form-group">
                         <label for="email">Email *</label>
-                        <input type="email" id="email" name="email" required 
-                               value="<?php echo $user ? htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                        <input type="email" id="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ($user['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </div>
                 
                 <div class="form-section">
                     <h3>Adresse de livraison</h3>
-                    
                     <div class="form-group">
                         <label for="adresse">Adresse *</label>
-                        <input type="text" id="adresse" name="adresse" required>
+                        <input type="text" id="adresse" name="adresse" required value="<?php echo htmlspecialchars($_POST['adresse'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
-                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="code_postal">Code postal *</label>
-                            <input type="text" id="code_postal" name="code_postal" required>
+                            <input type="text" id="code_postal" name="code_postal" required value="<?php echo htmlspecialchars($_POST['code_postal'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="form-group">
                             <label for="ville">Ville *</label>
-                            <input type="text" id="ville" name="ville" required>
+                            <input type="text" id="ville" name="ville" required value="<?php echo htmlspecialchars($_POST['ville'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                     </div>
                 </div>
                 
-                <div class="info-box">
-                    ℹ️ <strong>À savoir:</strong> En démo, le paiement ne sera pas débité. Vous recevrez un email de confirmation.
-                </div>
-                
-                <button type="submit" class="btn btn-primary">✓ Confirmer la commande</button>
+                <button type="submit" class="btn btn-primary">💳 Procéder au paiement</button>
                 <a href="cart.php" class="btn btn-secondary">Retour au panier</a>
             </form>
 
             <div class="checkout-resume">
                 <div class="resume-title">Résumé du panier</div>
-                
                 <?php foreach ($cart as $item): ?>
                     <div class="resume-item">
-                        <div class="resume-item-name"><?php echo htmlspecialchars($item['nom'], ENT_QUOTES, 'UTF-8'); ?></div>
-                        <div class="resume-item-qty">x<?php echo (int)$item['quantite']; ?></div>
-                        <div class="resume-item-total"><?php echo number_format((float)$item['prix'] * (int)$item['quantite'], 2, ',', ' '); ?> €</div>
+                        <div><?php echo htmlspecialchars($item['nom'], ENT_QUOTES, 'UTF-8'); ?></div>
+                        <div>x<?php echo (int)$item['quantite']; ?></div>
+                        <div><?php echo number_format((float)$item['prix'] * (int)$item['quantite'], 2, ',', ' '); ?> €</div>
                     </div>
                 <?php endforeach; ?>
-                
                 <div class="resume-total">
                     <span>Total:</span>
                     <span><?php echo number_format((float)$total_price, 2, ',', ' '); ?> €</span>
@@ -271,16 +263,5 @@ foreach ($cart as $item) {
             </div>
         </div>
     </div>
-
-    <footer style="background: #2B2B2B; color: white; padding: 30px; text-align: center; margin-top: 60px;">
-        <p>&copy; 2026 Le Repaire des Moustaches. Un tiers-lieu solidaire pour les chats et les humains.</p>
-        <div style="margin-top: 15px;">
-            <a href="#" style="color: white; text-decoration: none; margin: 0 15px;">Facebook</a> |
-            <a href="#" style="color: white; text-decoration: none; margin: 0 15px;">Instagram</a> |
-            <a href="../login.php" style="color: #85D6CD; text-decoration: none; margin: 0 15px;">Admin</a>
-        </div>
-    </footer>
-
-    <script src="../js/form-validation.js"></script>
 </body>
 </html>

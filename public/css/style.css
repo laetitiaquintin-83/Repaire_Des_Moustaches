@@ -1448,3 +1448,201 @@ nav.admin-nav a {
     outline: 3px solid var(--gris-fonce) !important;
     outline-offset: 3px;
 }
+/* --- UNIVERS VIP / HAUTE COUTURE --- */
+.vip-main-wrapper {
+    background-color: #121212;
+    color: #e0e0e0;
+    min-height: 80vh;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* BANNIÈRE HERO */
+.vip-hero {
+    background: linear-gradient(135deg, #1f1f1f 0%, #0a0a0a 100%);
+    border-bottom: 2px solid #D4AF37;
+    padding: 60px 20px;
+    overflow: hidden;
+}
+
+.vip-hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.vip-badge {
+    color: #D4AF37;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.vip-hero-text {
+    flex: 1;
+}
+
+.vip-hero-text h1 {
+    font-size: 3.8rem;
+    color: #ffffff;
+    margin: 15px 0;
+    font-family: 'Playfair Display', serif, Georgia;
+}
+
+.vip-hero-text p {
+    color: #cccccc;
+    font-size: 1.2rem;
+    max-width: 580px;
+    line-height: 1.6;
+}
+
+/* CAT LAGERFELD AGRANDI */
+.vip-hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.cat-lagerfeld {
+    width: 100%;
+    max-width: 480px; /* Taille augmentée de 260px à 480px */
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.25);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.cat-lagerfeld:hover {
+    transform: scale(1.02);
+    box-shadow: 0 16px 40px rgba(212, 175, 55, 0.4);
+}
+
+/* CATALOGUE ET GRILLE */
+.vip-container {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.vip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 35px;
+}
+
+.vip-card {
+    background: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vip-card:hover {
+    transform: translateY(-7px);
+    border-color: #D4AF37;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+}
+
+.vip-card-image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.vip-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.vip-card:hover .vip-card-image img {
+    transform: scale(1.06);
+}
+
+.vip-card-content {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.vip-card-content h3 {
+    color: #ffffff;
+    margin: 0 0 10px 0;
+    font-size: 1.35rem;
+    font-family: 'Playfair Display', serif, Georgia;
+}
+
+.vip-description {
+    color: #aaaaaa;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.vip-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.vip-price {
+    font-size: 1.4rem;
+    color: #D4AF37;
+    font-weight: 700;
+}
+
+.vip-btn {
+    color: #D4AF37;
+    border: 1px solid #D4AF37;
+    padding: 9px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.vip-btn:hover {
+    background-color: #D4AF37;
+    color: #121212;
+}
+
+.vip-empty {
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 40px;
+    color: #888;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 900px) {
+    .vip-hero-container {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+    .vip-hero-text h1 {
+        font-size: 2.8rem;
+    }
+    .vip-hero-image {
+        justify-content: center;
+    }
+    .cat-lagerfeld {
+        max-width: 320px;
+    }
+}

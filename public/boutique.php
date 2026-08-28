@@ -21,7 +21,6 @@ if (empty($_SESSION['csrf_token'])) {
 $csrf_token = $_SESSION['csrf_token'];
 
 // Récupérer tous les produits avec leurs catégories et leur image
-// CORRECTION : p.image au lieu de p.image_url
 $sql = 'SELECT p.id, p.nom, p.description, p.prix, p.image, cp.nom AS categorie
         FROM produits p
         JOIN categories_produits cp ON p.categorie_id = cp.id
@@ -98,6 +97,58 @@ if (isset($_SESSION['cart'])) {
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* Surcharge prioritaire pour le menu déroulant */
+        header {
+            overflow: visible !important;
+        }
+
+        nav ul li.dropdown {
+            position: relative !important;
+        }
+
+        nav ul li.dropdown .dropdown-content {
+            display: none !important;
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            background-color: #ffffff !important;
+            min-width: 180px !important;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.15) !important;
+            border-radius: 8px !important;
+            padding: 10px 0 !important;
+            z-index: 9999 !important;
+            list-style: none !important;
+            margin: 0 !important;
+        }
+
+        nav ul li.dropdown .dropdown-content li {
+            width: 100% !important;
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        nav ul li.dropdown .dropdown-content a {
+            color: #2c3e50 !important;
+            padding: 8px 16px !important;
+            display: block !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            font-family: inherit !important;
+            font-size: 0.95rem !important;
+            text-align: left !important;
+        }
+
+        nav ul li.dropdown .dropdown-content a:hover {
+            background-color: #f0f8f7 !important;
+            color: #ff7b7b !important;
+        }
+
+        nav ul li.dropdown:hover .dropdown-content {
+            display: block !important;
+        }
+
+        /* Styles specifiques boutique */
         .boutique-principale {
             max-width: 1100px;
             margin: 0 auto;
@@ -278,12 +329,24 @@ if (isset($_SESSION['cart'])) {
         <a href="index.php" class="logo"><img src="images/logo.png" alt="Logo du Repaire des Moustaches"></a>
         <nav>
             <ul>
-                <li><a href="concept.php">Le Concept</a></li>
-                <li><a href="projet.php">Le Projet</a></li>
-                <li><a href="equipage.php">L'équipage</a></li>
+                <li><a href="index.php">Accueil</a></li>
+                <li class="dropdown">
+                    <a href="concept.php" class="dropbtn">Le Concept ▾</a>
+                    <ul class="dropdown-content">
+                        <li><a href="projet.php">Le Projet</a></li>
+                        <li><a href="equipage.php">L'Équipage</a></li>
+                    </ul>
+                </li>
                 <li><a href="ateliers.php">Les Ateliers</a></li>
                 <li><a href="belles-histoires.php">Belles Histoires</a></li>
-                <li><a href="boutique.php">Boutique</a></li>
+                <li class="dropdown">
+                    <a href="boutique.php" class="dropbtn active">Boutique ▾</a>
+                    <ul class="dropdown-content">
+                        <li><a href="boutique.php">🛍️ Tous les produits</a></li>
+                        <li><a href="douceurs.php">🍰 Douceurs</a></li>
+                        <li><a href="vip.php">👑 VIP</a></li>
+                    </ul>
+                </li>
             </ul>
         </nav>
         <div class="action">
@@ -336,7 +399,6 @@ if (isset($_SESSION['cart'])) {
                     <div class="grille-produits-boutique">
                         <?php foreach ($items as $produit): ?>
                             <?php 
-                                // On utilise la colonne $produit['image'] du nouveau schéma
                                 $srcImage = !empty($produit['image']) 
                                     ? $produit['image'] 
                                     : getImagePath((string) $produit['nom']);

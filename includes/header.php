@@ -338,6 +338,7 @@ if (!isset($sitePrefix)) {
                     <ul class="dropdown-menu">
                         <li><a href="<?php echo $sitePrefix; ?>boutique.php">🛍️ La Boutique Solidaire</a></li>
                         <li><a href="<?php echo $sitePrefix; ?>douceurs.php">🧁 Nos Douceurs Rétro</a></li>
+                        <li><a href="<?php echo $sitePrefix; ?>vip.php">👑 Espace VIP</a></li>
                     </ul>
                 </li>
             </ul>
