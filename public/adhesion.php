@@ -175,7 +175,7 @@ include '../includes/header.php';
         
         <!-- BLOC IMAGE ENTIÈRE -->
         <div class="adhesion-hero-img">
-            <img src="../images/club-moustaches.png" alt="Le Club des Moustaches - Adhésion Annuelle">
+            <img src="/images/club-moustaches.png" alt="Le Club des Moustaches - Adhésion Annuelle">
         </div>
 
         <!-- CONTENU D'ADHÉSION -->

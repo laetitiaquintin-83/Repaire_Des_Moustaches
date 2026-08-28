@@ -13,6 +13,7 @@ if (!isset($sitePrefix)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="http://repaire_des_moustaches.test" />
     <title><?php echo htmlspecialchars($page_title ?? 'Le Repaire des Moustaches', ENT_QUOTES, 'UTF-8'); ?></title>
     
     <meta name="description" content="<?php echo htmlspecialchars($page_description ?? 'Le Repaire des Moustaches - Tiers-lieu solidaire et boutique en ligne. Adoptez, partagez des histoires et soutenez la cause animale à Toulon.', ENT_QUOTES, 'UTF-8'); ?>">
@@ -21,7 +22,7 @@ if (!isset($sitePrefix)) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="<?php echo $sitePrefix; ?>css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
     <!-- Styles du header -->
     <style>

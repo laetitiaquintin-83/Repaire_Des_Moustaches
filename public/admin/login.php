@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="main-content">
         <div class="login-container">
             <div class="login-header">
-                <img src="../images/logo.png" alt="Le Repaire des Moustaches Logo">
+                <img src="/images/logo.png" alt="Le Repaire des Moustaches Logo">
                 <h1>Admin</h1>
                 <p>Gestion du Repaire</p>
             </div>

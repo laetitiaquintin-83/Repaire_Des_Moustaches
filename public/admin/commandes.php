@@ -282,7 +282,7 @@ $commandes = $stmt->fetchAll();
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="admin-logo">
-                <img src="../images/logo.png" alt="Logo">
+                <img src="/images/logo.png" alt="Logo">
                 <h2>Admin</h2>
             </div>
             <ul class="admin-menu">
