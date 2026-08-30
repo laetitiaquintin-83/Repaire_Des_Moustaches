@@ -36,10 +36,15 @@ function getPDO(): PDO
         return $pdo;
     }
 
-    $host = '127.0.0.1';
-    $dbname = 'repaire_des_moustaches';
-    $username = 'root';
-    $password = '';
+    // Détection de l'environnement (Local vs Plesk)
+    $isLocal = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || stripos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+
+    // Variables d'environnement : à définir dans Plesk / serveur de production.
+    $host = getenv('DB_HOST') ?: ($isLocal ? '127.0.0.1' : 'localhost');
+    $dbname = getenv('DB_NAME') ?: ($isLocal ? 'repaire_des_moustaches' : 'laetitia-quintin_repaire_des_moustaches');
+    $username = getenv('DB_USER') ?: ($isLocal ? 'root' : 'laetitia-quintin');
+    $password = getenv('DB_PASS') ?: '';
+
     $charset = 'utf8mb4';
 
     $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $host, $dbname, $charset);
