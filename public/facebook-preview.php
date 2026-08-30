@@ -24,7 +24,7 @@ include_once '../includes/header.php';
             <!-- Nouvelle image Unsplash bien cadrée pour une bannière -->
             <img src="https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=1200&q=80" alt="Couverture Repaire des Moustaches" class="cover-img">
             <div class="fb-avatar-container">
-                <img src="../assets/img/logo.png" alt="Le Repaire des Moustaches" class="fb-avatar" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200'">
+                <img src="images/logo.png" alt="Le Repaire des Moustaches" class="fb-avatar" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200'">
             </div>
         </div>
 
@@ -70,7 +70,7 @@ include_once '../includes/header.php';
                 <!-- Post 1 -->
                 <div class="fb-card fb-post">
                     <div class="fb-post-header">
-                        <img src="../assets/img/logo.png" alt="Logo" class="fb-post-avatar" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100'">
+                        <img src="images/logo.png" alt="Logo" class="fb-post-avatar" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100'">
                         <div>
                             <h4>Le Repaire des Moustaches</h4>
                             <span class="fb-post-time">Hier à 14:30 • 🌍</span>

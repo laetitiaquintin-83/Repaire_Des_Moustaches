@@ -22,7 +22,7 @@ include_once '../includes/header.php';
         <!-- En-tête Profil -->
         <header class="insta-header">
             <div class="insta-avatar">
-                <img src="../assets/img/logo.png" alt="Le Repaire des Moustaches" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200'">
+                <img src="images/logo.png" alt="Le Repaire des Moustaches" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200'">
             </div>
             <div class="insta-info">
                 <div class="insta-title-row">
