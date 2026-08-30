@@ -128,14 +128,18 @@ try {
                     ];
                 }
 
+                $httpHost = $_SERVER['HTTP_HOST'] ?? 'localhost';
+                $siteProtocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http';
+                $baseUrl = $siteProtocol . '://' . $httpHost;
+
                 $checkout_session = \Stripe\Checkout\Session::create([
                     'payment_method_types' => ['card'],
                     'line_items' => $line_items,
                     'mode' => 'payment',
                     'customer_email' => $email,
                     'metadata' => ['commande_id' => $commande_id],
-                    'success_url' => 'http://repaire_des_moustaches.test/success.php?session_id={CHECKOUT_SESSION_ID}',
-                    'cancel_url' => 'http://repaire_des_moustaches.test/checkout.php',
+                    'success_url' => $baseUrl . '/success.php?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => $baseUrl . '/checkout.php',
                 ]);
 
                 header("HTTP/1.1 303 See Other");
