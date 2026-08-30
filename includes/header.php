@@ -13,7 +13,6 @@ if (!isset($sitePrefix)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="http://repaire_des_moustaches.test" />
     <title><?php echo htmlspecialchars($page_title ?? 'Le Repaire des Moustaches', ENT_QUOTES, 'UTF-8'); ?></title>
     
     <meta name="description" content="<?php echo htmlspecialchars($page_description ?? 'Le Repaire des Moustaches - Tiers-lieu solidaire et boutique en ligne. Adoptez, partagez des histoires et soutenez la cause animale à Toulon.', ENT_QUOTES, 'UTF-8'); ?>">

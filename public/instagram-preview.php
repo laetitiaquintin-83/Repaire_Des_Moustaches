@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 // Debug local (à désactiver en production)
 
-$sitePrefix = '../'; 
-include_once '../includes/header.php'; 
+$sitePrefix = '../';
+$siteProtocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443 ? 'https' : 'http';
+$siteHost = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$siteUrl = $siteProtocol . '://' . $siteHost;
+
+include_once '../includes/header.php';
 ?>
 
 <main class="insta-mockup-page">
@@ -35,7 +39,7 @@ include_once '../includes/header.php';
                     <p>☕ Café & Tiers-lieu solidaire pour chats & humains</p>
                     <p>📍 Toulon, France</p>
                     <p>👇 Réservez vos ateliers & commandes sur notre site :</p>
-                    <a href="index.php" class="insta-link">repaire-des-moustaches.test</a>
+                    <a href="<?php echo htmlspecialchars($siteUrl, ENT_QUOTES, 'UTF-8'); ?>" class="insta-link"><?php echo htmlspecialchars($siteHost, ENT_QUOTES, 'UTF-8'); ?></a>
                 </div>
             </div>
         </header>

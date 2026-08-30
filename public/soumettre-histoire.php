@@ -4,11 +4,11 @@ declare(strict_types=1);
 $sitePrefix = '';
 session_start();
 
-// Connexion BDD
-$host = 'localhost';
-$dbname = 'repaire_des_moustaches';
-$user = 'root';
-$pass = '';
+// Configuration de base pour le dépôt local ou le serveur de prod.
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbname = getenv('DB_NAME') ?: 'repaire_des_moustaches';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);

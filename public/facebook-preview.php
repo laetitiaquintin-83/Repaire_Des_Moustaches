@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 // Debug local (à désactiver en production)
 
-$sitePrefix = '../'; 
-include_once '../includes/header.php'; 
+$sitePrefix = '../';
+$siteProtocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443 ? 'https' : 'http';
+$siteHost = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$siteUrl = $siteProtocol . '://' . $siteHost;
+
+include_once '../includes/header.php';
 ?>
 
 <main class="fb-mockup-page">
@@ -55,7 +59,7 @@ include_once '../includes/header.php';
                     <ul class="fb-about-list">
                         <li>🐾 <strong>Tiers-lieu & Café solidaire</strong></li>
                         <li>📍 Toulon, France</li>
-                        <li>🌐 <a href="index.php">repaire-des-moustaches.test</a></li>
+                        <li>🌐 <a href="<?php echo htmlspecialchars($siteUrl, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($siteHost, ENT_QUOTES, 'UTF-8'); ?></a></li>
                         <li>⏰ Ouvert du mardi au dimanche</li>
                     </ul>
                 </div>
