@@ -42,11 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)($_POST['id'] ?? 0);
 
             // Récupération de l'image actuelle
-            $image_url = '';
+            $image = '';
             if ($action === 'modifier' && $id > 0) {
-                $stmtImg = $pdo->prepare('SELECT image_url FROM produits WHERE id = ?');
+                $stmtImg = $pdo->prepare('SELECT image FROM produits WHERE id = ?');
                 $stmtImg->execute([$id]);
-                $image_url = $stmtImg->fetchColumn() ?: '';
+                $image = $stmtImg->fetchColumn() ?: '';
             }
 
             // Upload d'image sécurisé
@@ -67,13 +67,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $new_name = uniqid('prod_', true) . '.' . $ext;
                     
                     if (move_uploaded_file($file_tmp, $upload_dir . $new_name)) {
-                        if ($action === 'modifier' && !empty($image_url)) {
-                            $old_file_path = __DIR__ . '/../' . $image_url;
+                        if ($action === 'modifier' && !empty($image)) {
+                            $old_file_path = __DIR__ . '/../' . $image;
                             if (file_exists($old_file_path)) {
                                 @unlink($old_file_path);
                             }
                         }
-                        $image_url = 'images/produits/' . $new_name;
+                        $image = 'images/produits/' . $new_name;
                     } else {
                         $error = "Erreur lors du déplacement de l'image.";
                     }
@@ -89,18 +89,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     try {
                         if ($action === 'ajouter') {
                             $stmt = $pdo->prepare('
-                                INSERT INTO produits (nom, description, prix, categorie_id, image_url)
+                                INSERT INTO produits (nom, description, prix, categorie_id, image)
                                 VALUES (?, ?, ?, ?, ?)
                             ');
-                            $stmt->execute([$nom, $description, $prix, $categorie_id, $image_url]);
+                            $stmt->execute([$nom, $description, $prix, $categorie_id, $image]);
                             $message = '✓ Produit ajouté avec succès !';
                         } else {
                             $stmt = $pdo->prepare('
                                 UPDATE produits 
-                                SET nom = ?, description = ?, prix = ?, categorie_id = ?, image_url = ?
+                                SET nom = ?, description = ?, prix = ?, categorie_id = ?, image = ?
                                 WHERE id = ?
                             ');
-                            $stmt->execute([$nom, $description, $prix, $categorie_id, $image_url, $id]);
+                            $stmt->execute([$nom, $description, $prix, $categorie_id, $image, $id]);
                             $message = '✓ Produit mis à jour avec succès !';
                         }
                         
@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id > 0) {
                 try {
-                    $stmtImg = $pdo->prepare('SELECT image_url FROM produits WHERE id = ?');
+                    $stmtImg = $pdo->prepare('SELECT image FROM produits WHERE id = ?');
                     $stmtImg->execute([$id]);
                     $old_image = $stmtImg->fetchColumn();
 
@@ -275,8 +275,8 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="form-group">
                         <label for="image">Image du produit</label>
                         <input type="file" id="image" name="image" accept="image/*">
-                        <?php if ($edit_produit && !empty($edit_produit['image_url'])): ?>
-                            <p style="font-size: 12px; margin-top: 5px; color: #666;">Image actuelle : <?= htmlspecialchars((string) $edit_produit['image_url'], ENT_QUOTES, 'UTF-8') ?></p>
+                        <?php if ($edit_produit && !empty($edit_produit['image'])): ?>
+                            <p style="font-size: 12px; margin-top: 5px; color: #666;">Image actuelle : <?= htmlspecialchars((string) $edit_produit['image'], ENT_QUOTES, 'UTF-8') ?></p>
                         <?php endif; ?>
                     </div>
                     
@@ -304,12 +304,12 @@ $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($produits as $produit): ?>
                             <div class="produit-card">
                                 <?php 
-                                    $img_file = !empty($produit['image_url']) ? htmlspecialchars((string) $produit['image_url'], ENT_QUOTES, 'UTF-8') : '';
-                                    $image_path = !empty($img_file) ? "../" . $img_file : "../images/produits/default-product.png";
+                                    $img_file = !empty($produit['image']) ? htmlspecialchars((string) $produit['image'], ENT_QUOTES, 'UTF-8') : '';
+                                    $image_path = !empty($img_file) ? "../" . $img_file : "../images/produits/milkshake-fraise.jpg";
                                 ?>
                                 <img src="<?= $image_path ?>" 
                                      alt="Aperçu" class="produit-img-preview" 
-                                     onerror="this.onerror=null; this.src='../images/produits/default-product.png';">
+                                     onerror="this.onerror=null; this.src='../images/produits/milkshake-fraise.jpg';">
                                 
                                 <div class="produit-details">
                                     <div class="produit-title"><?= htmlspecialchars((string) $produit['nom'], ENT_QUOTES, 'UTF-8') ?></div>

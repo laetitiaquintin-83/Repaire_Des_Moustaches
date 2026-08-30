@@ -14,7 +14,7 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die('âŒ Erreur BDD : ' . $e->getMessage());
+    die('Erreur BDD : ' . $e->getMessage());
 }
 
 // Token CSRF
@@ -38,18 +38,18 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrf_check = trim((string) ($_POST['csrf_token'] ?? ''));
     if (!validateCSRFToken($csrf_check)) {
-        $error = 'âŒ CSRF invalide.';
+        $error = 'Erreur CSRF invalide.';
     } else {
         $titre = trim((string) ($_POST['titre'] ?? ''));
         $contenu = trim((string) ($_POST['contenu'] ?? ''));
         $utilisateur_id = (int)($_POST['utilisateur_id'] ?? 0);
 
         if (strlen($titre) < 3) {
-            $error = 'âŒ Titre trop court (min 3 caractères).';
+            $error = 'Titre trop court (min 3 caractères).';
         } elseif (strlen($contenu) < 20) {
-            $error = 'âŒ Histoire trop courte (min 20 caractères).';
+            $error = 'Histoire trop courte (min 20 caractères).';
         } elseif ($utilisateur_id <= 0) {
-            $error = 'âŒ Veuillez sélectionner un auteur.';
+            $error = 'Veuillez sélectionner un auteur.';
         } else {
             try {
                 $stmt = $pdo->prepare('
@@ -57,9 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     VALUES (?, ?, ?, "en_attente", NOW())
                 ');
                 $stmt->execute([$utilisateur_id, $titre, $contenu]);
-                $message = 'œ… Histoire soumise avec succès ! Elle sera vérifiée.';
+                $message = 'Histoire soumise avec succès ! Elle sera vérifiée.';
             } catch (PDOException $e) {
-                $error = 'âŒ Erreur insertion : ' . $e->getMessage();
+                $error = 'Erreur insertion : ' . $e->getMessage();
             }
         }
     }
@@ -83,7 +83,7 @@ include_once __DIR__ . '/../includes/header.php';
 <main class="page-liste">
     <section class="page-section" style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
         
-        <h1 class="page-title neon-effect" style="text-align: center; margin-bottom: 30px;">🍔“ Soumettre une histoire</h1>
+        <h1 class="page-title neon-effect" style="text-align: center; margin-bottom: 30px;">✍️ Soumettre une histoire</h1>
 
         <?php if ($message): ?>
             <div class="message-success" style="padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;"><?php echo htmlspecialchars($message); ?></div>
@@ -119,7 +119,7 @@ include_once __DIR__ . '/../includes/header.php';
                     <textarea name="contenu" id="contenu" required minlength="20" rows="6" placeholder="Racontez votre plus belle anecdote au Repaire des Moustaches..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; resize: vertical;"></textarea>
                 </div>
 
-                <button type="submit" class="bouton-reserver" style="background-color: #FE7B7E; color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer;">🍔“¤ Soumettre l'histoire</button>
+                <button type="submit" class="bouton-reserver" style="background-color: #FE7B7E; color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer;">Soumettre l'histoire</button>
             </form>
         </div>
 

@@ -117,12 +117,12 @@ try {
                          data-nom="<?= htmlspecialchars(strtolower($chat['nom'])) ?>">
                     <div>
                         <picture>
-                            <img src="<?= htmlspecialchars($chat['photo_url']) ?>" 
+                            <img src="<?= htmlspecialchars($chat['photo'] ?? 'images/chat1.webp') ?>" 
                                  alt="<?= htmlspecialchars($chat['nom']) ?>" 
                                  width="220" 
                                  height="220" 
                                  loading="lazy" 
-                                 onerror="this.src='images/chats/chat1.jpg'"
+                                 onerror="this.src='images/chat1.webp'"
                                  style="border-radius: 50%; object-fit: cover; margin: 0 auto 15px; display: block; width: 220px; height: 220px;">
                         </picture>
 

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 $sitePrefix = '';
 // ============================================================
-// 🍔”’ BLOCAGE DES REQUàŠTES GET (sécurité)
+// Blocage des requêtes GET (sécurité)
 // ============================================================
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

@@ -1,10 +1,14 @@
 <?php
 declare(strict_types=1);
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 session_start();
 
 // Contrôle d'accès
-if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'admin') {
+if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
@@ -30,16 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'ajouter' || $action === 'modifier') {
             // Données du formulaire
-$nom = trim($_POST['nom'] ?? '');
-$age = (int)($_POST['age'] ?? 0);
-$caractere = trim($_POST['caractere'] ?? '');
-$description = trim($_POST['description'] ?? '');
+            $nom = trim($_POST['nom'] ?? '');
+            $age = (int)($_POST['age'] ?? 0);
+            $caractere = trim($_POST['caractere'] ?? '');
+            $description = trim($_POST['description'] ?? '');
             $statut = trim((string) ($_POST['statut'] ?? 'a_l_adoption'));
             $refuge_id = !empty($_POST['refuge_id']) ? (int)$_POST['refuge_id'] : null;
             $admin_id = $_SESSION['admin_id'];
 
             // Téléversement de l'image
-            $photo_url = trim((string) ($_POST['current_image'] ?? ''));
+            $photo = trim((string) ($_POST['current_image'] ?? ''));
             if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                 $file_tmp = $_FILES['photo']['tmp_name'];
                 $file_name = basename($_FILES['photo']['name']);
@@ -81,7 +85,7 @@ $description = trim($_POST['description'] ?? '');
                     }
 
                     if ($image_created) {
-                        $photo_url = 'images/' . $new_filename;
+                        $photo = 'images/' . $new_filename;
                     } else {
                         $error = "Erreur lors de la conversion de l'image en WebP.";
                     }
@@ -96,19 +100,19 @@ $description = trim($_POST['description'] ?? '');
                 try {
                     if ($action === 'ajouter') {
                         $stmt = $pdo->prepare('
-                            INSERT INTO pensionnaires (nom, age, description, caractere, photo_url, statut, refuge_id, admin_id)
+                            INSERT INTO pensionnaires (nom, age, description, caractere, photo, statut, refuge_id, admin_id)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                         ');
-                        $stmt->execute([$nom, $age, $description, $caractere, $photo_url, $statut, $refuge_id, $admin_id]);
+                        $stmt->execute([$nom, $age, $description, $caractere, $photo, $statut, $refuge_id, $admin_id]);
                         $message = '✓ Pensionnaire ajouté avec succès !';
                     } else {
                         $id = (int)($_POST['id'] ?? 0);
                         $stmt = $pdo->prepare('
                             UPDATE pensionnaires 
-                            SET nom = ?, age = ?, description = ?, caractere = ?, photo_url = ?, statut = ?, refuge_id = ?
+                            SET nom = ?, age = ?, description = ?, caractere = ?, photo = ?, statut = ?, refuge_id = ?
                             WHERE id = ?
                         ');
-                        $stmt->execute([$nom, $age, $description, $caractere, $photo_url, $statut, $refuge_id, $id]);
+                        $stmt->execute([$nom, $age, $description, $caractere, $photo, $statut, $refuge_id, $id]);
                         $message = '✓ Fiche du pensionnaire mise à jour avec succès !';
                     }
                 } catch (PDOException $e) {
@@ -158,7 +162,7 @@ $stmt = $pdo->prepare('
     FROM pensionnaires p 
     LEFT JOIN refuges_partenaires r ON p.refuge_id = r.id 
     ORDER BY p.id DESC
-$');
+');
 $stmt->execute();
 $pensionnaires = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -259,7 +263,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <input type="hidden" name="action" value="<?php echo $edit_pensionnaire ? 'modifier' : 'ajouter'; ?>">
                     <?php if ($edit_pensionnaire): ?>
                         <input type="hidden" name="id" value="<?php echo $edit_pensionnaire['id']; ?>">
-                        <input type="hidden" name="current_image" value="<?php echo htmlspecialchars((string) ($edit_pensionnaire['photo_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="hidden" name="current_image" value="<?php echo htmlspecialchars((string) ($edit_pensionnaire['photo'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                     <?php endif; ?>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -309,8 +313,8 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="form-group">
                             <label for="photo">Photo du matou (convertie auto en WebP)</label>
                             <input type="file" id="photo" name="photo" accept="image/webp,image/png,image/jpeg">
-                            <?php if ($edit_pensionnaire && !empty($edit_pensionnaire['photo_url'])): ?>
-                                <p style="font-size: 12px; margin-top: 5px; color: #666;">Photo actuelle : <?php echo htmlspecialchars((string) $edit_pensionnaire['photo_url'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            <?php if ($edit_pensionnaire && !empty($edit_pensionnaire['photo'])): ?>
+                                <p style="font-size: 12px; margin-top: 5px; color: #666;">Photo actuelle : <?php echo htmlspecialchars((string) $edit_pensionnaire['photo'], ENT_QUOTES, 'UTF-8'); ?></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -344,7 +348,7 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($pensionnaires as $p): ?>
                             <div class="produit-card">
                                 <?php 
-                                    $img_file = !empty($p['photo_url']) ? htmlspecialchars((string) $p['photo_url'], ENT_QUOTES, 'UTF-8') : '';
+                                    $img_file = !empty($p['photo']) ? htmlspecialchars((string) $p['photo'], ENT_QUOTES, 'UTF-8') : '';
                                     $image_path = !empty($img_file) ? '/' . ltrim($img_file, '/') : '/images/chat1.webp';
                                 ?>
                                 <img src="<?php echo $image_path; ?>" 
@@ -395,4 +399,4 @@ $refuges = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     ?>
 </body>
-</html>
+</html>-

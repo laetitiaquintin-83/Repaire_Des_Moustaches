@@ -188,11 +188,11 @@ if ($commande_id > 0) {
     <!-- Header -->
     <header style="background: white; border-bottom: 2px solid #85D6CD; position: sticky; top: 0; z-index: 100;">
         <nav style="max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🍔§” Repaire</a>
+            <a href="../index.php" style="font-family: 'Pacifico', cursive; font-size: 1.5rem; color: #2B2B2B; text-decoration: none; font-weight: bold;">🐾 Repaire</a>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <a href="../index.php">Accueil</a>
                 <a href="../public/boutique.php">Boutique</a>
-                <a href="cart.php" style="color: #2B2B2B;">🍔›’ Panier</a>
+                <a href="cart.php" style="color: #2B2B2B;">Panier</a>
             </div>
         </nav>
     </header>
@@ -200,7 +200,7 @@ if ($commande_id > 0) {
     <div class="confirmation-container">
         <?php if ($commande): ?>
             <div class="confirmation-card">
-                <div class="confirmation-icon">œ“</div>
+                <div class="confirmation-icon">✓</div>
                 <h1 class="confirmation-title">Commande confirmée !</h1>
                 <p class="confirmation-subtitle">Merci pour votre achat</p>
                 
@@ -238,7 +238,7 @@ if ($commande_id > 0) {
                 </div>
                 
                 <div class="info-box">
-                            🍔“§ <strong>Confirmation envoyée!</strong> Un email de confirmation a été envoyé à  <strong><?php echo htmlspecialchars((string) $commande['email'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                            ✓ <strong>Confirmation envoyée !</strong> Un email de confirmation a été envoyé à <strong><?php echo htmlspecialchars((string) $commande['email'], ENT_QUOTES, 'UTF-8'); ?></strong>
                 </div>
                 
                 <div class="actions">
@@ -248,7 +248,7 @@ if ($commande_id > 0) {
             </div>
         <?php else: ?>
             <div class="confirmation-card">
-                <div style="font-size: 3rem; margin-bottom: 20px;">âŒ</div>
+                <div style="font-size: 3rem; margin-bottom: 20px;">✦</div>
                 <h1 class="confirmation-title">Commande introuvable</h1>
                 <p class="confirmation-subtitle">Nous n'avons pas trouvé cette commande</p>
                 <a href="boutique.php" class="btn btn-primary" style="margin-top: 30px;">Retour à  la boutique</a>
