@@ -37,13 +37,28 @@ function getPDO(): PDO
     }
 
     // Détection de l'environnement (Local vs Plesk)
-    $isLocal = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || stripos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+    $httpHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+    $isLocal = (
+        $httpHost === 'localhost'
+        || strpos($httpHost, '127.0.0.1') !== false
+        || strpos($httpHost, '.test') !== false
+        || strpos($httpHost, '.local') !== false
+        || strpos($httpHost, 'laragon') !== false
+    );
 
-    // Variables d'environnement : à définir dans Plesk / serveur de production.
-    $host = getenv('DB_HOST') ?: ($isLocal ? '127.0.0.1' : 'localhost');
-    $dbname = getenv('DB_NAME') ?: ($isLocal ? 'repaire_des_moustaches' : 'laetitia-quintin_repaire_des_moustaches');
-    $username = getenv('DB_USER') ?: ($isLocal ? 'root' : 'laetitia-quintin');
-    $password = getenv('DB_PASS') ?: '';
+    // En local, on force toujours les identifiants Laragon pour ne pas être écrasés par des variables Apache de prod.
+    if ($isLocal) {
+        $host = '127.0.0.1';
+        $dbname = 'repaire_des_moustaches';
+        $username = 'root';
+        $password = '';
+    } else {
+        // Variables d'environnement : à définir dans Plesk / serveur de production.
+        $host = getenv('DB_HOST') ?: 'localhost';
+        $dbname = getenv('DB_NAME') ?: 'laetitia-quintin_repaire_des_moustaches';
+        $username = getenv('DB_USER') ?: 'laetitia-quintin';
+        $password = getenv('DB_PASS') ?: '';
+    }
 
     $charset = 'utf8mb4';
 

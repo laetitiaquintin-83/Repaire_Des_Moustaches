@@ -1,1 +1,18 @@
 ErrorDocument 404 /404.php
+
+# Les identifiants sensibles ne doivent pas être stockés dans le dépôt.
+# En local, le projet utilise les valeurs Laragon par défaut.
+# En production, ces variables doivent être définies côté Apache/Plesk.
+#
+# Exemple de configuration serveur :
+# SetEnv DB_HOST "127.0.0.1"
+# SetEnv DB_NAME "repaire_des_moustaches"
+# SetEnv DB_USER "root"
+# SetEnv DB_PASS ""
+#
+# Exemple production :
+# SetEnv DB_HOST "localhost"
+# SetEnv DB_NAME "nom_de_la_base"
+# SetEnv DB_USER "utilisateur_db"
+# SetEnv DB_PASS "mot_de_passe_secure"
+# SetEnv STRIPE_SECRET_KEY "..."
