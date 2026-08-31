@@ -4,17 +4,14 @@ declare(strict_types=1);
 $sitePrefix = '';
 session_start();
 
-// Configuration de base pour le dépôt local ou le serveur de prod.
-$host = getenv('DB_HOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: 'repaire_des_moustaches';
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+// Connexion à la base de données via la configuration partagée du projet
+require_once __DIR__ . '/../config/database.php';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getPDO();
 } catch (PDOException $e) {
-    die('Erreur BDD : ' . $e->getMessage());
+    error_log('Erreur BDD (soumettre-histoire) : ' . $e->getMessage());
+    die('Une erreur est survenue. Veuillez réessayer plus tard.');
 }
 
 // Token CSRF

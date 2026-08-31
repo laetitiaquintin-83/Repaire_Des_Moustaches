@@ -1,8 +1,4 @@
 <?php
-// Diagnostics (dev only) — turn off before production
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 
 try {
     if (session_status() === PHP_SESSION_NONE) {
