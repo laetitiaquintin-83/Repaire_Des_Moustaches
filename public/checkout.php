@@ -152,13 +152,16 @@ try {
     }
 
 } catch (Throwable $e) {
-    // Si une erreur survient n'importe où, elle sera affichée en grand
-    echo "<div style='background:#f8d7da; color:#721c24; padding:20px; font-family:sans-serif; border:2px solid #f5c6cb;'>";
-    echo "<h2>❌ Erreur PHP interceptée :</h2>";
-    echo "<p><strong>Message :</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-    echo "<p><strong>Fichier :</strong> " . htmlspecialchars($e->getFile()) . " (Ligne " . $e->getLine() . ")</p>";
-    echo "</div>";
-    exit;
+    // Détails de l'erreur dans les logs uniquement — jamais exposés à l'utilisateur
+    error_log('[checkout.php] Erreur : ' . $e->getMessage() . ' (' . $e->getFile() . ':' . $e->getLine() . ')');
+
+    // Valeurs par défaut pour que la page puisse se rendre même en cas d'erreur précoce
+    $cart = $_SESSION['cart'] ?? [];
+    $total_price = 0;
+    $csrf_token = $_SESSION['csrf_token'] ?? '';
+    $user = null;
+    $error = 'Une erreur est survenue lors du traitement de votre commande. Veuillez réessayer.';
+    // (l'erreur est affichée via le bloc $error existant dans le HTML)
 }
 ?>
 <!DOCTYPE html>

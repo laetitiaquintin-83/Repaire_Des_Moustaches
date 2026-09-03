@@ -42,22 +42,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $tmp_name = $_FILES['image']['tmp_name'];
-                $filename = basename($_FILES['image']['name']);
-                
-                // Nettoyage du nom de fichier
-                $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
-                
-                $upload_dir = __DIR__ . '/../../public/images/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
+                $file_tmp = $_FILES['image']['tmp_name'];
+                $file_name = basename($_FILES['image']['name']);
+                $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
-                $target_path = $upload_dir . $filename;
-                if (move_uploaded_file($tmp_name, $target_path)) {
-                    $image_path = 'images/' . $filename;
+                if (in_array($ext, $allowed, true)) {
+                    $upload_dir = __DIR__ . '/../images/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+
+                    $new_filename = uniqid('atelier_', true) . '.webp';
+                    $target_path = $upload_dir . $new_filename;
+
+                    // Vérification du contenu réel de l'image via GD, puis conversion WebP
+                    $image_created = false;
+                    if ($ext === 'webp') {
+                        $image_created = move_uploaded_file($file_tmp, $target_path);
+                    } else {
+                        $source_img = null;
+                        if ($ext === 'jpg' || $ext === 'jpeg') {
+                            $source_img = @imagecreatefromjpeg($file_tmp);
+                        } elseif ($ext === 'png') {
+                            $source_img = @imagecreatefrompng($file_tmp);
+                            if ($source_img) {
+                                imagepalettetotruecolor($source_img);
+                                imagealphablending($source_img, true);
+                                imagesavealpha($source_img, true);
+                            }
+                        }
+
+                        if ($source_img) {
+                            $image_created = imagewebp($source_img, $target_path, 80);
+                            imagedestroy($source_img);
+                        }
+                    }
+
+                    if ($image_created) {
+                        $image_path = 'images/' . $new_filename;
+                    } else {
+                        $error = "Erreur lors de la conversion de l'image en WebP.";
+                    }
                 } else {
-                    $error = 'Erreur lors de l\'enregistrement de l\'image sur le serveur.';
+                    $error = "Format d'image non supporté (utilisez JPG, PNG ou WebP).";
                 }
             }
 
