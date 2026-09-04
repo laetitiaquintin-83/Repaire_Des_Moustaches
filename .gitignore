@@ -3,29 +3,27 @@
 Thumbs.db
 *.log
 
-# Node.js
-node_modules/
-package-lock.json
-
-# IDE
-.vscode/
-.idea/
-
-# Build scripts
-minify-assets.js
-minify-assets.sh
-optimize-images.js
-
-# IDE
+# IDE & Outils local
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+# AI Assistant config
+.freebuff/
+
 # Dependencies
 node_modules/
 vendor/
+package-lock.json
+
+# Build & Scripts
+dist/
+build/
+minify-assets.js
+minify-assets.sh
+optimize-images.js
 
 # Environment
 .env
@@ -33,10 +31,6 @@ vendor/
 !.env.example
 .env.local
 .env.*.local
-
-# Build
-dist/
-build/
 
 # Database
 *.sql.bak
